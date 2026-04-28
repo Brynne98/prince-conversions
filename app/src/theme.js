@@ -1,0 +1,32 @@
+export const C = {
+  cream: '#FAF5EC',
+  creamDeep: '#F2EADB',
+  paper: '#FFFBF3',
+  ink: '#2A1F18',
+  ink70: 'rgba(42,31,24,0.70)',
+  ink50: 'rgba(42,31,24,0.50)',
+  ink30: 'rgba(42,31,24,0.28)',
+  ink10: 'rgba(42,31,24,0.10)',
+  ink06: 'rgba(42,31,24,0.06)',
+  terracotta: '#C2562E',
+  terracottaDeep: '#A8451F',
+  terracottaSoft: '#EFD9CC',
+  sage: '#7A8F6E',
+  sageSoft: '#DDE5D4',
+  butter: '#E9B85B',
+  divider: 'rgba(42,31,24,0.08)',
+  cream0: 'rgba(255,247,238,0)',
+  onTerracotta: '#FFF7EE',
+  onTerracotta85: 'rgba(255,247,238,0.85)',
+  onTerracotta70: 'rgba(255,247,238,0.70)',
+  onTerracotta60: 'rgba(255,247,238,0.60)',
+  onTerracotta20: 'rgba(255,247,238,0.20)',
+  onTerracotta18: 'rgba(255,247,238,0.18)',
+};
+
+export const FONT = {
+  ui: 'System',
+  uiSemi: 'System',
+  display: 'Fraunces_500Medium',
+  displayBold: 'Fraunces_600SemiBold',
+};
