@@ -36,6 +36,7 @@ function Root() {
   const [hydrated, setHydrated] = useState(false);
 
   const [unit, setUnit] = useState('F');
+  const [targetUnit, setTargetUnit] = useState('F');
   const [ovenTemp, setOvenTemp] = useState(425);
   const [ovenTime, setOvenTime] = useState(25);
   const [direction, setDirection] = useState('oven-to-air');
@@ -75,6 +76,8 @@ function Root() {
       const s = await loadState();
       if (s) {
         if (s.unit) setUnit(s.unit);
+        if (s.targetUnit) setTargetUnit(s.targetUnit);
+        else if (s.unit) setTargetUnit(s.unit); // migrate single-unit users
         if (typeof s.ovenTemp === 'number') setOvenTemp(s.ovenTemp);
         if (typeof s.ovenTime === 'number') setOvenTime(s.ovenTime);
         if (s.direction) setDirection(s.direction);
@@ -86,8 +89,8 @@ function Root() {
 
   useEffect(() => {
     if (!hydrated) return;
-    saveState({ unit, ovenTemp, ovenTime, direction, items });
-  }, [hydrated, unit, ovenTemp, ovenTime, direction, items]);
+    saveState({ unit, targetUnit, ovenTemp, ovenTime, direction, items });
+  }, [hydrated, unit, targetUnit, ovenTemp, ovenTime, direction, items]);
 
   // Hide the splash as soon as fonts are ready; AsyncStorage hydration
   // continues in the background and items pop in when ready.
@@ -166,6 +169,7 @@ function Root() {
       <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ translateX: converterTx }] }]}>
         <ConverterScreen
           unit={unit} setUnit={setUnit}
+          targetUnit={targetUnit} setTargetUnit={setTargetUnit}
           ovenTemp={ovenTemp} setOvenTemp={setOvenTemp}
           ovenTime={ovenTime} setOvenTime={setOvenTime}
           direction={direction} setDirection={setDirection}

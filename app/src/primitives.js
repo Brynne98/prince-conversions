@@ -49,8 +49,30 @@ function HoldButton({ onTrigger, children, style }) {
   );
 }
 
+// Renders mixed-size time text: "20 min" / "1hr 20min" / "2hr"
+function TimeRich({ minutes, baseStyle, suffixStyle }) {
+  if (minutes < 60) {
+    return (
+      <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+        {minutes}
+        <Text style={suffixStyle}> min</Text>
+      </Text>
+    );
+  }
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return (
+    <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+      {h}
+      <Text style={suffixStyle}>hr</Text>
+      {m > 0 ? ` ${m}` : ''}
+      {m > 0 ? <Text style={suffixStyle}>min</Text> : null}
+    </Text>
+  );
+}
+
 // ─── Stepper ─────────────────────────────────────────────────────────
-export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, big = false }) {
+export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, formatTime = false, big = false }) {
   const valueRef = useRef(value);
   useEffect(() => { valueRef.current = value; }, [value]);
 
@@ -78,15 +100,23 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, big
         <Minus s={20} c={C.ink} />
       </HoldButton>
       <View style={styles.stepperValueWrap}>
-        <Text
-          style={[styles.stepperValue, { fontSize: valueSize, lineHeight: valueSize }]}
-          numberOfLines={1}
-        >
-          {value}
-          {suffix ? (
-            <Text style={[styles.stepperSuffix, { fontSize: suffixSize }]}>{suffix}</Text>
-          ) : null}
-        </Text>
+        {formatTime ? (
+          <TimeRich
+            minutes={value}
+            baseStyle={[styles.stepperValue, { fontSize: valueSize, lineHeight: valueSize }]}
+            suffixStyle={[styles.stepperSuffix, { fontSize: suffixSize }]}
+          />
+        ) : (
+          <Text
+            style={[styles.stepperValue, { fontSize: valueSize, lineHeight: valueSize }]}
+            numberOfLines={1}
+          >
+            {value}
+            {suffix ? (
+              <Text style={[styles.stepperSuffix, { fontSize: suffixSize }]}>{suffix}</Text>
+            ) : null}
+          </Text>
+        )}
       </View>
       <HoldButton onTrigger={inc} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
         <Plus s={20} c={C.ink} />
@@ -151,7 +181,8 @@ export function RoundButton({ onPress, children, size = 44 }) {
 }
 
 // ─── Segmented control ───────────────────────────────────────────────
-export function Segmented({ options, value, onChange, compact = false }) {
+export function Segmented({ options, value, onChange, compact = false, tone = 'default' }) {
+  const onTerracotta = tone === 'onTerracotta';
   const idx = Math.max(0, options.findIndex(o => o.value === value));
   const slide = useRef(new Animated.Value(idx)).current;
   useEffect(() => {
@@ -166,9 +197,14 @@ export function Segmented({ options, value, onChange, compact = false }) {
   const padH = compact ? 14 : 18;
   const fontSize = compact ? 13 : 14;
 
+  const trackBg = onTerracotta ? 'rgba(255,247,238,0.18)' : C.ink06;
+  const pillBg = onTerracotta ? '#FFF7EE' : C.paper;
+  const inactiveColor = onTerracotta ? 'rgba(255,247,238,0.75)' : C.ink50;
+  const activeColor = onTerracotta ? C.terracotta : C.ink;
+
   return (
-    <View style={styles.segWrap}>
-      <SegmentedTrack count={options.length} slide={slide} />
+    <View style={[styles.segWrap, { backgroundColor: trackBg }]}>
+      <SegmentedTrack count={options.length} slide={slide} pillBg={pillBg} />
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -186,7 +222,7 @@ export function Segmented({ options, value, onChange, compact = false }) {
               fontFamily: FONT.ui,
               fontSize,
               fontWeight: '600',
-              color: active ? C.ink : C.ink50,
+              color: active ? activeColor : inactiveColor,
               letterSpacing: -0.1,
             }}>{o.label}</Text>
           </Pressable>
@@ -196,7 +232,7 @@ export function Segmented({ options, value, onChange, compact = false }) {
   );
 }
 
-function SegmentedTrack({ count, slide }) {
+function SegmentedTrack({ count, slide, pillBg = C.paper }) {
   const [width, setWidth] = useState(0);
   const segW = width > 0 ? (width - 6) / count : 0;
   const left = slide.interpolate({
@@ -217,7 +253,7 @@ function SegmentedTrack({ count, slide }) {
             bottom: 3,
             left,
             width: segW,
-            backgroundColor: C.paper,
+            backgroundColor: pillBg,
             borderRadius: 999,
             shadowColor: '#000',
             shadowOpacity: 0.08,

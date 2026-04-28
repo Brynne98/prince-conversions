@@ -6,7 +6,7 @@ import * as Haptics from 'expo-haptics';
 import { C, FONT } from '../theme';
 import { Back, Search, Trash } from '../icons';
 import { AdSlot, RoundButton } from '../primitives';
-import { cToF, fToC } from '../convert';
+import { cToF, fToC, formatMinutesShort } from '../convert';
 
 export default function SavedScreen({ items, onClose, onDelete, unit, topInset = 0 }) {
   const [query, setQuery] = useState('');
@@ -103,12 +103,12 @@ function SavedRow({ item, unit, onDelete }) {
         <View style={styles.tagRow}>
           <View style={[styles.tag, { backgroundColor: C.creamDeep }]}>
             <Text style={[styles.tagText, { color: C.ink70 }]}>
-              Oven {ovenT}°{unit} · {item.ovenTime}m
+              Oven {ovenT}°{unit} · {formatMinutesShort(item.ovenTime)}
             </Text>
           </View>
           <View style={[styles.tag, { backgroundColor: C.terracottaSoft }]}>
             <Text style={[styles.tagText, { color: C.terracottaDeep }]}>
-              Air {airT}°{unit} · {item.afTime}m
+              Air {airT}°{unit} · {formatMinutesShort(item.afTime)}
             </Text>
           </View>
         </View>

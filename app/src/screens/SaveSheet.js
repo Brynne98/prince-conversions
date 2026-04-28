@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { C, FONT } from '../theme';
+import { formatMinutes } from '../convert';
 
 const EMOJI_OPTS = [
   '🍟','🍗','🐟','🥕','🥓','🍕','🥖','🥔','🧆','🍪','🥩','🌽',
@@ -126,11 +127,11 @@ export default function SaveSheet({
               <Text style={styles.summaryKicker}>SAVING BOTH</Text>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryText}>
-                  <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {ovenValues.time} min
+                  <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
                 </Text>
                 <Text style={[styles.summaryText, { opacity: 0.5 }]}>↔</Text>
                 <Text style={styles.summaryText}>
-                  <Text style={{ fontWeight: '700' }}>Air fryer</Text> {airValues.temp}°{unit} · {airValues.time} min
+                  <Text style={{ fontWeight: '700' }}>Air fryer</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
                 </Text>
               </View>
             </View>

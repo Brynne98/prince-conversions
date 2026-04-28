@@ -11,13 +11,20 @@ import { convert, fToC, cToF } from '../convert';
 
 export default function ConverterScreen({
   unit, setUnit,
+  targetUnit, setTargetUnit,
   ovenTemp, setOvenTemp,
   ovenTime, setOvenTime,
   direction, setDirection,
   onOpenSaved, onOpenSettings, onSave, onStartTimer,
   topInset = 0, bottomInset = 0,
 }) {
-  const result = convert(ovenTemp, unit, ovenTime, direction);
+  const sameUnitResult = convert(ovenTemp, unit, ovenTime, direction);
+  const result = unit === targetUnit
+    ? sameUnitResult
+    : {
+        temp: unit === 'F' ? fToC(sameUnitResult.temp) : cToF(sameUnitResult.temp),
+        time: sameUnitResult.time,
+      };
   const tempStep = 5;
   const tempMin = unit === 'F' ? 200 : 95;
   const tempMax = unit === 'F' ? 500 : 260;
@@ -117,7 +124,7 @@ export default function ConverterScreen({
             step={1}
             min={1}
             max={240}
-            suffix=" min"
+            formatTime
           />
         </Card>
 
@@ -139,21 +146,49 @@ export default function ConverterScreen({
         >
           <View style={styles.resultHeader}>
             <Text style={styles.resultKicker}>{targetLabel}</Text>
+            <Segmented
+              compact
+              tone="onTerracotta"
+              options={[{ value: 'C', label: '°C' }, { value: 'F', label: '°F' }]}
+              value={targetUnit}
+              onChange={(u) => {
+                if (u !== targetUnit) {
+                  setTargetUnit(u);
+                  Haptics.selectionAsync();
+                }
+              }}
+            />
           </View>
 
           <View style={styles.resultRow}>
             <View style={styles.resultCol}>
               <Text style={styles.resultBig} numberOfLines={1}>
                 {result.temp}
-                <Text style={styles.resultBigSuffix}>°{unit}</Text>
+                <Text style={styles.resultBigSuffix}>°{targetUnit}</Text>
               </Text>
               <Text style={styles.resultLabel}>TEMPERATURE</Text>
             </View>
             <View style={styles.resultDivider} />
             <View style={styles.resultCol}>
-              <Text style={styles.resultBig} numberOfLines={1}>
-                {result.time}
-                <Text style={styles.resultBigSuffix}> min</Text>
+              <Text
+                style={styles.resultBig}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.6}
+              >
+                {result.time < 60 ? (
+                  <>
+                    {result.time}
+                    <Text style={styles.resultBigSuffix}> min</Text>
+                  </>
+                ) : (
+                  <>
+                    {Math.floor(result.time / 60)}
+                    <Text style={styles.resultBigSuffix}>hr</Text>
+                    {result.time % 60 > 0 ? ` ${result.time % 60}` : ''}
+                    {result.time % 60 > 0 ? <Text style={styles.resultBigSuffix}>min</Text> : null}
+                  </>
+                )}
               </Text>
               <Text style={styles.resultLabel}>TIME</Text>
             </View>

@@ -27,6 +27,22 @@ export function convert(temp, unit, time, direction) {
 export const fToC = (f) => Math.round(((f - 32) * 5) / 9 / 5) * 5;
 export const cToF = (c) => Math.round((c * 9 / 5 + 32) / 5) * 5;
 
+// "20 min" / "1hr 20min" / "2hr"
+export function formatMinutes(min) {
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m === 0 ? `${h}hr` : `${h}hr ${m}min`;
+}
+
+// Short form for tight chips: "20m" / "1h 20m" / "2h"
+export function formatMinutesShort(min) {
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}
+
 export const FOOD_PRESETS = [
   { id: 'fries',   name: 'Fries',         emoji: '🍟', tempF: 425, time: 25 },
   { id: 'chicken', name: 'Chicken wings', emoji: '🍗', tempF: 400, time: 35 },
