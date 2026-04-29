@@ -14,24 +14,34 @@ import SettingsSheet from './src/screens/SettingsSheet';
 import TimerStack from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
-import { C } from './src/theme';
+import { ThemeProvider, useTheme, useStyles } from './src/theme';
 import { convert, fToC, FOOD_PRESETS, SEED_RECIPES } from './src/convert';
 import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
+import { IapProvider } from './src/iap';
+import { initAds } from './src/ads';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions?.({ duration: 250, fade: true });
 
 export default function App() {
+  const [mode, setMode] = useState('light');
+  useEffect(() => { initAds(); }, []);
   return (
     <SafeAreaProvider>
-      <Root />
-      <StatusBar style="dark" />
+      <ThemeProvider mode={mode} setMode={setMode}>
+        <IapProvider>
+          <Root themeMode={mode} setThemeMode={setMode} />
+          <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+        </IapProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
 
-function Root() {
+function Root({ themeMode, setThemeMode }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const [hydrated, setHydrated] = useState(false);
 
@@ -82,6 +92,7 @@ function Root() {
         if (typeof s.ovenTime === 'number') setOvenTime(s.ovenTime);
         if (s.direction) setDirection(s.direction);
         if (Array.isArray(s.items)) setItems(s.items);
+        if (s.themeMode === 'dark' || s.themeMode === 'light') setThemeMode(s.themeMode);
       }
       setHydrated(true);
     })();
@@ -89,8 +100,8 @@ function Root() {
 
   useEffect(() => {
     if (!hydrated) return;
-    saveState({ unit, targetUnit, ovenTemp, ovenTime, direction, items });
-  }, [hydrated, unit, targetUnit, ovenTemp, ovenTime, direction, items]);
+    saveState({ unit, targetUnit, ovenTemp, ovenTime, direction, items, themeMode });
+  }, [hydrated, unit, targetUnit, ovenTemp, ovenTime, direction, items, themeMode]);
 
   // Hide the splash as soon as fonts are ready; AsyncStorage hydration
   // continues in the background and items pop in when ready.
@@ -189,6 +200,13 @@ function Root() {
           items={items}
           onClose={() => setView('converter')}
           onDelete={doDelete}
+          onStart={(item, mode) => {
+            const isAir = mode !== 'oven';
+            const minutes = isAir ? item.afTime : item.ovenTime;
+            const label = `${item.emoji} ${item.name || 'Recipe'}${isAir ? '' : ' · oven'}`;
+            cookTimers.start(minutes, label);
+            showToast(`Timer · ${item.name || 'recipe'}`);
+          }}
           unit={unit}
           topInset={topInset}
         />
@@ -208,6 +226,8 @@ function Root() {
       <SettingsSheet
         visible={showSettings}
         onClose={() => setShowSettings(false)}
+        mode={themeMode}
+        setMode={setThemeMode}
       />
 
       <TimerStack
@@ -256,7 +276,7 @@ function Root() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream, overflow: 'hidden' },
   toastWrap: {
     position: 'absolute',
@@ -269,13 +289,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 999,
     shadowColor: '#000',
-    shadowOpacity: 0.25,
+    shadowOpacity: C.isDark ? 0.5 : 0.25,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
   toastText: {
-    color: '#FFF7EE',
+    // C.cream is the page bg color, so on a C.ink (inverse) toast it
+    // gives high contrast in both light and dark modes.
+    color: C.cream,
     fontSize: 14,
     fontWeight: '500',
   },

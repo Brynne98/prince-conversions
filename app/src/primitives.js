@@ -3,12 +3,10 @@ import {
   Pressable, Text, View, Animated, StyleSheet,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { C, FONT } from './theme';
+import { FONT, useTheme, useStyles } from './theme';
 import { Plus, Minus } from './icons';
 
 // ─── Hold-to-repeat button ────────────────────────────────────────────
-// Tap fires onTrigger once. Holding past 320ms starts auto-repeat that
-// gets faster the longer you hold (clamped at 35ms between ticks).
 function HoldButton({ onTrigger, children, style }) {
   const timerRef = useRef(null);
   const triggerRef = useRef(onTrigger);
@@ -49,7 +47,51 @@ function HoldButton({ onTrigger, children, style }) {
   );
 }
 
-// Renders mixed-size time text: "20 min" / "1hr 20min" / "2hr"
+// ─── Custom toggle ───────────────────────────────────────────────────
+export function Toggle({ value, onValueChange, onColor }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
+  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+  useEffect(() => {
+    Animated.spring(anim, {
+      toValue: value ? 1 : 0,
+      damping: 18,
+      stiffness: 280,
+      useNativeDriver: true,
+    }).start();
+  }, [value, anim]);
+
+  const thumbX = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 20],
+  });
+
+  return (
+    <Pressable
+      onPress={() => {
+        onValueChange?.(!value);
+        Haptics.selectionAsync();
+      }}
+      hitSlop={8}
+    >
+      <View style={[styles.toggleTrack, { backgroundColor: C.ink10 }]}>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: onColor || C.terracotta, borderRadius: 14, opacity: anim },
+          ]}
+        />
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.toggleThumb, { transform: [{ translateX: thumbX }] }]}
+        />
+      </View>
+    </Pressable>
+  );
+}
+
+// Renders mixed-size time text.
 function TimeRich({ minutes, baseStyle, suffixStyle }) {
   if (minutes < 60) {
     return (
@@ -73,6 +115,9 @@ function TimeRich({ minutes, baseStyle, suffixStyle }) {
 
 // ─── Stepper ─────────────────────────────────────────────────────────
 export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, formatTime = false, big = false }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
+
   const valueRef = useRef(value);
   useEffect(() => { valueRef.current = value; }, [value]);
 
@@ -125,51 +170,8 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
   );
 }
 
-// ─── Custom toggle ───────────────────────────────────────────────────
-// Owns its own Animated.Value so parent re-renders (e.g. timer ticks)
-// don't interrupt the slide animation.
-export function Toggle({ value, onValueChange, onColor = C.terracotta }) {
-  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
-  useEffect(() => {
-    Animated.spring(anim, {
-      toValue: value ? 1 : 0,
-      damping: 18,
-      stiffness: 280,
-      useNativeDriver: true,
-    }).start();
-  }, [value, anim]);
-
-  const thumbX = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 20],
-  });
-
-  return (
-    <Pressable
-      onPress={() => {
-        onValueChange?.(!value);
-        Haptics.selectionAsync();
-      }}
-      hitSlop={8}
-    >
-      <View style={[styles.toggleTrack, { backgroundColor: C.ink10 }]}>
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            { backgroundColor: onColor, borderRadius: 14, opacity: anim },
-          ]}
-        />
-        <Animated.View
-          pointerEvents="none"
-          style={[styles.toggleThumb, { transform: [{ translateX: thumbX }] }]}
-        />
-      </View>
-    </Pressable>
-  );
-}
-
 export function RoundButton({ onPress, children, size = 44 }) {
+  const styles = useStyles(makeStyles);
   return (
     <Pressable onPress={onPress} hitSlop={8} style={({ pressed }) => [
       styles.roundBtn,
@@ -182,6 +184,8 @@ export function RoundButton({ onPress, children, size = 44 }) {
 
 // ─── Segmented control ───────────────────────────────────────────────
 export function Segmented({ options, value, onChange, compact = false, tone = 'default' }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const onTerracotta = tone === 'onTerracotta';
   const idx = Math.max(0, options.findIndex(o => o.value === value));
   const slide = useRef(new Animated.Value(idx)).current;
@@ -232,7 +236,7 @@ export function Segmented({ options, value, onChange, compact = false, tone = 'd
   );
 }
 
-function SegmentedTrack({ count, slide, pillBg = C.paper }) {
+function SegmentedTrack({ count, slide, pillBg }) {
   const [width, setWidth] = useState(0);
   const segW = width > 0 ? (width - 6) / count : 0;
   const left = slide.interpolate({
@@ -269,6 +273,7 @@ function SegmentedTrack({ count, slide, pillBg = C.paper }) {
 
 // ─── Ad slot ─────────────────────────────────────────────────────────
 export function AdSlot({ height = 64, label = 'Ad · 320×50 banner', native = false, style }) {
+  const styles = useStyles(makeStyles);
   if (native) {
     return (
       <View style={[styles.adNative, style]}>
@@ -290,10 +295,11 @@ export function AdSlot({ height = 64, label = 'Ad · 320×50 banner', native = f
 
 // ─── Card ────────────────────────────────────────────────────────────
 export function Card({ children, style }) {
+  const styles = useStyles(makeStyles);
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => ({
   stepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -327,19 +333,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
-    borderWidth: 0.5,
-    borderColor: C.ink10,
-  },
-  roundBtn: {
-    backgroundColor: C.paper,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
+    shadowOpacity: C.isDark ? 0.4 : 0.08,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
@@ -367,6 +361,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
+  roundBtn: {
+    backgroundColor: C.paper,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: C.isDark ? 0.4 : 0.08,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+    borderWidth: 0.5,
+    borderColor: C.ink10,
+  },
   segWrap: {
     position: 'relative',
     flexDirection: 'row',
@@ -380,7 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 18,
     shadowColor: '#000',
-    shadowOpacity: 0.06,
+    shadowOpacity: C.isDark ? 0.4 : 0.06,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,

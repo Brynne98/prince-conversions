@@ -3,13 +3,18 @@ import {
   View, Text, ScrollView, Pressable, TextInput, StyleSheet,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { C, FONT } from '../theme';
+import { FONT, useTheme, useStyles } from '../theme';
 import { Back, Search, Trash } from '../icons';
-import { AdSlot, RoundButton } from '../primitives';
+import { RoundButton, Segmented } from '../primitives';
+import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutesShort } from '../convert';
 
-export default function SavedScreen({ items, onClose, onDelete, unit, topInset = 0 }) {
+export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0 }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const [query, setQuery] = useState('');
+  const [displayUnit, setDisplayUnit] = useState(unit);
+  const [displayMode, setDisplayMode] = useState('air'); // 'oven' | 'air'
   const filtered = useMemo(
     () => items.filter(i => i.name.toLowerCase().includes(query.toLowerCase())),
     [items, query],
@@ -36,6 +41,21 @@ export default function SavedScreen({ items, onClose, onDelete, unit, topInset =
         <Text style={styles.subtitle}>
           {items.length} {items.length === 1 ? 'recipe' : 'recipes'}
         </Text>
+
+        <View style={styles.toggleRow}>
+          <Segmented
+            compact
+            options={[{ value: 'C', label: '°C' }, { value: 'F', label: '°F' }]}
+            value={displayUnit}
+            onChange={setDisplayUnit}
+          />
+          <Segmented
+            compact
+            options={[{ value: 'air', label: 'Air fryer' }, { value: 'oven', label: 'Oven' }]}
+            value={displayMode}
+            onChange={setDisplayMode}
+          />
+        </View>
 
         <View style={styles.searchBar}>
           <Search />
@@ -66,14 +86,19 @@ export default function SavedScreen({ items, onClose, onDelete, unit, topInset =
         ) : (
           <View style={{ gap: 10 }}>
             {rendered.map((r, idx) => r.kind === 'ad'
-              ? <AdSlot key={`ad-${idx}`} native />
+              ? <BannerAd key={`ad-${idx}`} />
               : <SavedRow
                   key={r.it.id}
                   item={r.it}
-                  unit={unit}
+                  unit={displayUnit}
+                  mode={displayMode}
                   onDelete={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     onDelete(r.it.id);
+                  }}
+                  onStart={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    onStart?.(r.it, displayMode);
                   }}
                 />
             )}
@@ -82,33 +107,37 @@ export default function SavedScreen({ items, onClose, onDelete, unit, topInset =
       </ScrollView>
 
       <View style={styles.stickyBanner}>
-        <AdSlot label="Ad · 320×50 sticky banner" height={56} />
+        <BannerAd />
       </View>
     </View>
   );
 }
 
-function SavedRow({ item, unit, onDelete }) {
+function SavedRow({ item, unit, mode, onDelete, onStart }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const conv = (val) => item.unit === unit ? val : (unit === 'F' ? cToF(val) : fToC(val));
-  const ovenT = conv(item.ovenTemp);
-  const airT = conv(item.afTemp);
+  const isAir = mode === 'air';
+  const temp = conv(isAir ? item.afTemp : item.ovenTemp);
+  const time = isAir ? item.afTime : item.ovenTime;
+  const tagBg = isAir ? C.terracottaSoft : C.creamDeep;
+  const tagFg = isAir ? C.terracottaDeep : C.ink70;
+  const label = isAir ? 'Air' : 'Oven';
 
   return (
-    <View style={styles.row}>
-      <View style={styles.rowEmojiBox}>
+    <Pressable
+      onPress={onStart}
+      style={({ pressed }) => [styles.row, { opacity: pressed ? 0.85 : 1 }]}
+    >
+      <View style={[styles.rowEmojiBox, { backgroundColor: tagBg }]}>
         <Text style={styles.rowEmoji}>{item.emoji}</Text>
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={styles.rowName} numberOfLines={1}>{item.name}</Text>
         <View style={styles.tagRow}>
-          <View style={[styles.tag, { backgroundColor: C.creamDeep }]}>
-            <Text style={[styles.tagText, { color: C.ink70 }]}>
-              Oven {ovenT}°{unit} · {formatMinutesShort(item.ovenTime)}
-            </Text>
-          </View>
-          <View style={[styles.tag, { backgroundColor: C.terracottaSoft }]}>
-            <Text style={[styles.tagText, { color: C.terracottaDeep }]}>
-              Air {airT}°{unit} · {formatMinutesShort(item.afTime)}
+          <View style={[styles.tag, { backgroundColor: tagBg }]}>
+            <Text style={[styles.tagText, { color: tagFg }]}>
+              {label} {temp}°{unit} · {formatMinutesShort(time)}
             </Text>
           </View>
         </View>
@@ -119,11 +148,11 @@ function SavedRow({ item, unit, onDelete }) {
       <Pressable onPress={onDelete} hitSlop={10} style={styles.trashBtn}>
         <Trash s={16} />
       </Pressable>
-    </View>
+    </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
   topBar: {
     paddingHorizontal: 20,
@@ -151,8 +180,15 @@ const styles = StyleSheet.create({
     color: C.ink50,
     marginTop: 2,
   },
-  searchBar: {
+  toggleRow: {
     marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  searchBar: {
+    marginTop: 12,
     backgroundColor: C.paper,
     borderRadius: 14,
     flexDirection: 'row',

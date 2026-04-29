@@ -4,7 +4,7 @@ import {
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { C, FONT } from '../theme';
+import { FONT, useTheme, useStyles } from '../theme';
 import { formatMinutes } from '../convert';
 
 const EMOJI_OPTS = [
@@ -20,6 +20,8 @@ export default function SaveSheet({
   draft, setDraft,
   ovenValues, airValues, unit,
 }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const valid = (draft.name || '').trim().length > 0 && (draft.emoji || '').trim().length > 0;
 
   return (
@@ -142,7 +144,7 @@ export default function SaveSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
   handle: {
     width: 36, height: 4, borderRadius: 2,

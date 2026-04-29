@@ -23,5 +23,10 @@
         "simulator": false
       }
     }
+  },
+  "submit": {
+    "production": {
+      "ios": {}
+    }
   }
 }

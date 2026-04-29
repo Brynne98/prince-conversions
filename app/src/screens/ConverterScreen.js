@@ -4,8 +4,9 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { C, FONT } from '../theme';
-import { Stepper, Segmented, Card, AdSlot, RoundButton } from '../primitives';
+import { FONT, useTheme, useStyles } from '../theme';
+import { Stepper, Segmented, Card, RoundButton } from '../primitives';
+import { BannerAd } from '../ads';
 import { Bookmark, Flame, Gear, List, Swap, Play } from '../icons';
 import { convert, fToC, cToF } from '../convert';
 
@@ -18,6 +19,8 @@ export default function ConverterScreen({
   onOpenSaved, onOpenSettings, onSave, onStartTimer,
   topInset = 0, bottomInset = 0,
 }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const sameUnitResult = convert(ovenTemp, unit, ovenTime, direction);
   const result = unit === targetUnit
     ? sameUnitResult
@@ -216,14 +219,14 @@ export default function ConverterScreen({
         </LinearGradient>
 
         <View style={{ marginTop: 22 }}>
-          <AdSlot label="Ad · 320×50 banner" />
+          <BannerAd />
         </View>
       </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
   topBar: {
     paddingHorizontal: 20,

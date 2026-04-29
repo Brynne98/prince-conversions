@@ -38,12 +38,27 @@
     },
     "plugins": [
       "expo-font",
-      "expo-audio"
+      "expo-audio",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-3005788156292964~1665576706",
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads."
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Allow this app to use your data to deliver personalized ads."
+        }
+      ]
     ],
     "extra": {
       "eas": {
         "projectId": "ad23e342-6da3-4d83-b69e-5d1ca2af6400"
-      }
+      },
+      "revenueCatIosApiKey": "appl_eWvOgxDYqxmPUybJsFvFneEcXhn"
     },
     "owner": "brynne98"
   }

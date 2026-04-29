@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
-import { C, FONT } from '../theme';
+import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Restart } from '../icons';
 import { Toggle } from '../primitives';
 import { formatRemaining } from '../timer';
@@ -16,6 +16,8 @@ export default function TimerScreen({
   remainingSec, totalSec, elapsedFrac, startedAt, label,
   remindHalfway, onToggleHalfway, completed,
 }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   const screenW = Dimensions.get('window').width;
   const ringSize = Math.min(screenW - 64, 320);
   const stroke = 14;
@@ -162,7 +164,7 @@ export default function TimerScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
   header: {
     paddingHorizontal: 20,

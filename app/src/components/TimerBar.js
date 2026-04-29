@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { C, FONT } from '../theme';
+import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
 
@@ -16,6 +16,7 @@ const MAX_PEEKS = 2;
 export default function TimerStack({
   timers, onPressTimer, onCancel, onRestart, bottomInset = 0,
 }) {
+  const styles = useStyles(makeStyles);
   const [expanded, setExpanded] = useState(false);
   const expand = useRef(new Animated.Value(0)).current;
 
@@ -127,6 +128,8 @@ export default function TimerStack({
 }
 
 function TimerCard({ timer, onPress, onCancel, onRestart }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
   // Pulse the card while it's in the completed/ringing state.
   const pulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -208,7 +211,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   card: {
     flex: 1,
     flexDirection: 'row',
