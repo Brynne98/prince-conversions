@@ -37,16 +37,12 @@ const TEST_BANNER = TestIds?.BANNER;
 
 // Replace the prod strings with your real banner unit IDs from
 // https://apps.admob.com once the AdMob app is set up.
-// TEMP: forcing test ads in production too so we can verify the SDK is
-// loading correctly while AdMob ramps fill rate. Revert this block to the
-// __DEV__ ternary before submitting to the App Store.
-const BANNER_UNIT_ID = TEST_BANNER;
-// const BANNER_UNIT_ID = __DEV__
-//   ? TEST_BANNER
-//   : Platform.select({
-//       ios: 'ca-app-pub-3005788156292964/5992983308',
-//       android: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-//     }) || TEST_BANNER;
+const BANNER_UNIT_ID = __DEV__
+  ? TEST_BANNER
+  : Platform.select({
+      ios: 'ca-app-pub-3005788156292964/5992983308',
+      android: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+    }) || TEST_BANNER;
 
 let adsInitialized = false;
 
