@@ -17,6 +17,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.brynneprince.airfryerconverter",
       "buildNumber": "1",
+      "icon": "./assets/icon-ios.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
