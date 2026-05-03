@@ -52,9 +52,3 @@ export const FOOD_PRESETS = [
   { id: 'pizza',   name: 'Pizza',         emoji: '🍕', tempF: 425, time: 14 },
 ];
 
-export const SEED_RECIPES = [
-  { id: 's1', name: 'Crispy fries',     emoji: '🍟', unit: 'F', ovenTemp: 425, ovenTime: 25, afTemp: 400, afTime: 20, note: 'Shake at 10 min' },
-  { id: 's2', name: 'Chicken wings',    emoji: '🍗', unit: 'F', ovenTemp: 400, ovenTime: 35, afTemp: 375, afTime: 28, note: 'Pat dry first' },
-  { id: 's3', name: 'Salmon fillet',    emoji: '🐟', unit: 'F', ovenTemp: 400, ovenTime: 18, afTemp: 375, afTime: 14, note: '' },
-  { id: 's4', name: 'Brussels sprouts', emoji: '🥬', unit: 'F', ovenTemp: 425, ovenTime: 20, afTemp: 400, afTime: 16, note: 'Cut in half' },
-];

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const KEY = '@afc/state-v1';
+const KEY = '@afc/state-v2';
 
 export async function loadState() {
   try {

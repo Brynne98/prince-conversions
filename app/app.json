@@ -3,16 +3,11 @@
     "name": "Air Fryer Converter",
     "slug": "prince-conversions",
     "scheme": "princeconversions",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FAF5EC"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.brynneprince.airfryerconverter",
@@ -40,6 +35,14 @@
     "plugins": [
       "expo-font",
       "expo-audio",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 140,
+          "backgroundColor": "#FAF5EC"
+        }
+      ],
       [
         "react-native-google-mobile-ads",
         {

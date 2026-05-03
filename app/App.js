@@ -15,7 +15,7 @@ import TimerStack from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
 import { ThemeProvider, useTheme, useStyles } from './src/theme';
-import { convert, fToC, FOOD_PRESETS, SEED_RECIPES } from './src/convert';
+import { convert, fToC, FOOD_PRESETS } from './src/convert';
 import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
 import { IapProvider } from './src/iap';
@@ -26,7 +26,6 @@ SplashScreen.setOptions?.({ duration: 250, fade: true });
 
 export default function App() {
   const [mode, setMode] = useState('light');
-  useEffect(() => { initAds(); }, []);
   return (
     <SafeAreaProvider>
       <ThemeProvider mode={mode} setMode={setMode}>
@@ -50,7 +49,7 @@ function Root({ themeMode, setThemeMode }) {
   const [ovenTemp, setOvenTemp] = useState(425);
   const [ovenTime, setOvenTime] = useState(25);
   const [direction, setDirection] = useState('oven-to-air');
-  const [items, setItems] = useState(SEED_RECIPES);
+  const [items, setItems] = useState([]);
 
   const [view, setView] = useState('converter');
   const [showSave, setShowSave] = useState(false);
@@ -110,6 +109,13 @@ function Root({ themeMode, setThemeMode }) {
       SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded]);
+
+  // Defer ATT + AdMob init until the splash is fully dismissed.
+  // Requesting ATT while another view is animating causes iOS to silently
+  // drop the system permission dialog (caught in App Review on iPad).
+  useEffect(() => {
+    if (splashGone) initAds();
+  }, [splashGone]);
 
   const screenW = Dimensions.get('window').width;
   const slide = useRef(new Animated.Value(0)).current;
