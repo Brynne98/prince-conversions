@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Air Fryer Converter — App Icon</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Caveat:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #1a1410;
+    font-family: 'Fraunces', serif;
+    color: #fbf6ec;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stage {
+    padding: 64px;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 80px;
+    align-items: end;
+  }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    opacity: 0.55;
+  }
+  .name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    opacity: 0.92;
+  }
+
+  /* Recipe-card icon — proportional to the rendered size */
+  .icon {
+    border-radius: calc(var(--size) * 0.225); /* iOS squircle approx */
+    background: #fbf6ec;
+    border: calc(var(--size) * 0.009) solid #2a201a;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 calc(var(--size) * 0.10) calc(var(--size) * 0.18) -8px rgba(0,0,0,0.45),
+      0 calc(var(--size) * 0.02) calc(var(--size) * 0.04) rgba(0,0,0,0.20);
+    width: var(--size); height: var(--size);
+  }
+  .icon::before {
+    /* notebook ruling */
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0 calc(var(--size) * 0.118),
+      #f1ead9 calc(var(--size) * 0.118) calc(var(--size) * 0.122)
+    );
+    background-position: 0 calc(var(--size) * 0.06);
+  }
+  .icon .stack {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: calc(var(--size) * 0.024);
+  }
+  .icon .top {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    color: #2a201a;
+    font-size: calc(var(--size) * 0.30);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .icon .div {
+    width: calc(var(--size) * 0.46);
+    height: calc(var(--size) * 0.012);
+    background: #c25a35;
+    border-radius: calc(var(--size) * 0.012);
+  }
+  .icon .bot {
+    font-family: 'Caveat', cursive;
+    font-weight: 600;
+    color: #c25a35;
+    font-size: calc(var(--size) * 0.18);
+    line-height: 1;
+  }
+
+  /* size-1024 — main marketing icon */
+  .size-1024 { --size: 512px; }   /* shown at 50% on screen */
+  /* size-180 — iOS home-screen */
+  .size-180  { --size: 180px; }
+  /* size-120 */
+  .size-120  { --size: 120px; }
+  /* size-60 */
+  .size-60   { --size: 60px; }
+
+  .small-row {
+    display: flex; gap: 28px; align-items: end; padding-top: 12px;
+  }
+  .small-row .col { gap: 10px; }
+
+  /* mockup of a phone home-screen tile */
+  .home {
+    width: 360px; padding: 28px 22px 22px;
+    background: linear-gradient(160deg, #2c4d6b 0%, #4a3a52 100%);
+    border-radius: 36px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px 14px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+    box-sizing: border-box;
+  }
+  .home .tile {
+    aspect-ratio: 1;
+    min-width: 0;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(8px);
+  }
+  .home .tile.real {
+    background: transparent; padding: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    aspect-ratio: auto;
+    min-width: 0;
+  }
+  .home .tile.real .icon { width: 100%; height: auto; aspect-ratio: 1; }
+  .home .tile.real .nm {
+    font-family: -apple-system, system-ui, sans-serif;
+    font-size: 11px; color: #fff; opacity: 0.95;
+    text-align: center; line-height: 1.1;
+  }
+  .home-wrap { display: flex; flex-direction: column; gap: 22px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <!-- Hero icon -->
+  <div class="col">
+    <div class="icon size-1024">
+      <div class="stack">
+        <div class="top">425°</div>
+        <div class="div"></div>
+        <div class="bot">400°</div>
+      </div>
+    </div>
+    <div class="name">Air Fryer Converter</div>
+    <div class="label">1024 × 1024 — marketing</div>
+  </div>
+
+  <!-- Sizes + home screen mock -->
+  <div class="col" style="gap: 40px;">
+    <div class="small-row">
+      <div class="col">
+        <div class="icon size-180">
+          <div class="stack">
+            <div class="top">425°</div>
+            <div class="div"></div>
+            <div class="bot">400°</div>
+          </div>
+        </div>
+        <div class="label">180</div>
+      </div>
+      <div class="col">
+        <div class="icon size-120">
+          <div class="stack">
+            <div class="top">425°</div>
+            <div class="div"></div>
+            <div class="bot">400°</div>
+          </div>
+        </div>
+        <div class="label">120</div>
+      </div>
+      <div class="col">
+        <div class="icon size-60">
+          <div class="stack">
+            <div class="top">425°</div>
+            <div class="div"></div>
+            <div class="bot">400°</div>
+          </div>
+        </div>
+        <div class="label">60</div>
+      </div>
+    </div>
+
+    <div class="home-wrap">
+      <div class="home">
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile real">
+          <div class="icon" style="--size: 60px;">
+            <div class="stack">
+              <div class="top">425°</div>
+              <div class="div"></div>
+              <div class="bot">400°</div>
+            </div>
+          </div>
+          <div class="nm">Air Fryer<br/>Converter</div>
+        </div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+      </div>
+      <div class="label">on a home screen</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
