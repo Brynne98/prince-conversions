@@ -4,7 +4,7 @@ title: Privacy Policy — Air Fryer Converter
 
 # Privacy Policy
 
-_Last updated: 30 April 2026_
+_Last updated: 2 September 2026_
 
 This privacy policy applies to the **Air Fryer Converter** iOS app (the
 "App"), published on the App Store under the bundle identifier
@@ -14,17 +14,40 @@ The App is a recipe-conversion utility. We try to collect the absolute
 minimum data needed for the App to function, and to be transparent about
 the third-party services that do collect data on our behalf.
 
-## Data we collect directly
+## Data stored on your device
 
-**None.** The App stores your saved recipes, unit preferences, and theme
-choice locally on your device using the operating system's standard
-storage. This data never leaves your device, is not transmitted to us,
-and is removed if you delete the App.
+The App stores your saved recipes, unit preferences, theme choice, and
+analytics preference locally on your device using the operating system's
+standard storage. Recipe names, notes, temperatures, and other recipe
+content are not included in product analytics.
 
 ## Data collected by third-party services
 
-The App embeds two third-party SDKs to deliver ads and process the
-optional in-app purchase that removes ads.
+The App uses third-party services for anonymous product analytics,
+advertising, and processing the optional in-app purchase that removes
+ads.
+
+### PostHog (product analytics)
+
+When anonymous analytics is enabled, the App sends a limited set of
+events to PostHog's EU-hosted service. These events include:
+
+- App opens and app/device version information.
+- Use of conversion, timer, and saved-recipe features.
+- Counts such as the number of saved recipes or active timers.
+- Coarse timer-duration ranges rather than exact cooking values.
+- Ad impressions and revenue, paywall views, and purchase outcomes.
+
+PostHog assigns a random identifier to an installation so that we can
+measure return usage. We do not send your name, email address, recipe
+names, recipe notes, exact temperatures, or advertising identifier to
+PostHog. Session replay and automatic touch or text capture are disabled.
+
+You can stop future product analytics at any time in the App's Settings
+screen by turning off **Share anonymous analytics**.
+
+PostHog's privacy policy:
+https://posthog.com/privacy
 
 ### Google AdMob (advertising)
 
@@ -87,12 +110,12 @@ data to us, please contact us at the address below and we will assist.
 
 You have the right to:
 
-- See what data we hold about you (in our case: none directly; the
-  third-party services listed above hold their own data).
-- Request deletion of any data linked to you. For App-linked data,
-  this is satisfied by deleting the App. For third-party data, contact
-  Google AdMob or RevenueCat directly via the links above, or contact
-  us and we will assist.
+- Disable future anonymous product analytics in the App's Settings.
+- Request information about or deletion of data held by the third-party
+  services listed above. Contact us and we will assist where possible.
+  Because product analytics is not linked to your name or email address,
+  we may not be able to identify a particular anonymous installation
+  from your contact details alone.
 - Opt out of personalized advertising at any time via the App
   Tracking Transparency setting in iOS.
 
