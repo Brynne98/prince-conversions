@@ -38,6 +38,8 @@ export function capture(event, properties = {}) {
   try {
     client.capture(event, {
       ...properties,
+      // Lets development / simulator traffic be filtered out of real usage.
+      environment: __DEV__ ? 'development' : 'production',
       $process_person_profile: false,
     });
   } catch {}
