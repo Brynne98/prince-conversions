@@ -1,19 +1,55 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, Modal, Pressable, StyleSheet, Alert,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import Constants from 'expo-constants';
 import { FONT, useTheme, useStyles } from '../theme';
+
+const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 import { Close } from '../icons';
 import { Toggle } from '../primitives';
-import { BannerAd } from '../ads';
+import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
+import { capture, isAnalyticsConfigured } from '../analytics';
 
-export default function SettingsSheet({ visible, onClose, mode, setMode }) {
+export default function SettingsSheet({
+  visible,
+  onClose,
+  mode,
+  setMode,
+  analyticsEnabled,
+  setAnalyticsEnabled,
+}) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
   const { configured, isPro, price, buyPro, restorePurchases } = useIap();
   const [busy, setBusy] = useState(false);
+  const [adPrivacyOptions, setAdPrivacyOptions] = useState(false);
+  const offerTrackedForOpen = useRef(false);
+
+  useEffect(() => {
+    if (!visible) return undefined;
+    let active = true;
+    isAdPrivacyOptionsRequired().then((required) => {
+      if (active) setAdPrivacyOptions(required);
+    });
+    return () => { active = false; };
+  }, [visible]);
+
+  useEffect(() => {
+    if (!visible) {
+      offerTrackedForOpen.current = false;
+      return;
+    }
+    if (!isPro && !offerTrackedForOpen.current) {
+      offerTrackedForOpen.current = true;
+      capture('pro_offer_viewed', {
+        surface: 'settings',
+        price_available: !!price,
+      });
+    }
+  }, [visible, isPro, price]);
 
   const onBuy = async () => {
     if (!configured) {
@@ -84,6 +120,18 @@ export default function SettingsSheet({ visible, onClose, mode, setMode }) {
             />
           </Row>
 
+          {isAnalyticsConfigured() && (
+            <Row
+              label="Share anonymous analytics"
+              subtitle="Usage events only — never recipe content"
+            >
+              <Toggle
+                value={analyticsEnabled}
+                onValueChange={setAnalyticsEnabled}
+              />
+            </Row>
+          )}
+
           {isPro ? (
             <Row label="Pro" subtitle="Ads removed — thanks!">
               <View style={styles.proPill}>
@@ -106,11 +154,23 @@ export default function SettingsSheet({ visible, onClose, mode, setMode }) {
             busy={busy}
           />
 
-          <Row label="About" detail="v1.0.0" isLast />
+          {adPrivacyOptions && !isPro && (
+            <PressableRow
+              label="Ad privacy options"
+              subtitle="Review or change your consent choices"
+              onPress={() => {
+                capture('ad_privacy_options_opened');
+                showAdPrivacyOptions();
+              }}
+              busy={busy}
+            />
+          )}
+
+          <Row label="About" detail={`v${APP_VERSION}`} isLast />
         </View>
 
         <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
-          <BannerAd />
+          <BannerAd placement="settings" />
         </View>
       </View>
     </Modal>

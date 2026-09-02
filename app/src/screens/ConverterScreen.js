@@ -1,14 +1,24 @@
 import React, { useRef } from 'react';
 import {
-  View, Text, ScrollView, Pressable, StyleSheet, Platform, Animated, Easing,
+  View, Text, ScrollView, Pressable, StyleSheet, Platform, Animated, Easing, Share,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { BannerAd } from '../ads';
-import { Bookmark, Flame, Gear, List, Swap, Play } from '../icons';
+import { Bookmark, Flame, Gear, List, Swap, Play, ShareIcon } from '../icons';
 import { convert, fToC, cToF } from '../convert';
+import { capture } from '../analytics';
+
+const STORE_URL = 'https://apps.apple.com/app/id6764600062';
+
+function fmtMinutes(m) {
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const rest = m % 60;
+  return rest ? `${h} hr ${rest} min` : `${h} hr`;
+}
 
 export default function ConverterScreen({
   unit, setUnit,
@@ -35,6 +45,22 @@ export default function ConverterScreen({
   const isOvenToAir = direction === 'oven-to-air';
   const sourceLabel = isOvenToAir ? 'OVEN RECIPE' : 'AIR FRYER RECIPE';
   const targetLabel = isOvenToAir ? 'AIR FRYER' : 'OVEN';
+
+  // "425°F oven for 25 min → 400°F air fryer for 20 min"
+  const share = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const from = `${ovenTemp}°${unit} ${isOvenToAir ? 'oven' : 'air fryer'} for ${fmtMinutes(ovenTime)}`;
+    const to = `${result.temp}°${targetUnit} ${isOvenToAir ? 'air fryer' : 'oven'} for ${fmtMinutes(result.time)}`;
+    const message = `${from} → ${to}\n\nConverted with Air Fryer Converter\n${STORE_URL}`;
+    try {
+      // Message only: the link is already in the text, and passing it as a
+      // separate `url` on iOS makes Messages send it twice.
+      const res = await Share.share({ message }, { subject: 'Air fryer conversion' });
+      if (res.action === Share.sharedAction) {
+        capture('result_shared', { direction, source_unit: unit, target_unit: targetUnit });
+      }
+    } catch {}
+  };
 
   const spinTurns = useRef(0);
   const spin = useRef(new Animated.Value(0)).current;
@@ -149,18 +175,28 @@ export default function ConverterScreen({
         >
           <View style={styles.resultHeader}>
             <Text style={styles.resultKicker}>{targetLabel}</Text>
-            <Segmented
-              compact
-              tone="onTerracotta"
-              options={[{ value: 'C', label: '°C' }, { value: 'F', label: '°F' }]}
-              value={targetUnit}
-              onChange={(u) => {
-                if (u !== targetUnit) {
-                  setTargetUnit(u);
-                  Haptics.selectionAsync();
-                }
-              }}
-            />
+            <View style={styles.resultHeaderRight}>
+              <Pressable
+                onPress={share}
+                hitSlop={8}
+                accessibilityLabel="Share conversion"
+                style={({ pressed }) => [styles.shareBtn, { opacity: pressed ? 0.6 : 1 }]}
+              >
+                <ShareIcon s={16} c={C.onTerracotta} />
+              </Pressable>
+              <Segmented
+                compact
+                tone="onTerracotta"
+                options={[{ value: 'C', label: '°C' }, { value: 'F', label: '°F' }]}
+                value={targetUnit}
+                onChange={(u) => {
+                  if (u !== targetUnit) {
+                    setTargetUnit(u);
+                    Haptics.selectionAsync();
+                  }
+                }}
+              />
+            </View>
           </View>
 
           <View style={styles.resultRow}>
@@ -219,7 +255,7 @@ export default function ConverterScreen({
         </LinearGradient>
 
         <View style={{ marginTop: 22 }}>
-          <BannerAd />
+          <BannerAd placement="converter" />
         </View>
       </ScrollView>
     </View>
@@ -296,6 +332,16 @@ const makeStyles = (C) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 14,
+  },
+  resultHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  shareBtn: {
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: C.onTerracotta18,
+    alignItems: 'center', justifyContent: 'center',
   },
   resultKicker: {
     fontFamily: FONT.ui,

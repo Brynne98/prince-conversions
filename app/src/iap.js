@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import { capture } from './analytics';
 
 const IS_EXPO_GO = Constants?.executionEnvironment === 'storeClient';
 
@@ -14,7 +16,13 @@ if (!IS_EXPO_GO) {
   } catch {}
 }
 
-const API_KEY = Constants?.expoConfig?.extra?.revenueCatIosApiKey || '';
+// Per-platform RevenueCat public SDK keys. Android stays empty until the
+// Play app exists in RevenueCat; an empty key means IAP reports itself as
+// "not configured" instead of erroring against the wrong store.
+const API_KEY = Platform.select({
+  ios: Constants?.expoConfig?.extra?.revenueCatIosApiKey,
+  android: Constants?.expoConfig?.extra?.revenueCatAndroidApiKey,
+}) || '';
 const ENTITLEMENT_ID = 'pro';
 
 const IapContext = createContext({
@@ -63,21 +71,54 @@ export function IapProvider({ children }) {
 
   const buyPro = async () => {
     if (!usable) throw new Error('Purchases not configured');
-    const offerings = await Purchases.getOfferings();
-    const pkg = offerings?.current?.availablePackages?.[0];
-    if (!pkg) throw new Error('No products available');
-    const { customerInfo } = await Purchases.purchasePackage(pkg);
-    const owned = !!customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
-    setIsPro(owned);
-    return owned;
+    capture('purchase_started', { product: 'pro' });
+
+    try {
+      const offerings = await Purchases.getOfferings();
+      const pkg = offerings?.current?.availablePackages?.[0];
+      if (!pkg) throw new Error('No products available');
+      const { customerInfo } = await Purchases.purchasePackage(pkg);
+      const owned = !!customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
+      setIsPro(owned);
+      if (owned) {
+        capture('purchase_completed', {
+          product: 'pro',
+          product_id: pkg.product.identifier,
+          price: pkg.product.price,
+          currency: pkg.product.currencyCode,
+        });
+      }
+      return owned;
+    } catch (error) {
+      const cancelled =
+        error?.userCancelled || error?.code === 'PURCHASE_CANCELLED';
+      capture(cancelled ? 'purchase_cancelled' : 'purchase_failed', {
+        product: 'pro',
+        error_code: error?.code || 'unknown',
+      });
+      throw error;
+    }
   };
 
   const restorePurchases = async () => {
     if (!usable) return false;
-    const customerInfo = await Purchases.restorePurchases();
-    const owned = !!customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
-    setIsPro(owned);
-    return owned;
+    capture('purchase_restore_started', { product: 'pro' });
+    try {
+      const customerInfo = await Purchases.restorePurchases();
+      const owned = !!customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
+      setIsPro(owned);
+      capture('purchase_restore_completed', {
+        product: 'pro',
+        entitlement_active: owned,
+      });
+      return owned;
+    } catch (error) {
+      capture('purchase_restore_failed', {
+        product: 'pro',
+        error_code: error?.code || 'unknown',
+      });
+      throw error;
+    }
   };
 
   const value = useMemo(() => ({

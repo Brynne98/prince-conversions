@@ -3,7 +3,7 @@
     "name": "Air Fryer Converter",
     "slug": "prince-conversions",
     "scheme": "princeconversions",
-    "version": "1.2.0",
+    "version": "1.4.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,10 +11,12 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.brynneprince.airfryerconverter",
-      "buildNumber": "1",
       "icon": "./assets/icon-ios.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "entitlements": {
+        "com.apple.developer.usernotifications.time-sensitive": true
       }
     },
     "android": {
@@ -26,7 +28,9 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.USE_EXACT_ALARM"
       ]
     },
     "web": {
@@ -55,6 +59,18 @@
         "expo-tracking-transparency",
         {
           "userTrackingPermission": "Allow this app to use your data to deliver personalized ads."
+        }
+      ],
+      "expo-localization",
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/done.wav",
+            "./assets/sounds/shake.wav"
+          ],
+          "color": "#C2562E"
         }
       ]
     ],

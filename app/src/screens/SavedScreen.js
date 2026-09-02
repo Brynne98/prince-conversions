@@ -86,7 +86,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         ) : (
           <View style={{ gap: 10 }}>
             {rendered.map((r, idx) => r.kind === 'ad'
-              ? <BannerAd key={`ad-${idx}`} />
+              ? <BannerAd key={`ad-${idx}`} placement="saved_inline" />
               : <SavedRow
                   key={r.it.id}
                   item={r.it}
@@ -107,7 +107,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
       </ScrollView>
 
       <View style={styles.stickyBanner}>
-        <BannerAd />
+        <BannerAd placement="saved_sticky" />
       </View>
     </View>
   );

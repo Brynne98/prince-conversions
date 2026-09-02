@@ -20,6 +20,8 @@ import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
 import { IapProvider } from './src/iap';
 import { initAds } from './src/ads';
+import { capture, setAnalyticsEnabled } from './src/analytics';
+import { recordTimerCompletion } from './src/review';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions?.({ duration: 250, fade: true });
@@ -50,6 +52,7 @@ function Root({ themeMode, setThemeMode }) {
   const [ovenTime, setOvenTime] = useState(25);
   const [direction, setDirection] = useState('oven-to-air');
   const [items, setItems] = useState([]);
+  const [analyticsEnabled, setAnalyticsPreference] = useState(true);
 
   const [view, setView] = useState('converter');
   const [showSave, setShowSave] = useState(false);
@@ -58,6 +61,8 @@ function Root({ themeMode, setThemeMode }) {
   const [splashGone, setSplashGone] = useState(false);
   const [draft, setDraft] = useState({ name: '', emoji: '🍟', note: '' });
   const [toast, setToast] = useState(null);
+  const appOpenTracked = useRef(false);
+  const lastTrackedConversion = useRef(null);
 
   const showToast = (msg, ms = 1800) => {
     setToast(msg);
@@ -66,7 +71,13 @@ function Root({ themeMode, setThemeMode }) {
 
   const cookTimers = useCookTimers({
     onShake: (t) => showToast(`Shake halfway · ${t.label || 'cooking'}`),
-    onDone: (t) => showToast(`Done · ${t.label || 'cook timer'}`),
+    onDone: (t) => {
+      capture('timer_completed', {
+        duration_bucket: durationBucket(t.totalSec),
+      });
+      showToast(`Done · ${t.label || 'cook timer'}`);
+      recordTimerCompletion();
+    },
   });
   const openTimer = openTimerId
     ? cookTimers.list.find((t) => t.id === openTimerId)
@@ -92,6 +103,9 @@ function Root({ themeMode, setThemeMode }) {
         if (s.direction) setDirection(s.direction);
         if (Array.isArray(s.items)) setItems(s.items);
         if (s.themeMode === 'dark' || s.themeMode === 'light') setThemeMode(s.themeMode);
+        if (typeof s.analyticsEnabled === 'boolean') {
+          setAnalyticsPreference(s.analyticsEnabled);
+        }
       }
       setHydrated(true);
     })();
@@ -99,8 +113,64 @@ function Root({ themeMode, setThemeMode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    saveState({ unit, targetUnit, ovenTemp, ovenTime, direction, items, themeMode });
-  }, [hydrated, unit, targetUnit, ovenTemp, ovenTime, direction, items, themeMode]);
+    saveState({
+      unit,
+      targetUnit,
+      ovenTemp,
+      ovenTime,
+      direction,
+      items,
+      themeMode,
+      analyticsEnabled,
+    });
+  }, [
+    hydrated,
+    unit,
+    targetUnit,
+    ovenTemp,
+    ovenTime,
+    direction,
+    items,
+    themeMode,
+    analyticsEnabled,
+  ]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let active = true;
+
+    (async () => {
+      await setAnalyticsEnabled(analyticsEnabled);
+      if (active && analyticsEnabled && !appOpenTracked.current) {
+        appOpenTracked.current = true;
+        capture('app_opened', { saved_recipe_count: items.length });
+      }
+    })();
+
+    return () => { active = false; };
+  }, [hydrated, analyticsEnabled]);
+
+  useEffect(() => {
+    if (!hydrated) return undefined;
+
+    const signature = [direction, unit, targetUnit, ovenTemp, ovenTime].join(':');
+    if (lastTrackedConversion.current === null) {
+      lastTrackedConversion.current = signature;
+      return undefined;
+    }
+    if (signature === lastTrackedConversion.current) return undefined;
+
+    const timeout = setTimeout(() => {
+      lastTrackedConversion.current = signature;
+      capture('conversion_completed', {
+        direction,
+        source_unit: unit,
+        target_unit: targetUnit,
+      });
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [hydrated, direction, unit, targetUnit, ovenTemp, ovenTime]);
 
   // Hide the splash as soon as fonts are ready; AsyncStorage hydration
   // continues in the background and items pop in when ready.
@@ -136,7 +206,22 @@ function Root({ themeMode, setThemeMode }) {
     ? { temp: result.temp, time: result.time }
     : { temp: ovenTemp, time: ovenTime };
 
+  const startTimer = (minutes, label, source) => {
+    const id = cookTimers.start(minutes, label);
+    capture('timer_started', {
+      source,
+      duration_bucket: durationBucket(Math.round(minutes * 60)),
+      active_timer_count: cookTimers.list.length + 1,
+    });
+    return id;
+  };
+
   const openSave = () => {
+    capture('recipe_save_opened', {
+      direction,
+      source_unit: unit,
+      target_unit: targetUnit,
+    });
     const guess = FOOD_PRESETS.find(
       p => Math.abs((unit === 'F' ? p.tempF : fToC(p.tempF)) - ovenValues.temp) < 5
         && Math.abs(p.time - ovenValues.time) < 5,
@@ -162,10 +247,20 @@ function Root({ themeMode, setThemeMode }) {
     };
     setItems([newItem, ...items]);
     setShowSave(false);
-    cookTimers.start(airValues.time, `${newItem.emoji} ${newItem.name || 'Recipe'}`);
+    capture('recipe_saved', { saved_recipe_count: items.length + 1 });
+    startTimer(
+      airValues.time,
+      `${newItem.emoji} ${newItem.name || 'Recipe'}`,
+      'recipe_save',
+    );
     showToast('Saved to recipes');
   };
-  const doDelete = (id) => setItems(items.filter(i => i.id !== id));
+  const doDelete = (id) => {
+    setItems(items.filter(i => i.id !== id));
+    capture('recipe_deleted', {
+      saved_recipe_count: Math.max(0, items.length - 1),
+    });
+  };
 
   if (!fontsLoaded) return null;
 
@@ -190,11 +285,14 @@ function Root({ themeMode, setThemeMode }) {
           ovenTemp={ovenTemp} setOvenTemp={setOvenTemp}
           ovenTime={ovenTime} setOvenTime={setOvenTime}
           direction={direction} setDirection={setDirection}
-          onOpenSaved={() => setView('saved')}
+          onOpenSaved={() => {
+            capture('saved_recipes_viewed', { saved_recipe_count: items.length });
+            setView('saved');
+          }}
           onOpenSettings={() => setShowSettings(true)}
           onSave={openSave}
           onStartTimer={(min) => {
-            cookTimers.start(min, `Air fryer ${airValues.temp}°${unit}`);
+            startTimer(min, `Air fryer ${airValues.temp}°${unit}`, 'converter');
           }}
           topInset={topInset}
           bottomInset={cookTimers.list.length > 0 ? 90 : 0}
@@ -210,7 +308,7 @@ function Root({ themeMode, setThemeMode }) {
             const isAir = mode !== 'oven';
             const minutes = isAir ? item.afTime : item.ovenTime;
             const label = `${item.emoji} ${item.name || 'Recipe'}${isAir ? '' : ' · oven'}`;
-            cookTimers.start(minutes, label);
+            startTimer(minutes, label, 'saved_recipe');
             showToast(`Timer · ${item.name || 'recipe'}`);
           }}
           unit={unit}
@@ -234,21 +332,37 @@ function Root({ themeMode, setThemeMode }) {
         onClose={() => setShowSettings(false)}
         mode={themeMode}
         setMode={setThemeMode}
+        analyticsEnabled={analyticsEnabled}
+        setAnalyticsEnabled={setAnalyticsPreference}
       />
 
       <TimerStack
         timers={cookTimers.list}
         onPressTimer={(id) => setOpenTimerId(id)}
-        onCancel={(id) => cookTimers.cancel(id)}
-        onRestart={(id) => cookTimers.restart(id)}
+        onCancel={(id) => {
+          cookTimers.cancel(id);
+          capture('timer_cancelled', { surface: 'timer_stack' });
+        }}
+        onRestart={(id) => {
+          cookTimers.restart(id);
+          capture('timer_restarted', { surface: 'timer_stack' });
+        }}
         bottomInset={bottomInset}
       />
 
       <TimerScreen
         visible={!!openTimer}
         onClose={() => setOpenTimerId(null)}
-        onCancel={() => openTimer && cookTimers.cancel(openTimer.id)}
-        onRestart={() => openTimer && cookTimers.restart(openTimer.id)}
+        onCancel={() => {
+          if (!openTimer) return;
+          cookTimers.cancel(openTimer.id);
+          capture('timer_cancelled', { surface: 'timer_screen' });
+        }}
+        onRestart={() => {
+          if (!openTimer) return;
+          cookTimers.restart(openTimer.id);
+          capture('timer_restarted', { surface: 'timer_screen' });
+        }}
         remainingSec={openTimer?.remainingSec ?? 0}
         elapsedFrac={openTimer?.elapsedFrac ?? 0}
         totalSec={openTimer?.totalSec ?? 0}
@@ -280,6 +394,13 @@ function Root({ themeMode, setThemeMode }) {
       )}
     </View>
   );
+}
+
+function durationBucket(totalSec) {
+  if (totalSec < 15 * 60) return 'under_15_min';
+  if (totalSec <= 30 * 60) return '15_to_30_min';
+  if (totalSec <= 60 * 60) return '31_to_60_min';
+  return 'over_60_min';
 }
 
 const makeStyles = (C) => StyleSheet.create({

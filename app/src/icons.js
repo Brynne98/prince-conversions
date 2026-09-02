@@ -167,3 +167,19 @@ export const Swap = ({ s = 14, c }) => {
     </Svg>
   );
 };
+
+export const ShareIcon = ({ s = 18, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.ink;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 15V4M8 8l4-4 4 4M5 13v6a1 1 0 001 1h12a1 1 0 001-1v-6"
+        stroke={stroke}
+        strokeWidth={2.1}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+};

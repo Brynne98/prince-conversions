@@ -45,6 +45,60 @@ npx expo start
 
 Press `i` to launch the iOS simulator.
 
+## Product analytics
+
+The app sends a small set of anonymous, manually defined product events
+to PostHog when it is configured. Autocapture, session replay, and
+user-entered recipe content are excluded.
+
+1. Create an EU-hosted project at https://eu.posthog.com.
+2. Copy `app/.env.example` to `app/.env.local`.
+3. Add the PostHog project token. This is a public client token, not a
+   personal or secret API key.
+4. Add the same `EXPO_PUBLIC_POSTHOG_API_KEY` and
+   `EXPO_PUBLIC_POSTHOG_HOST` variables to the EAS production environment.
+5. Enable impression-level ad revenue in AdMob if you want
+   `ad_revenue_recorded` events in addition to ad impressions.
+
+Analytics remains a no-op when no project token is configured and is
+disabled in development by default. Users can turn it off in Settings.
+Update the App Store privacy disclosure before releasing this version.
+
+## Timers in the background
+
+Active timers are persisted (`@afc/timers-v1`) and their alerts are
+scheduled with the OS via `expo-notifications` (`src/notifications.js`), so
+a locked phone still gets the "shake halfway" and "done" alerts with the
+app's own chimes. Notification permission is requested the first time a
+timer starts. In the foreground the system notification is silenced and
+the in-app chime / toast handles it. Timers that finished more than an
+hour ago are dropped on the next launch instead of ringing.
+
+`app.json` declares the iOS time-sensitive entitlement and Android's
+`USE_EXACT_ALARM` so alerts land on time; Play Console asks you to
+justify the latter (the app runs cook timers).
+
+## Ad consent (UMP)
+
+`initAds()` runs Google's User Messaging Platform consent flow before
+initialising AdMob, then the ATT prompt on iOS. For the form to appear you
+must publish a GDPR message (and, optionally, a US states message) under
+AdMob → Privacy & messaging for this app; without one, EEA/UK users get no
+ads. Settings shows an "Ad privacy options" row only where the SDK says one
+is required.
+
+The Android banner unit ID in `src/ads.js` is `null` until the Android app
+exists in AdMob; until then Android builds serve Google's test banner. The
+`androidAppId` in `app.json` is likewise Google's sample ID and must be
+replaced.
+
+## Review prompt and sharing
+
+`src/review.js` asks for an App Store / Play rating after three completed
+timers, once per app version, only while the app is in the foreground.
+The share button on the result card sends
+`425°F oven for 25 min → 400°F air fryer for 20 min` with the App Store link.
+
 ## Build for TestFlight
 
 ```sh

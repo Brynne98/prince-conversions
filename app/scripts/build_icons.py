@@ -42,7 +42,6 @@ def render_card(size, *, alpha_corners=True, safe_zone=False, foreground_only=Fa
     draw = ImageDraw.Draw(img)
 
     radius = int(size * 0.225)
-    border_w = max(1, round(size * 0.009))
 
     if not foreground_only:
         # Card body
@@ -58,13 +57,10 @@ def render_card(size, *, alpha_corners=True, safe_zone=False, foreground_only=Fa
             draw.rectangle((0, y0, size, y0 + line_h - 1), fill=RULING)
             y += line_gap
 
-        # Border ring
-        draw.rounded_rectangle(
-            (0, 0, size - 1, size - 1),
-            radius=radius,
-            outline=INK,
-            width=border_w,
-        )
+        # No edge border — iOS's own squircle mask clips into it
+        # asymmetrically (corners vs straight edges), leaving thin
+        # dark lines on the sides. The cream-vs-system contrast is
+        # enough to define the squircle shape.
 
     # Stack: "425°" / divider / "400°", centered.
     # Mirrors the CSS flex column with line-height: 1, so each text's
