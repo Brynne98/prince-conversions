@@ -43,7 +43,7 @@ const TEST_BANNER = TestIds?.BANNER;
 // test banner rather than requesting an invalid unit.
 const PROD_BANNER_UNIT_ID = Platform.select({
   ios: 'ca-app-pub-3005788156292964/5992983308',
-  android: null,
+  android: 'ca-app-pub-3005788156292964/4447877393',
 });
 const BANNER_UNIT_ID = __DEV__ || !PROD_BANNER_UNIT_ID ? TEST_BANNER : PROD_BANNER_UNIT_ID;
 

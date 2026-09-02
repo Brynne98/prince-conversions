@@ -87,10 +87,11 @@ AdMob → Privacy & messaging for this app; without one, EEA/UK users get no
 ads. Settings shows an "Ad privacy options" row only where the SDK says one
 is required.
 
-The Android banner unit ID in `src/ads.js` is `null` until the Android app
-exists in AdMob; until then Android builds serve Google's test banner. The
-`androidAppId` in `app.json` is likewise Google's sample ID and must be
-replaced.
+Both platforms have real AdMob IDs wired in (`app.json` for the app IDs,
+`src/ads.js` for the banner units). The Android app is registered in AdMob
+but not yet linked to a Play listing, so it shows as "Requires review" and
+ad serving stays limited until the app is published to Play and approved.
+Development builds always serve Google's test banner regardless.
 
 ## Review prompt and sharing
 
