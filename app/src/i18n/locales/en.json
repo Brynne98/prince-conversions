@@ -1,0 +1,31 @@
+{
+  "paywall": {
+    "badge": "PRO",
+    "title": "Ad-free cooking",
+    "subtitle": "Pay once. Converter and timers stay free.",
+    "benefit_no_banners": "No banners while you cook",
+    "benefit_same_tools": "Timers and saves stay the same",
+    "benefit_restore": "Restore on this Apple ID anytime",
+    "cta": "Remove ads · %{price}",
+    "cta_no_price": "Remove ads",
+    "restore": "Restore purchases",
+    "footer": "One-time · No subscription",
+    "thanks_title": "Thanks!",
+    "thanks_body": "Ads removed.",
+    "purchase_failed_title": "Purchase failed",
+    "purchase_failed_body": "Try again later.",
+    "not_configured": "In-app purchases not configured yet.",
+    "restored_title": "Restored",
+    "restored_body": "Pro is active on this device.",
+    "nothing_title": "Nothing to restore",
+    "nothing_body": "No previous purchase found.",
+    "restore_failed_title": "Restore failed"
+  },
+  "settings": {
+    "remove_ads": "Remove ads",
+    "remove_ads_subtitle": "One-time purchase%{price}",
+    "pro_active": "Pro",
+    "pro_active_subtitle": "Ads removed — thanks!",
+    "pro_active_pill": "ACTIVE"
+  }
+}

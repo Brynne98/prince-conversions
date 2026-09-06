@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View, Text, Modal, Pressable, StyleSheet, Alert,
+  View, Text, Modal, Pressable, StyleSheet,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
 import Constants from 'expo-constants';
 import { FONT, useTheme, useStyles } from '../theme';
 
@@ -12,6 +11,7 @@ import { Toggle } from '../primitives';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
 import { capture, isAnalyticsConfigured } from '../analytics';
+import { t } from '../i18n';
 
 export default function SettingsSheet({
   visible,
@@ -20,13 +20,12 @@ export default function SettingsSheet({
   setMode,
   analyticsEnabled,
   setAnalyticsEnabled,
+  onOpenPaywall,
 }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
-  const { configured, isPro, price, buyPro, restorePurchases } = useIap();
-  const [busy, setBusy] = useState(false);
+  const { isPro, price } = useIap();
   const [adPrivacyOptions, setAdPrivacyOptions] = useState(false);
-  const offerTrackedForOpen = useRef(false);
 
   useEffect(() => {
     if (!visible) return undefined;
@@ -37,64 +36,7 @@ export default function SettingsSheet({
     return () => { active = false; };
   }, [visible]);
 
-  useEffect(() => {
-    if (!visible) {
-      offerTrackedForOpen.current = false;
-      return;
-    }
-    if (!isPro && !offerTrackedForOpen.current) {
-      offerTrackedForOpen.current = true;
-      capture('pro_offer_viewed', {
-        surface: 'settings',
-        price_available: !!price,
-      });
-    }
-  }, [visible, isPro, price]);
-
-  const onBuy = async () => {
-    if (!configured) {
-      Alert.alert('In-app purchases not configured yet.');
-      return;
-    }
-    if (busy) return;
-    setBusy(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    try {
-      const owned = await buyPro();
-      if (owned) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert('Thanks!', 'Ads removed.');
-      }
-    } catch (e) {
-      // RevenueCat throws userCancelled with code PURCHASE_CANCELLED — silent.
-      if (!e?.userCancelled && e?.code !== 'PURCHASE_CANCELLED') {
-        Alert.alert('Purchase failed', e?.message || 'Try again later.');
-      }
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const onRestore = async () => {
-    if (!configured) {
-      Alert.alert('In-app purchases not configured yet.');
-      return;
-    }
-    if (busy) return;
-    setBusy(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    try {
-      const owned = await restorePurchases();
-      Alert.alert(
-        owned ? 'Restored' : 'Nothing to restore',
-        owned ? 'Pro is active on this device.' : 'No previous purchase found.',
-      );
-    } catch (e) {
-      Alert.alert('Restore failed', e?.message || 'Try again later.');
-    } finally {
-      setBusy(false);
-    }
-  };
+  const priceSuffix = price ? ` · ${price}` : '';
 
   return (
     <Modal
@@ -133,26 +75,21 @@ export default function SettingsSheet({
           )}
 
           {isPro ? (
-            <Row label="Pro" subtitle="Ads removed — thanks!">
+            <Row
+              label={t('settings.pro_active')}
+              subtitle={t('settings.pro_active_subtitle')}
+            >
               <View style={styles.proPill}>
-                <Text style={styles.proPillText}>ACTIVE</Text>
+                <Text style={styles.proPillText}>{t('settings.pro_active_pill')}</Text>
               </View>
             </Row>
           ) : (
             <PressableRow
-              label="Remove ads"
-              subtitle={price ? `One-time purchase · ${price}` : 'One-time purchase'}
-              onPress={onBuy}
-              busy={busy}
+              label={t('settings.remove_ads')}
+              subtitle={t('settings.remove_ads_subtitle', { price: priceSuffix })}
+              onPress={() => onOpenPaywall?.()}
             />
           )}
-
-          <PressableRow
-            label="Restore purchases"
-            subtitle="Already paid? Bring Pro back here."
-            onPress={onRestore}
-            busy={busy}
-          />
 
           {adPrivacyOptions && !isPro && (
             <PressableRow
@@ -162,7 +99,6 @@ export default function SettingsSheet({
                 capture('ad_privacy_options_opened');
                 showAdPrivacyOptions();
               }}
-              busy={busy}
             />
           )}
 
@@ -194,16 +130,15 @@ function Row({ label, subtitle, detail, children, isLast }) {
   );
 }
 
-function PressableRow({ label, subtitle, onPress, busy }) {
+function PressableRow({ label, subtitle, onPress }) {
   const styles = useStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
-      disabled={busy}
       style={({ pressed }) => [
         styles.row,
         styles.rowDivider,
-        { opacity: pressed || busy ? 0.55 : 1 },
+        { opacity: pressed ? 0.55 : 1 },
       ]}
     >
       <View style={{ flex: 1, paddingRight: 12 }}>

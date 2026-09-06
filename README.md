@@ -93,6 +93,15 @@ but not yet linked to a Play listing, so it shows as "Requires review" and
 ad serving stays limited until the app is published to Play and approved.
 Development builds always serve Google's test banner regardless.
 
+## Pro paywall + i18n
+
+Dedicated Pro paywall (`app/src/screens/PaywallSheet.js`): opens from Settings
+→ Remove ads, and at most once per app version as a soft prompt after three
+completed timers (never mid-cook). Copy lives in `app/src/i18n/locales/en.json`
+via `i18n-js` + `expo-localization`. Add `de.json` / `es.json` / … and register
+them in `app/src/i18n/index.js` to localize. Button price uses RevenueCat's
+localized `priceString`.
+
 ## Review prompt and sharing
 
 `src/review.js` asks for an App Store / Play rating after three completed

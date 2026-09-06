@@ -11,6 +11,7 @@ import ConverterScreen from './src/screens/ConverterScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import SaveSheet from './src/screens/SaveSheet';
 import SettingsSheet from './src/screens/SettingsSheet';
+import PaywallSheet from './src/screens/PaywallSheet';
 import TimerStack from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
@@ -18,10 +19,12 @@ import { ThemeProvider, useTheme, useStyles } from './src/theme';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
 import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
-import { IapProvider } from './src/iap';
+import { IapProvider, useIap } from './src/iap';
 import { initAds } from './src/ads';
 import { capture, setAnalyticsEnabled } from './src/analytics';
 import { recordTimerCompletion } from './src/review';
+import { recordCompletionForSoftPaywall } from './src/softPaywall';
+import './src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions?.({ duration: 250, fade: true });
@@ -57,7 +60,10 @@ function Root({ themeMode, setThemeMode }) {
   const [view, setView] = useState('converter');
   const [showSave, setShowSave] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallSurface, setPaywallSurface] = useState('paywall');
   const [openTimerId, setOpenTimerId] = useState(null);
+  const { isPro } = useIap();
   const [splashGone, setSplashGone] = useState(false);
   const [draft, setDraft] = useState({ name: '', emoji: '🍟', note: '' });
   const [toast, setToast] = useState(null);
@@ -69,16 +75,48 @@ function Root({ themeMode, setThemeMode }) {
     setTimeout(() => setToast((cur) => (cur === msg ? null : cur)), ms);
   };
 
+  // Keep soft-paywall gates fresh without rebinding useCookTimers every render.
+  const softPaywallGate = useRef({});
+  const onTimerDoneRef = useRef(() => {});
+
   const cookTimers = useCookTimers({
     onShake: (t) => showToast(`Shake halfway · ${t.label || 'cooking'}`),
-    onDone: (t) => {
-      capture('timer_completed', {
-        duration_bucket: durationBucket(t.totalSec),
-      });
-      showToast(`Done · ${t.label || 'cook timer'}`);
-      recordTimerCompletion();
-    },
+    onDone: (t) => onTimerDoneRef.current?.(t),
   });
+
+  softPaywallGate.current = {
+    isPro,
+    openTimerId,
+    splashGone,
+    showSettings,
+    showPaywall,
+    timers: cookTimers.list,
+  };
+
+  onTimerDoneRef.current = (t) => {
+    capture('timer_completed', {
+      duration_bucket: durationBucket(t.totalSec),
+    });
+    showToast(`Done · ${t.label || 'cook timer'}`);
+
+    const g = softPaywallGate.current;
+    const hasRunning = (g.timers || []).some(
+      (x) => x.id !== t.id && !x.completed,
+    );
+    const canShowSoftPaywall = !g.openTimerId && !hasRunning;
+
+    recordCompletionForSoftPaywall({
+      isPro: !!g.isPro,
+      canShow: canShowSoftPaywall && g.splashGone && !g.showSettings && !g.showPaywall,
+      onOffer: () => {
+        setPaywallSurface('soft_prompt');
+        setShowPaywall(true);
+      },
+    }).then(({ offered }) => {
+      // Avoid stacking review + soft paywall in the same moment.
+      if (!offered) recordTimerCompletion();
+    });
+  };
   const openTimer = openTimerId
     ? cookTimers.list.find((t) => t.id === openTimerId)
     : null;
@@ -334,6 +372,17 @@ function Root({ themeMode, setThemeMode }) {
         setMode={setThemeMode}
         analyticsEnabled={analyticsEnabled}
         setAnalyticsEnabled={setAnalyticsPreference}
+        onOpenPaywall={() => {
+          setShowSettings(false);
+          setPaywallSurface('settings');
+          setShowPaywall(true);
+        }}
+      />
+
+      <PaywallSheet
+        visible={showPaywall}
+        surface={paywallSurface}
+        onClose={() => setShowPaywall(false)}
       />
 
       <TimerStack
