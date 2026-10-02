@@ -5,7 +5,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, useTheme, useStyles } from './theme';
-import { GLASS, GlassFill } from './glass';
+import { GLASS, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close } from './icons';
 
 // ─── Hold-to-repeat button ────────────────────────────────────────────
@@ -38,14 +38,14 @@ function HoldButton({ onTrigger, children, style }) {
   useEffect(() => () => stop(), []);
 
   return (
-    <Pressable
+    <GlassPressable
       onPressIn={start}
       onPressOut={stop}
       hitSlop={10}
       style={style}
     >
       {children}
-    </Pressable>
+    </GlassPressable>
   );
 }
 
@@ -177,20 +177,18 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
 export function RoundButton({ onPress, children, size = 44, tone = 'raised', accessibilityLabel }) {
   const styles = useStyles(makeStyles);
   return (
-    <Pressable
+    <GlassPressable
       onPress={onPress}
       hitSlop={8}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
-        GLASS ? styles.roundGlass : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
-        { width: size, height: size, borderRadius: size / 2 },
-        GLASS ? { transform: [{ scale: pressed ? 0.92 : 1 }] } : { opacity: pressed ? 0.6 : 1 },
+        tone === 'flat' ? styles.roundFlat : styles.roundBtn,
+        { width: size, height: size, borderRadius: size / 2, opacity: pressed ? 0.6 : 1 },
       ]}
     >
-      <GlassFill />
       {children}
-    </Pressable>
+    </GlassPressable>
   );
 }
 
@@ -278,7 +276,8 @@ export function Segmented({ options, value, onChange, compact = false, tone = 'd
 
 // On iOS 26 the thumb is a glass pill tinted with the thumb's colour.
 function SegmentedTrack({ count, slide, pillBg, scheme }) {
-  const [width, setWidth] = useState(0);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const { width } = size;
   const segW = width > 0 ? (width - 6) / count : 0;
   const left = slide.interpolate({
     inputRange: Array.from({ length: count }, (_, i) => i),
@@ -287,7 +286,7 @@ function SegmentedTrack({ count, slide, pillBg, scheme }) {
   return (
     <View
       pointerEvents="none"
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      onLayout={(e) => setSize(e.nativeEvent.layout)}
       style={StyleSheet.absoluteFill}
     >
       {segW > 0 && (
@@ -299,7 +298,7 @@ function SegmentedTrack({ count, slide, pillBg, scheme }) {
             left,
             width: segW,
             borderRadius: 999,
-            ...(GLASS ? { overflow: 'hidden' } : {
+            ...(GLASS ? null : {
               backgroundColor: pillBg,
               shadowColor: '#000',
               shadowOpacity: 0.08,
@@ -309,7 +308,7 @@ function SegmentedTrack({ count, slide, pillBg, scheme }) {
             }),
           }}
         >
-          <GlassFill tint={pillBg} scheme={scheme} />
+          <GlassFill tint={pillBg} scheme={scheme} radius={(size.height - 6) / 2} />
         </Animated.View>
       )}
     </View>
@@ -420,11 +419,6 @@ const makeStyles = (C) => ({
   },
   roundFlat: {
     backgroundColor: C.ink06,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  roundGlass: {
-    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },

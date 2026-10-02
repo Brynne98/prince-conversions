@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
-import { GLASS, GlassFill } from '../glass';
+import { GLASS, GlassFill, GlassPressable } from '../glass';
 
 const CARD_HEIGHT = 70;
 const PEEK = 10;
@@ -169,7 +169,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
     >
       <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
         <Body {...bodyProps} style={[styles.card, GLASS && styles.cardGlass]}>
-          <GlassFill tint={isDone ? '#E07246' : C.terracotta} scheme="dark" />
+          <GlassFill tint={isDone ? '#E07246' : C.terracotta} scheme="dark" radius={26} />
           <View style={styles.left}>
             <View style={styles.kickerRow}>
               <Text style={styles.kicker} numberOfLines={1}>
@@ -198,23 +198,27 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
           </View>
 
           {isDone && (
-            <Pressable
+            <GlassPressable
               onPress={onRestart}
               hitSlop={12}
+              clear
+              scheme="dark"
+              accessibilityLabel="Restart timer"
               style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1 }]}
             >
-              <GlassFill clear scheme="dark" />
               <Restart s={18} c={C.onTerracotta} />
-            </Pressable>
+            </GlassPressable>
           )}
-          <Pressable
+          <GlassPressable
             onPress={onCancel}
             hitSlop={12}
+            clear
+            scheme="dark"
+            accessibilityLabel="Cancel timer"
             style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <GlassFill clear scheme="dark" />
             <Close s={18} c={C.onTerracotta} />
-          </Pressable>
+          </GlassPressable>
 
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${timer.elapsedFrac * 100}%` }]} />
@@ -286,8 +290,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   iconBtn: {
     width: 34, height: 34, borderRadius: 17,
-    backgroundColor: GLASS ? undefined : 'rgba(255,247,238,0.18)',
-    overflow: 'hidden',
+    backgroundColor: 'rgba(255,247,238,0.18)',
     alignItems: 'center', justifyContent: 'center',
     marginLeft: 8,
   },

@@ -6,6 +6,7 @@ import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Back, Search, Trash } from '../icons';
 import { RoundButton, Segmented } from '../primitives';
+import { GLASS, GlassSurface } from '../glass';
 import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutesShort } from '../convert';
 
@@ -51,7 +52,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
           />
         </View>
 
-        <View style={styles.searchBar}>
+        <GlassSurface clear style={styles.searchBar}>
           <Search />
           <TextInput
             value={query}
@@ -62,7 +63,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
             autoCorrect={false}
             autoCapitalize="none"
           />
-        </View>
+        </GlassSurface>
       </View>
 
       <ScrollView
@@ -183,12 +184,13 @@ const makeStyles = (C) => StyleSheet.create({
   searchBar: {
     marginTop: 12,
     backgroundColor: C.paper,
-    borderRadius: 14,
+    // A glass capsule on iOS 26, like Apple's search fields.
+    borderRadius: GLASS ? 22 : 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 12,
-    height: 40,
+    paddingHorizontal: GLASS ? 16 : 12,
+    height: GLASS ? 44 : 40,
     borderWidth: 0.5,
     borderColor: C.ink10,
   },
