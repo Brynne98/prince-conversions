@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { Alert, Platform, View, Text, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 import { useIap } from './iap';
@@ -50,6 +50,16 @@ const BANNER_UNIT_ID = __DEV__ || !PROD_BANNER_UNIT_ID ? TEST_BANNER : PROD_BANN
 
 let adsInitialized = false;
 
+// Banners stay hidden until initAds() has the consent and tracking answers
+// and Google allows ad requests, so no ad is requested before the user answers.
+let adsReady = false;
+const readyListeners = new Set();
+function subscribeAdsReady(listener) {
+  readyListeners.add(listener);
+  return () => readyListeners.delete(listener);
+}
+const getAdsReady = () => adsReady;
+
 // Google's User Messaging Platform: shows the GDPR / US-state consent form
 // where the user's region requires one, and tells us whether ads may be
 // requested at all. In unregulated regions it returns immediately. The
@@ -98,6 +108,8 @@ export async function initAds() {
       adsInitialized = true;
     } catch {}
   }
+  adsReady = true;
+  readyListeners.forEach((listener) => listener());
 }
 
 function errorCode(error) {
@@ -126,11 +138,13 @@ export async function showAdPrivacyOptions() {
 // size 'box' is the 300×250 medium rectangle; the default fits the screen width.
 export function BannerAd({ style, placement = 'unknown', size = 'banner' }) {
   const { isPro } = useIap();
+  const ready = useSyncExternalStore(subscribeAdsReady, getAdsReady);
   if (isPro) return null;
 
   if (IS_EXPO_GO || !GBannerAd || !BannerAdSize) {
     return <ExpoGoPlaceholder style={style} height={size === 'box' ? 250 : 64} />;
   }
+  if (!ready) return null;
 
   return (
     <View style={[styles.wrap, style]}>
