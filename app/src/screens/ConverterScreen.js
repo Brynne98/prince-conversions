@@ -255,7 +255,7 @@ export default function ConverterScreen({
         </LinearGradient>
 
         <View style={{ marginTop: 22 }}>
-          <BannerAd placement="converter" />
+          <BannerAd placement="converter" size="box" />
         </View>
       </ScrollView>
     </View>
