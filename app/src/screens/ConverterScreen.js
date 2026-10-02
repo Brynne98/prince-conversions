@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
-import { GLASS, GlassFill } from '../glass';
+import { GLASS, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
 import { Bookmark, Flame, Gear, List, Swap, Play, Plus, ShareIcon } from '../icons';
 import { t } from '../i18n';
@@ -162,11 +162,11 @@ export default function ConverterScreen({
 
         {/* Flip arrow */}
         <View style={{ alignItems: 'center', marginVertical: 12 }}>
-          <Pressable onPress={flip} hitSlop={10} style={styles.flipBtn}>
+          <GlassPressable onPress={flip} hitSlop={10} style={styles.flipBtn} accessibilityLabel="Swap direction">
             <Animated.View style={{ transform: [{ rotate: spinDeg }] }}>
               <Swap s={14} c={C.terracotta} />
             </Animated.View>
-          </Pressable>
+          </GlassPressable>
         </View>
 
         {/* Result card */}
@@ -179,15 +179,16 @@ export default function ConverterScreen({
           <View style={styles.resultHeader}>
             <Text style={styles.resultKicker}>{targetLabel}</Text>
             <View style={styles.resultHeaderRight}>
-              <Pressable
+              <GlassPressable
                 onPress={share}
                 hitSlop={8}
                 accessibilityLabel="Share conversion"
+                clear
+                scheme="light"
                 style={({ pressed }) => [styles.shareBtn, { opacity: pressed ? 0.6 : 1 }]}
               >
-                <GlassFill clear scheme="light" />
                 <ShareIcon s={16} c={C.onTerracotta} />
-              </Pressable>
+              </GlassPressable>
               <Segmented
                 compact
                 tone="onTerracotta"
@@ -238,52 +239,56 @@ export default function ConverterScreen({
           </View>
 
           <View style={styles.actionRow}>
-            <Pressable
+            <GlassPressable
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 onStartTimer?.(result.time);
               }}
+              tint={C.onTerracotta}
+              scheme="light"
               style={({ pressed }) => [styles.actionBtn, styles.actionPrimary, { opacity: pressed ? 0.85 : 1 }]}
             >
-              <GlassFill tint={C.onTerracotta} scheme="light" />
               <Play s={14} c={C.terracotta} />
               <Text style={[styles.actionBtnText, { color: C.terracotta }]}>Start timer</Text>
-            </Pressable>
-            <Pressable
+            </GlassPressable>
+            <GlassPressable
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onSave(); }}
+              clear
+              scheme="light"
               style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
             >
-              <GlassFill clear scheme="light" />
               <Bookmark s={16} c={C.onTerracotta} />
               <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>Save</Text>
-            </Pressable>
+            </GlassPressable>
           </View>
 
-          <Pressable
+          <GlassPressable
             onPress={() => {
               Haptics.selectionAsync();
               onAddToPlan?.(result.temp, targetUnit, result.time);
             }}
             hitSlop={8}
+            clear
+            scheme="light"
             style={({ pressed }) => [styles.addToPlan, { opacity: pressed ? 0.6 : 1 }]}
           >
-            <GlassFill clear scheme="light" />
             <Plus s={14} c={C.onTerracotta85} />
             <Text style={styles.addToPlanText}>{t('plan.add')}</Text>
             {!isPro && <Text style={styles.proTag}>PRO</Text>}
-          </Pressable>
+          </GlassPressable>
 
           {planCount > 0 && (
-            <Pressable
+            <GlassPressable
               onPress={onOpenPlan}
+              clear
+              scheme="light"
               style={({ pressed }) => [styles.planBar, { opacity: pressed ? 0.7 : 1 }]}
             >
-              <GlassFill clear scheme="light" />
               <Text style={styles.planBarText}>
                 {planCount === 1 ? t('plan.open_one') : t('plan.open', { count: planCount })}
               </Text>
               <Text style={styles.planBarText}>›</Text>
-            </Pressable>
+            </GlassPressable>
           )}
         </LinearGradient>
 
@@ -373,8 +378,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   shareBtn: {
     width: 30, height: 30, borderRadius: 15,
-    backgroundColor: GLASS ? undefined : C.onTerracotta18,
-    overflow: 'hidden',
+    backgroundColor: C.onTerracotta18,
     alignItems: 'center', justifyContent: 'center',
   },
   resultKicker: {
@@ -427,7 +431,6 @@ const makeStyles = (C) => StyleSheet.create({
   actionBtn: {
     height: 48,
     borderRadius: GLASS ? 24 : 14,
-    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -435,11 +438,11 @@ const makeStyles = (C) => StyleSheet.create({
   },
   actionPrimary: {
     flex: 2,
-    backgroundColor: GLASS ? undefined : C.onTerracotta,
+    backgroundColor: C.onTerracotta,
   },
   actionSecondary: {
     flex: 1,
-    backgroundColor: GLASS ? undefined : C.onTerracotta18,
+    backgroundColor: C.onTerracotta18,
   },
   proTag: {
     fontFamily: FONT.ui,
@@ -460,7 +463,7 @@ const makeStyles = (C) => StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     // A glass capsule on iOS 26; a plain text link elsewhere.
-    ...(GLASS ? { minHeight: 36, paddingHorizontal: 14, borderRadius: 18, overflow: 'hidden' } : null),
+    ...(GLASS ? { height: 36, paddingHorizontal: 14, borderRadius: 18 } : null),
   },
   addToPlanText: {
     fontFamily: FONT.ui,
@@ -476,8 +479,7 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    overflow: 'hidden',
-    borderWidth: GLASS ? 0 : 1,
+    borderWidth: 1,
     borderColor: C.onTerracotta20,
   },
   planBarText: {
