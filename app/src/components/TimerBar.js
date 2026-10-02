@@ -148,6 +148,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
   }, [timer.completed, pulse]);
 
   const isDone = timer.completed;
+  const isWaiting = !isDone && timer.waitingSec > 0;
 
   return (
     <Pressable
@@ -173,6 +174,10 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
                 <View style={[styles.badge, styles.badgeDone]}>
                   <Text style={[styles.badgeText, { color: C.terracottaDeep }]}>DONE</Text>
                 </View>
+              ) : isWaiting ? (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>GOES IN</Text>
+                </View>
               ) : timer.remindHalfway ? (
                 <View style={styles.badge}>
                   <Bell s={11} c={C.onTerracotta} />
@@ -181,7 +186,9 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
               ) : null}
             </View>
             <Text style={styles.time} numberOfLines={1}>
-              {isDone ? 'Done!' : formatRemaining(timer.remainingSec)}
+              {isDone
+                ? 'Done!'
+                : formatRemaining(isWaiting ? timer.waitingSec : timer.remainingSec)}
             </Text>
           </View>
 

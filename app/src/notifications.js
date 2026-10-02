@@ -12,6 +12,7 @@ try {
 
 const DONE_CHANNEL = 'cook-timer-done';
 const HALF_CHANNEL = 'cook-timer-halfway';
+const PUT_IN_CHANNEL = 'cook-timer-put-in';
 
 let prepared = false;
 async function prepare() {
@@ -47,6 +48,14 @@ async function prepare() {
         importance: Notifications.AndroidImportance.HIGH,
         sound: 'shake.wav',
         vibrationPattern: [0, 150],
+        enableVibrate: true,
+        lightColor: '#C2562E',
+      });
+      await Notifications.setNotificationChannelAsync(PUT_IN_CHANNEL, {
+        name: 'Put food in (finish together)',
+        importance: Notifications.AndroidImportance.MAX,
+        sound: 'shake.wav',
+        vibrationPattern: [0, 250, 150, 250],
         enableVibrate: true,
         lightColor: '#C2562E',
       });
@@ -94,9 +103,9 @@ async function scheduleAt(whenMs, content, channelId) {
 // they can be cancelled when the timer is cancelled, restarted or edited.
 export async function scheduleTimerNotifications(
   timer,
-  { done = true, half = true } = {},
+  { done = true, half = true, putIn = true } = {},
 ) {
-  const ids = { done: null, half: null };
+  const ids = { done: null, half: null, putIn: null };
   if (!Notifications) return ids;
   await prepare();
   const label = timer.label || 'Cook timer';
@@ -111,6 +120,19 @@ export async function scheduleTimerNotifications(
         data: { timerId: timer.id, kind: 'done' },
       },
       DONE_CHANNEL,
+    );
+  }
+  if (putIn && timer.putInPending) {
+    ids.putIn = await scheduleAt(
+      timer.startedAt,
+      {
+        title: 'Put it in now',
+        body: `Put in ${label}. Everything finishes together.`,
+        sound: 'shake.wav',
+        interruptionLevel: 'timeSensitive',
+        data: { timerId: timer.id, kind: 'putIn' },
+      },
+      PUT_IN_CHANNEL,
     );
   }
   if (half && timer.remindHalfway && !timer.halfFired) {
@@ -131,7 +153,7 @@ export async function scheduleTimerNotifications(
 
 export async function cancelTimerNotifications(ids) {
   if (!Notifications || !ids) return;
-  for (const id of [ids.done, ids.half]) {
+  for (const id of [ids.done, ids.half, ids.putIn]) {
     if (!id) continue;
     try {
       await Notifications.cancelScheduledNotificationAsync(id);

@@ -1,17 +1,17 @@
 {
   "paywall": {
     "badge": "PRO",
-    "title": "Ad-free cooking",
-    "subtitle": "Pay once. Converter and timers stay free.",
+    "title": "Air Fryer Pro",
+    "subtitle": "Pay once. No ads, and a whole meal ready at once.",
     "benefit_no_banners": "No banners while you cook",
-    "benefit_same_tools": "Timers and saves stay the same",
+    "benefit_finish_together": "Finish together: several foods, one finish time",
     "benefit_restore": "Restore on this Apple ID anytime",
-    "cta": "Remove ads · %{price}",
-    "cta_no_price": "Remove ads",
+    "cta": "Get Pro · %{price}",
+    "cta_no_price": "Get Pro",
     "restore": "Restore purchases",
     "footer": "One-time · No subscription",
     "thanks_title": "Thanks!",
-    "thanks_body": "Ads removed.",
+    "thanks_body": "Pro is unlocked.",
     "purchase_failed_title": "Purchase failed",
     "purchase_failed_body": "Try again later.",
     "not_configured": "In-app purchases not configured yet.",
@@ -22,15 +22,37 @@
     "restore_failed_title": "Restore failed"
   },
   "settings": {
-    "remove_ads": "Remove ads",
+    "remove_ads": "Get Pro",
     "remove_ads_subtitle": "One-time purchase%{price}",
     "pro_active": "Pro",
-    "pro_active_subtitle": "Ads removed — thanks!",
+    "pro_active_subtitle": "No ads, finish together on. Thanks!",
     "pro_active_pill": "ACTIVE"
   },
   "ads": {
     "att_title": "Keep the app free",
     "att_body": "Next, iPhone asks if this app may track you. Allowing it shows ads that fit you better, which keeps the converter free.",
     "att_continue": "Continue"
+  },
+  "plan": {
+    "add": "Add to plan",
+    "open": "Finish together · %{count} foods",
+    "open_one": "Finish together · 1 food",
+    "added": "Added to plan",
+    "full": "A plan holds up to %{max} foods",
+    "title": "Finish together",
+    "subtitle": "Each food goes in at the right moment, so everything is ready at once.",
+    "first": "Goes in first",
+    "later": "Goes in after %{time}",
+    "mixed_temps": "These foods need different temperatures. Use a dual-zone fryer or a second appliance.",
+    "start": "Start · ready in %{time}",
+    "started": "Plan started",
+    "put_in": "Put in now · %{label}",
+    "clear": "Clear plan",
+    "nudge_title": "Cooking several things?",
+    "nudge_body_free": "Finish together tells you when to put each food in, so everything is ready at once. Part of Pro.",
+    "nudge_body_pro": "Tap \"Add to plan\" under each result, then Start. Everything is ready at once.",
+    "nudge_see_pro": "See Pro",
+    "nudge_later": "Not now",
+    "nudge_ok": "Got it"
   }
 }
