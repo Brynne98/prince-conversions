@@ -14,7 +14,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 export default function TimerScreen({
   visible, onClose, onCancel, onRestart,
   remainingSec, totalSec, elapsedFrac, startedAt, label,
-  remindHalfway, onToggleHalfway, completed,
+  remindHalfway, onToggleHalfway, completed, waitingSec = 0,
 }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
@@ -30,6 +30,11 @@ export default function TimerScreen({
   // then animate the rest of the way to 1 over the remaining time.
   useEffect(() => {
     if (!visible) return;
+    // A staggered food that hasn't gone in yet: ring stays empty.
+    if (waitingSec > 0) {
+      progress.setValue(0);
+      return;
+    }
     const initialFrac = Math.max(0, Math.min(1, elapsedFrac));
     progress.setValue(initialFrac);
     if (initialFrac >= 1) return;
@@ -42,7 +47,7 @@ export default function TimerScreen({
     anim.start();
     return () => anim.stop();
     // We re-run when startedAt changes (timer restarted), not on every elapsedFrac tick.
-  }, [visible, startedAt, totalSec]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [visible, startedAt, totalSec, waitingSec > 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dashOffset = progress.interpolate({
     inputRange: [0, 1],
@@ -103,8 +108,9 @@ export default function TimerScreen({
               ) : (
                 <>
                   <Text style={styles.timeText} numberOfLines={1}>
-                    {formatRemaining(remainingSec)}
+                    {formatRemaining(waitingSec > 0 ? waitingSec : remainingSec)}
                   </Text>
+                  {waitingSec > 0 && <Text style={styles.labelText}>until it goes in</Text>}
                   {!!label && <Text style={styles.labelText}>{label}</Text>}
                 </>
               )}

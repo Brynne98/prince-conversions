@@ -12,6 +12,7 @@ import SavedScreen from './src/screens/SavedScreen';
 import SaveSheet from './src/screens/SaveSheet';
 import SettingsSheet from './src/screens/SettingsSheet';
 import PaywallSheet from './src/screens/PaywallSheet';
+import PlanSheet from './src/screens/PlanSheet';
 import TimerStack from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
@@ -24,7 +25,7 @@ import { initAds } from './src/ads';
 import { capture, setAnalyticsEnabled } from './src/analytics';
 import { recordTimerCompletion } from './src/review';
 import { recordCompletionForSoftPaywall } from './src/softPaywall';
-import './src/i18n';
+import { t } from './src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions?.({ duration: 250, fade: true });
@@ -63,6 +64,9 @@ function Root({ themeMode, setThemeMode }) {
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallSurface, setPaywallSurface] = useState('paywall');
   const [openTimerId, setOpenTimerId] = useState(null);
+  // "Finish together" foods waiting to be started as one staggered plan.
+  const [plan, setPlan] = useState([]);
+  const [showPlan, setShowPlan] = useState(false);
   const { isPro } = useIap();
   const [splashGone, setSplashGone] = useState(false);
   const [draft, setDraft] = useState({ name: '', emoji: '🍟', note: '' });
@@ -82,6 +86,7 @@ function Root({ themeMode, setThemeMode }) {
   const cookTimers = useCookTimers({
     onShake: (t) => showToast(`Shake halfway · ${t.label || 'cooking'}`),
     onDone: (t) => onTimerDoneRef.current?.(t),
+    onPutIn: (timer) => showToast(t('plan.put_in', { label: timer.label }), 4000),
   });
 
   softPaywallGate.current = {
@@ -244,14 +249,41 @@ function Root({ themeMode, setThemeMode }) {
     ? { temp: result.temp, time: result.time }
     : { temp: ovenTemp, time: ovenTime };
 
-  const startTimer = (minutes, label, source) => {
-    const id = cookTimers.start(minutes, label);
+  const startTimer = (minutes, label, source, opts) => {
+    const id = cookTimers.start(minutes, label, opts);
     capture('timer_started', {
       source,
       duration_bucket: durationBucket(Math.round(minutes * 60)),
       active_timer_count: cookTimers.list.length + 1,
     });
     return id;
+  };
+
+  const addToPlan = (temp, tempUnit, minutes) => {
+    if (!isPro) {
+      setPaywallSurface('finish_together');
+      setShowPaywall(true);
+      return;
+    }
+    if (plan.length >= PLAN_MAX) {
+      showToast(t('plan.full', { max: PLAN_MAX }));
+      return;
+    }
+    setPlan([...plan, { id: 'p' + Date.now(), temp, unit: tempUnit, minutes }]);
+    capture('plan_food_added', { food_count: plan.length + 1 });
+    showToast(t('plan.added'));
+  };
+  const startPlan = () => {
+    const longest = Math.max(...plan.map((f) => f.minutes));
+    for (const f of plan) {
+      startTimer(f.minutes, `${f.temp}°${f.unit} · ${f.minutes} min`, 'plan', {
+        delayMs: (longest - f.minutes) * 60 * 1000,
+      });
+    }
+    capture('plan_started', { food_count: plan.length });
+    setPlan([]);
+    setShowPlan(false);
+    showToast(t('plan.started'));
   };
 
   const openSave = () => {
@@ -332,6 +364,10 @@ function Root({ themeMode, setThemeMode }) {
           onStartTimer={(min) => {
             startTimer(min, `Air fryer ${airValues.temp}°${unit}`, 'converter');
           }}
+          onAddToPlan={addToPlan}
+          onOpenPlan={() => setShowPlan(true)}
+          planCount={plan.length}
+          isPro={isPro}
           topInset={topInset}
           bottomInset={cookTimers.list.length > 0 ? 90 : 0}
         />
@@ -379,6 +415,18 @@ function Root({ themeMode, setThemeMode }) {
         }}
       />
 
+      <PlanSheet
+        visible={showPlan}
+        plan={plan}
+        onClose={() => setShowPlan(false)}
+        onRemove={(id) => {
+          const next = plan.filter((f) => f.id !== id);
+          setPlan(next);
+          if (next.length === 0) setShowPlan(false);
+        }}
+        onStart={startPlan}
+      />
+
       <PaywallSheet
         visible={showPaywall}
         surface={paywallSurface}
@@ -418,6 +466,7 @@ function Root({ themeMode, setThemeMode }) {
         startedAt={openTimer?.startedAt ?? 0}
         label={openTimer?.label}
         completed={!!openTimer?.completed}
+        waitingSec={openTimer?.waitingSec ?? 0}
         remindHalfway={openTimer?.remindHalfway ?? true}
         onToggleHalfway={(v) => openTimer && cookTimers.update(openTimer.id, { remindHalfway: v })}
       />
@@ -444,6 +493,8 @@ function Root({ themeMode, setThemeMode }) {
     </View>
   );
 }
+
+const PLAN_MAX = 4;
 
 function durationBucket(totalSec) {
   if (totalSec < 15 * 60) return 'under_15_min';

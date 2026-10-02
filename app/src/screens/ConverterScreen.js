@@ -7,7 +7,8 @@ import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { BannerAd } from '../ads';
-import { Bookmark, Flame, Gear, List, Swap, Play, ShareIcon } from '../icons';
+import { Bookmark, Flame, Gear, List, Swap, Play, Plus, ShareIcon } from '../icons';
+import { t } from '../i18n';
 import { convert, fToC, cToF } from '../convert';
 import { capture } from '../analytics';
 
@@ -27,6 +28,7 @@ export default function ConverterScreen({
   ovenTime, setOvenTime,
   direction, setDirection,
   onOpenSaved, onOpenSettings, onSave, onStartTimer,
+  onAddToPlan, onOpenPlan, planCount = 0, isPro = false,
   topInset = 0, bottomInset = 0,
 }) {
   const { C } = useTheme();
@@ -251,7 +253,31 @@ export default function ConverterScreen({
               <Bookmark s={16} c={C.onTerracotta} />
               <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>Save</Text>
             </Pressable>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                onAddToPlan?.(result.temp, targetUnit, result.time);
+              }}
+              style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
+            >
+              {isPro
+                ? <Plus s={16} c={C.onTerracotta} />
+                : <Text style={styles.proTag}>PRO</Text>}
+              <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>{t('plan.add')}</Text>
+            </Pressable>
           </View>
+
+          {planCount > 0 && (
+            <Pressable
+              onPress={onOpenPlan}
+              style={({ pressed }) => [styles.planBar, { opacity: pressed ? 0.7 : 1 }]}
+            >
+              <Text style={styles.planBarText}>
+                {planCount === 1 ? t('plan.open_one') : t('plan.open', { count: planCount })}
+              </Text>
+              <Text style={styles.planBarText}>›</Text>
+            </Pressable>
+          )}
         </LinearGradient>
 
         <View style={{ marginTop: 22 }}>
@@ -404,6 +430,35 @@ const makeStyles = (C) => StyleSheet.create({
   actionSecondary: {
     flex: 1,
     backgroundColor: C.onTerracotta18,
+  },
+  proTag: {
+    fontFamily: FONT.ui,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    color: C.terracotta,
+    backgroundColor: C.onTerracotta,
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    overflow: 'hidden',
+  },
+  planBar: {
+    marginTop: 10,
+    height: 44,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: C.onTerracotta20,
+  },
+  planBarText: {
+    fontFamily: FONT.ui,
+    fontSize: 15,
+    fontWeight: '600',
+    color: C.onTerracotta,
   },
   actionBtnText: {
     fontFamily: FONT.ui,

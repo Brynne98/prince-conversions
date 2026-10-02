@@ -126,7 +126,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
             />
             <Benefit
               icon={<TimerIcon c={C.terracotta} />}
-              label={t('paywall.benefit_same_tools')}
+              label={t('paywall.benefit_finish_together')}
               divider
             />
             <Benefit
