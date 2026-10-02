@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Pressable, Text, View, Animated, StyleSheet,
+  Pressable, Text, View, Animated, StyleSheet, Modal, Platform,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, useTheme, useStyles } from './theme';
-import { Plus, Minus } from './icons';
+import { GLASS, GlassFill } from './glass';
+import { Plus, Minus, Close } from './icons';
 
 // ─── Hold-to-repeat button ────────────────────────────────────────────
 function HoldButton({ onTrigger, children, style }) {
@@ -170,15 +172,53 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
   );
 }
 
-export function RoundButton({ onPress, children, size = 44 }) {
+// A circle button. `raised` sits on the page (paper, hairline, shadow);
+// `flat` sits inside a sheet (a faint ink wash). Glass on iOS 26.
+export function RoundButton({ onPress, children, size = 44, tone = 'raised', accessibilityLabel }) {
   const styles = useStyles(makeStyles);
   return (
-    <Pressable onPress={onPress} hitSlop={8} style={({ pressed }) => [
-      styles.roundBtn,
-      { width: size, height: size, borderRadius: size / 2, opacity: pressed ? 0.6 : 1 },
-    ]}>
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      style={({ pressed }) => [
+        GLASS ? styles.roundGlass : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
+        { width: size, height: size, borderRadius: size / 2 },
+        GLASS ? { transform: [{ scale: pressed ? 0.92 : 1 }] } : { opacity: pressed ? 0.6 : 1 },
+      ]}
+    >
+      <GlassFill />
       {children}
     </Pressable>
+  );
+}
+
+export function CloseButton({ onPress, size = 30 }) {
+  const { C } = useTheme();
+  return (
+    <RoundButton onPress={onPress} size={size} tone="flat" accessibilityLabel="Close">
+      <Close s={16} c={C.ink70} />
+    </RoundButton>
+  );
+}
+
+// ─── Sheet ───────────────────────────────────────────────────────────
+// Apple's page sheet, which iOS 26 draws in its own glass style. Android
+// shows it full screen, edge to edge, so the content is padded clear of the
+// status and navigation bars there (AFC-10). The grabber is drawn on iOS
+// only: an Android sheet cannot be dragged away.
+export function Sheet({ visible, onClose, handle = true, children }) {
+  const styles = useStyles(makeStyles);
+  const insets = useSafeAreaInsets();
+  const android = Platform.OS === 'android';
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+      <View style={[styles.sheetRoot, android && { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        {handle && !android && <View style={styles.sheetHandle} />}
+        {children}
+      </View>
+    </Modal>
   );
 }
 
@@ -208,7 +248,7 @@ export function Segmented({ options, value, onChange, compact = false, tone = 'd
 
   return (
     <View style={[styles.segWrap, { backgroundColor: trackBg }]}>
-      <SegmentedTrack count={options.length} slide={slide} pillBg={pillBg} />
+      <SegmentedTrack count={options.length} slide={slide} pillBg={pillBg} scheme={onTerracotta ? 'light' : undefined} />
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -236,7 +276,8 @@ export function Segmented({ options, value, onChange, compact = false, tone = 'd
   );
 }
 
-function SegmentedTrack({ count, slide, pillBg }) {
+// On iOS 26 the thumb is a glass pill tinted with the thumb's colour.
+function SegmentedTrack({ count, slide, pillBg, scheme }) {
   const [width, setWidth] = useState(0);
   const segW = width > 0 ? (width - 6) / count : 0;
   const left = slide.interpolate({
@@ -257,15 +298,19 @@ function SegmentedTrack({ count, slide, pillBg }) {
             bottom: 3,
             left,
             width: segW,
-            backgroundColor: pillBg,
             borderRadius: 999,
-            shadowColor: '#000',
-            shadowOpacity: 0.08,
-            shadowRadius: 3,
-            shadowOffset: { width: 0, height: 1 },
-            elevation: 1,
+            ...(GLASS ? { overflow: 'hidden' } : {
+              backgroundColor: pillBg,
+              shadowColor: '#000',
+              shadowOpacity: 0.08,
+              shadowRadius: 3,
+              shadowOffset: { width: 0, height: 1 },
+              elevation: 1,
+            }),
           }}
-        />
+        >
+          <GlassFill tint={pillBg} scheme={scheme} />
+        </Animated.View>
       )}
     </View>
   );
@@ -372,6 +417,23 @@ const makeStyles = (C) => ({
     elevation: 1,
     borderWidth: 0.5,
     borderColor: C.ink10,
+  },
+  roundFlat: {
+    backgroundColor: C.ink06,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roundGlass: {
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sheetRoot: { flex: 1, backgroundColor: C.cream },
+  sheetHandle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: C.ink30,
+    alignSelf: 'center',
+    marginTop: 8, marginBottom: 4,
   },
   segWrap: {
     position: 'relative',

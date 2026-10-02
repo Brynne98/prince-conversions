@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
+import { GLASS, GlassFill } from '../glass';
 
 const CARD_HEIGHT = 70;
 const PEEK = 10;
@@ -149,6 +150,14 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
 
   const isDone = timer.completed;
   const isWaiting = !isDone && timer.waitingSec > 0;
+  // iOS 26: a terracotta-tinted glass card, like a Live Activity. Elsewhere
+  // the gradient card.
+  const Body = GLASS ? View : LinearGradient;
+  const bodyProps = GLASS ? {} : {
+    colors: isDone ? ['#E07246', '#A8451F'] : [C.terracotta, '#B14E29'],
+    start: { x: 0, y: 0 },
+    end: { x: 1, y: 1 },
+  };
 
   return (
     <Pressable
@@ -159,12 +168,8 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
       })}
     >
       <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
-        <LinearGradient
-          colors={isDone ? ['#E07246', '#A8451F'] : [C.terracotta, '#B14E29']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.card}
-        >
+        <Body {...bodyProps} style={[styles.card, GLASS && styles.cardGlass]}>
+          <GlassFill tint={isDone ? '#E07246' : C.terracotta} scheme="dark" />
           <View style={styles.left}>
             <View style={styles.kickerRow}>
               <Text style={styles.kicker} numberOfLines={1}>
@@ -198,6 +203,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
               hitSlop={12}
               style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1 }]}
             >
+              <GlassFill clear scheme="dark" />
               <Restart s={18} c={C.onTerracotta} />
             </Pressable>
           )}
@@ -206,13 +212,14 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
             hitSlop={12}
             style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
+            <GlassFill clear scheme="dark" />
             <Close s={18} c={C.onTerracotta} />
           </Pressable>
 
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${timer.elapsedFrac * 100}%` }]} />
           </View>
-        </LinearGradient>
+        </Body>
       </Animated.View>
     </Pressable>
   );
@@ -233,6 +240,7 @@ const makeStyles = (C) => StyleSheet.create({
     elevation: 8,
     overflow: 'hidden',
   },
+  cardGlass: { borderRadius: 26, shadowOpacity: 0, elevation: 0 },
   left: { flex: 1, minWidth: 0 },
   kickerRow: {
     flexDirection: 'row',
@@ -278,7 +286,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   iconBtn: {
     width: 34, height: 34, borderRadius: 17,
-    backgroundColor: 'rgba(255,247,238,0.18)',
+    backgroundColor: GLASS ? undefined : 'rgba(255,247,238,0.18)',
+    overflow: 'hidden',
     alignItems: 'center', justifyContent: 'center',
     marginLeft: 8,
   },

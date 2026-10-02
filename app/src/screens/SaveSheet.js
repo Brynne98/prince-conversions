@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import {
-  View, Text, Modal, ScrollView, TextInput, Pressable,
+  View, Text, ScrollView, TextInput, Pressable,
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
+import { Sheet } from '../primitives';
 import { formatMinutes } from '../convert';
 
 const EMOJI_OPTS = [
@@ -25,133 +26,118 @@ export default function SaveSheet({
   const valid = (draft.name || '').trim().length > 0 && (draft.emoji || '').trim().length > 0;
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <View style={styles.root}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Pressable onPress={onClose} hitSlop={10}>
-            <Text style={styles.cancelText}>Cancel</Text>
-          </Pressable>
-          <Text style={styles.title}>Save recipe</Text>
-          <Pressable
-            onPress={() => {
-              if (valid) {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                onSave();
-              }
-            }}
-            hitSlop={10}
-            disabled={!valid}
-          >
-            <Text style={[
-              styles.saveText,
-              { color: valid ? C.terracotta : C.ink30 },
-            ]}>Save</Text>
-          </Pressable>
-        </View>
-
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <Sheet visible={visible} onClose={onClose}>
+      <View style={styles.headerRow}>
+        <Pressable onPress={onClose} hitSlop={10}>
+          <Text style={styles.cancelText}>Cancel</Text>
+        </Pressable>
+        <Text style={styles.title}>Save recipe</Text>
+        <Pressable
+          onPress={() => {
+            if (valid) {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              onSave();
+            }
+          }}
+          hitSlop={10}
+          disabled={!valid}
         >
-          <ScrollView
-            contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 10 }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.namePill}>
-              <View style={styles.nameEmojiBox}>
-                <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
-              </View>
-              <TextInput
-                value={draft.name}
-                onChangeText={(t) => setDraft({ ...draft, name: t })}
-                placeholder="Recipe name"
-                placeholderTextColor={C.ink50}
-                style={styles.nameInput}
-                returnKeyType="done"
-              />
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.rowLabel}>Custom emoji</Text>
-              <TextInput
-                value={draft.emoji}
-                onChangeText={(t) => setDraft({ ...draft, emoji: [...t].slice(0, 4).join('') })}
-                placeholder="Paste any emoji"
-                placeholderTextColor={C.ink50}
-                style={styles.emojiInput}
-                returnKeyType="done"
-              />
-            </View>
-
-            <ScrollView
-              style={styles.gridWrap}
-              contentContainerStyle={styles.grid}
-              nestedScrollEnabled
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
-              {EMOJI_OPTS.map(e => {
-                const active = draft.emoji === e;
-                return (
-                  <Pressable
-                    key={e}
-                    onPress={() => {
-                      setDraft({ ...draft, emoji: e });
-                      Haptics.selectionAsync();
-                    }}
-                    style={[styles.gridItem, active && { backgroundColor: C.terracottaSoft }]}
-                  >
-                    <Text style={styles.gridEmoji}>{e}</Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-
-            <View style={styles.notesBox}>
-              <TextInput
-                value={draft.note}
-                onChangeText={(t) => setDraft({ ...draft, note: t })}
-                placeholder="Notes — e.g. shake at 10 min, single layer"
-                placeholderTextColor={C.ink50}
-                style={styles.notesInput}
-                returnKeyType="done"
-              />
-            </View>
-
-            <View style={styles.summary}>
-              <Text style={styles.summaryKicker}>SAVING BOTH</Text>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryText}>
-                  <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
-                </Text>
-                <Text style={[styles.summaryText, { opacity: 0.5 }]}>↔</Text>
-                <Text style={styles.summaryText}>
-                  <Text style={{ fontWeight: '700' }}>Air fryer</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
-                </Text>
-              </View>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          <Text style={[
+            styles.saveText,
+            { color: valid ? C.terracotta : C.ink30 },
+          ]}>Save</Text>
+        </Pressable>
       </View>
-    </Modal>
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 10 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.namePill}>
+            <View style={styles.nameEmojiBox}>
+              <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
+            </View>
+            <TextInput
+              value={draft.name}
+              onChangeText={(t) => setDraft({ ...draft, name: t })}
+              placeholder="Recipe name"
+              placeholderTextColor={C.ink50}
+              style={styles.nameInput}
+              returnKeyType="done"
+            />
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.rowLabel}>Custom emoji</Text>
+            <TextInput
+              value={draft.emoji}
+              onChangeText={(t) => setDraft({ ...draft, emoji: [...t].slice(0, 4).join('') })}
+              placeholder="Paste any emoji"
+              placeholderTextColor={C.ink50}
+              style={styles.emojiInput}
+              returnKeyType="done"
+            />
+          </View>
+
+          <ScrollView
+            style={styles.gridWrap}
+            contentContainerStyle={styles.grid}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {EMOJI_OPTS.map(e => {
+              const active = draft.emoji === e;
+              return (
+                <Pressable
+                  key={e}
+                  onPress={() => {
+                    setDraft({ ...draft, emoji: e });
+                    Haptics.selectionAsync();
+                  }}
+                  style={[styles.gridItem, active && { backgroundColor: C.terracottaSoft }]}
+                >
+                  <Text style={styles.gridEmoji}>{e}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          <View style={styles.notesBox}>
+            <TextInput
+              value={draft.note}
+              onChangeText={(t) => setDraft({ ...draft, note: t })}
+              placeholder="Notes — e.g. shake at 10 min, single layer"
+              placeholderTextColor={C.ink50}
+              style={styles.notesInput}
+              returnKeyType="done"
+            />
+          </View>
+
+          <View style={styles.summary}>
+            <Text style={styles.summaryKicker}>SAVING BOTH</Text>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryText}>
+                <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
+              </Text>
+              <Text style={[styles.summaryText, { opacity: 0.5 }]}>↔</Text>
+              <Text style={styles.summaryText}>
+                <Text style={{ fontWeight: '700' }}>Air fryer</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Sheet>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.cream },
-  handle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: C.ink30,
-    alignSelf: 'center',
-    marginTop: 8, marginBottom: 6,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
