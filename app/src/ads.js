@@ -1,9 +1,10 @@
 import React from 'react';
-import { Platform, View, Text, StyleSheet } from 'react-native';
+import { Alert, Platform, View, Text, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 import { useIap } from './iap';
 import { useTheme } from './theme';
 import { capture } from './analytics';
+import { t } from './i18n';
 
 // AdMob and ATT are native modules — they live only in dev / production
 // builds, not in Expo Go. We detect the runtime and render a placeholder
@@ -76,7 +77,18 @@ export async function initAds() {
   if (attGet && attRequest) {
     try {
       const { status } = await attGet();
-      if (status === 'undetermined') await attRequest();
+      if (status === 'undetermined') {
+        // Explain before the system prompt; a cold prompt gets fewer yeses.
+        await new Promise((resolve) => {
+          Alert.alert(t('ads.att_title'), t('ads.att_body'), [
+            { text: t('ads.att_continue'), onPress: resolve },
+          ], { cancelable: false });
+        });
+        // iOS drops the ATT dialog if it is requested while the alert is
+        // still animating out (see App.js); let the dismissal finish first.
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        await attRequest();
+      }
     } catch {}
   }
   if (!canRequestAds) return;
@@ -86,6 +98,10 @@ export async function initAds() {
       adsInitialized = true;
     } catch {}
   }
+}
+
+function errorCode(error) {
+  return String(error?.code ?? error?.message ?? 'unknown');
 }
 
 // Regulated regions require a way to revisit the consent choice. Settings
@@ -107,29 +123,33 @@ export async function showAdPrivacyOptions() {
   } catch {}
 }
 
-export function BannerAd({ style, placement = 'unknown' }) {
+// size 'box' is the 300×250 medium rectangle; the default fits the screen width.
+export function BannerAd({ style, placement = 'unknown', size = 'banner' }) {
   const { isPro } = useIap();
   if (isPro) return null;
 
   if (IS_EXPO_GO || !GBannerAd || !BannerAdSize) {
-    return <ExpoGoPlaceholder style={style} />;
+    return <ExpoGoPlaceholder style={style} height={size === 'box' ? 250 : 64} />;
   }
 
   return (
     <View style={[styles.wrap, style]}>
       <GBannerAd
         unitId={BANNER_UNIT_ID}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        size={size === 'box' ? BannerAdSize.MEDIUM_RECTANGLE : BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{ requestNonPersonalizedAdsOnly: false }}
+        onAdFailedToLoad={(error) => {
+          capture('ad_load_failed', { format: size, placement, code: errorCode(error) });
+        }}
         onAdImpression={() => {
           capture('ad_impression', {
-            format: 'banner',
+            format: size,
             placement,
           });
         }}
         onPaid={({ value, currency, precision }) => {
           capture('ad_revenue_recorded', {
-            format: 'banner',
+            format: size,
             placement,
             revenue: value,
             currency,
@@ -141,13 +161,13 @@ export function BannerAd({ style, placement = 'unknown' }) {
   );
 }
 
-function ExpoGoPlaceholder({ style }) {
+function ExpoGoPlaceholder({ style, height }) {
   const { C } = useTheme();
   return (
     <View
       style={[
         {
-          height: 64,
+          height,
           borderRadius: 12,
           borderWidth: 1,
           borderStyle: 'dashed',

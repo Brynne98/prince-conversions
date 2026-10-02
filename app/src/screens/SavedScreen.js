@@ -20,12 +20,6 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
     [items, query],
   );
 
-  const rendered = [];
-  filtered.forEach((it, i) => {
-    rendered.push({ kind: 'item', it });
-    if ((i + 1) % 5 === 0) rendered.push({ kind: 'ad', i });
-  });
-
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
       <View style={styles.topBar}>
@@ -85,23 +79,22 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
           </View>
         ) : (
           <View style={{ gap: 10 }}>
-            {rendered.map((r, idx) => r.kind === 'ad'
-              ? <BannerAd key={`ad-${idx}`} placement="saved_inline" />
-              : <SavedRow
-                  key={r.it.id}
-                  item={r.it}
-                  unit={displayUnit}
-                  mode={displayMode}
-                  onDelete={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    onDelete(r.it.id);
-                  }}
-                  onStart={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    onStart?.(r.it, displayMode);
-                  }}
-                />
-            )}
+            {filtered.map((it) => (
+              <SavedRow
+                key={it.id}
+                item={it}
+                unit={displayUnit}
+                mode={displayMode}
+                onDelete={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  onDelete(it.id);
+                }}
+                onStart={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  onStart?.(it, displayMode);
+                }}
+              />
+            ))}
           </View>
         )}
       </ScrollView>

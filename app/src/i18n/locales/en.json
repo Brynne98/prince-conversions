@@ -27,5 +27,10 @@
     "pro_active": "Pro",
     "pro_active_subtitle": "Ads removed — thanks!",
     "pro_active_pill": "ACTIVE"
+  },
+  "ads": {
+    "att_title": "Keep the app free",
+    "att_body": "Next, iPhone asks if this app may track you. Allowing it shows ads that fit you better, which keeps the converter free.",
+    "att_continue": "Continue"
   }
 }

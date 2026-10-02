@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, Modal, Pressable, StyleSheet,
+  View, Text, Modal, Pressable, ScrollView, StyleSheet,
 } from 'react-native';
 import Constants from 'expo-constants';
 import { FONT, useTheme, useStyles } from '../theme';
@@ -54,60 +54,62 @@ export default function SettingsSheet({
           </Pressable>
         </View>
 
-        <View style={{ paddingHorizontal: 20 }}>
-          <Row label="Dark mode" subtitle="Warm-charcoal palette">
-            <Toggle
-              value={mode === 'dark'}
-              onValueChange={(v) => setMode?.(v ? 'dark' : 'light')}
-            />
-          </Row>
-
-          {isAnalyticsConfigured() && (
-            <Row
-              label="Share anonymous analytics"
-              subtitle="Usage events only — never recipe content"
-            >
+        <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+          <View style={{ paddingHorizontal: 20 }}>
+            <Row label="Dark mode" subtitle="Warm-charcoal palette">
               <Toggle
-                value={analyticsEnabled}
-                onValueChange={setAnalyticsEnabled}
+                value={mode === 'dark'}
+                onValueChange={(v) => setMode?.(v ? 'dark' : 'light')}
               />
             </Row>
-          )}
 
-          {isPro ? (
-            <Row
-              label={t('settings.pro_active')}
-              subtitle={t('settings.pro_active_subtitle')}
-            >
-              <View style={styles.proPill}>
-                <Text style={styles.proPillText}>{t('settings.pro_active_pill')}</Text>
-              </View>
-            </Row>
-          ) : (
-            <PressableRow
-              label={t('settings.remove_ads')}
-              subtitle={t('settings.remove_ads_subtitle', { price: priceSuffix })}
-              onPress={() => onOpenPaywall?.()}
-            />
-          )}
+            {isAnalyticsConfigured() && (
+              <Row
+                label="Share anonymous analytics"
+                subtitle="Usage events only — never recipe content"
+              >
+                <Toggle
+                  value={analyticsEnabled}
+                  onValueChange={setAnalyticsEnabled}
+                />
+              </Row>
+            )}
 
-          {adPrivacyOptions && !isPro && (
-            <PressableRow
-              label="Ad privacy options"
-              subtitle="Review or change your consent choices"
-              onPress={() => {
-                capture('ad_privacy_options_opened');
-                showAdPrivacyOptions();
-              }}
-            />
-          )}
+            {isPro ? (
+              <Row
+                label={t('settings.pro_active')}
+                subtitle={t('settings.pro_active_subtitle')}
+              >
+                <View style={styles.proPill}>
+                  <Text style={styles.proPillText}>{t('settings.pro_active_pill')}</Text>
+                </View>
+              </Row>
+            ) : (
+              <PressableRow
+                label={t('settings.remove_ads')}
+                subtitle={t('settings.remove_ads_subtitle', { price: priceSuffix })}
+                onPress={() => onOpenPaywall?.()}
+              />
+            )}
 
-          <Row label="About" detail={`v${APP_VERSION}`} isLast />
-        </View>
+            {adPrivacyOptions && !isPro && (
+              <PressableRow
+                label="Ad privacy options"
+                subtitle="Review or change your consent choices"
+                onPress={() => {
+                  capture('ad_privacy_options_opened');
+                  showAdPrivacyOptions();
+                }}
+              />
+            )}
 
-        <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
-          <BannerAd placement="settings" />
-        </View>
+            <Row label="About" detail={`v${APP_VERSION}`} isLast />
+          </View>
+
+          <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
+            <BannerAd placement="settings" size="box" />
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );
