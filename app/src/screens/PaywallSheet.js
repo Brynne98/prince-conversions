@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Modal, Pressable, StyleSheet, Alert, ScrollView,
+  View, Text, Pressable, StyleSheet, Alert, ScrollView,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
 import { FONT, useTheme, useStyles } from '../theme';
-import { Close } from '../icons';
+import { Sheet, CloseButton } from '../primitives';
 import { useIap } from '../iap';
 import { capture } from '../analytics';
 import { t } from '../i18n';
@@ -92,74 +92,64 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
     : t('paywall.cta_no_price');
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <View style={styles.root}>
-        <View style={styles.handle} />
-        <View style={styles.header}>
-          <View style={{ width: 30 }} />
-          <Pressable onPress={onClose} hitSlop={10} style={styles.closeBtn}>
-            <Close s={16} c={C.ink70} />
-          </Pressable>
+    <Sheet visible={visible} onClose={onClose}>
+      <View style={styles.header}>
+        <View style={{ width: 30 }} />
+        <CloseButton onPress={onClose} />
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.body}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{t('paywall.badge')}</Text>
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.body}
-          bounces={false}
-          showsVerticalScrollIndicator={false}
+        <Text style={styles.title}>{t('paywall.title')}</Text>
+        <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
+
+        <View style={styles.benefits}>
+          <Benefit
+            icon={<NoAdsIcon c={C.terracotta} />}
+            label={t('paywall.benefit_no_banners')}
+          />
+          <Benefit
+            icon={<TimerIcon c={C.terracotta} />}
+            label={t('paywall.benefit_finish_together')}
+            divider
+          />
+          <Benefit
+            icon={<RestoreIcon c={C.terracotta} />}
+            label={t('paywall.benefit_restore')}
+            divider
+          />
+        </View>
+
+        <Pressable
+          onPress={onBuy}
+          disabled={busy}
+          style={({ pressed }) => [
+            styles.cta,
+            { opacity: pressed || busy ? 0.7 : 1 },
+          ]}
         >
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{t('paywall.badge')}</Text>
-          </View>
+          <Text style={styles.ctaText}>{ctaLabel}</Text>
+        </Pressable>
 
-          <Text style={styles.title}>{t('paywall.title')}</Text>
-          <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
+        <Pressable
+          onPress={onRestore}
+          disabled={busy}
+          hitSlop={8}
+          style={({ pressed }) => ({ opacity: pressed || busy ? 0.55 : 1 })}
+        >
+          <Text style={styles.restore}>{t('paywall.restore')}</Text>
+        </Pressable>
 
-          <View style={styles.benefits}>
-            <Benefit
-              icon={<NoAdsIcon c={C.terracotta} />}
-              label={t('paywall.benefit_no_banners')}
-            />
-            <Benefit
-              icon={<TimerIcon c={C.terracotta} />}
-              label={t('paywall.benefit_finish_together')}
-              divider
-            />
-            <Benefit
-              icon={<RestoreIcon c={C.terracotta} />}
-              label={t('paywall.benefit_restore')}
-              divider
-            />
-          </View>
-
-          <Pressable
-            onPress={onBuy}
-            disabled={busy}
-            style={({ pressed }) => [
-              styles.cta,
-              { opacity: pressed || busy ? 0.7 : 1 },
-            ]}
-          >
-            <Text style={styles.ctaText}>{ctaLabel}</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={onRestore}
-            disabled={busy}
-            hitSlop={8}
-            style={({ pressed }) => ({ opacity: pressed || busy ? 0.55 : 1 })}
-          >
-            <Text style={styles.restore}>{t('paywall.restore')}</Text>
-          </Pressable>
-
-          <Text style={styles.footer}>{t('paywall.footer')}</Text>
-        </ScrollView>
-      </View>
-    </Modal>
+        <Text style={styles.footer}>{t('paywall.footer')}</Text>
+      </ScrollView>
+    </Sheet>
   );
 }
 
@@ -212,24 +202,12 @@ function RestoreIcon({ c }) {
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.cream },
-  handle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: C.ink30,
-    alignSelf: 'center',
-    marginTop: 8, marginBottom: 2,
-  },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  closeBtn: {
-    width: 30, height: 30, borderRadius: 15,
-    backgroundColor: C.ink06,
-    alignItems: 'center', justifyContent: 'center',
   },
   body: {
     paddingHorizontal: 24,

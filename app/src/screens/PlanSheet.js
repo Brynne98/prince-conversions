@@ -1,10 +1,11 @@
 import React from 'react';
 import {
-  View, Text, Modal, Pressable, StyleSheet, ScrollView,
+  View, Text, Pressable, StyleSheet, ScrollView,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Play } from '../icons';
+import { Sheet, CloseButton } from '../primitives';
 import { formatMinutes } from '../convert';
 import { t } from '../i18n';
 
@@ -18,72 +19,55 @@ export default function PlanSheet({ visible, plan, onClose, onRemove, onStart })
   const mixedTemps = new Set(plan.map((f) => `${f.temp}${f.unit}`)).size > 1;
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <View style={styles.root}>
-        <View style={styles.handle} />
-        <View style={styles.header}>
-          <View style={{ width: 30 }} />
-          <Pressable onPress={onClose} hitSlop={10} style={styles.closeBtn}>
-            <Close s={16} c={C.ink70} />
-          </Pressable>
+    <Sheet visible={visible} onClose={onClose}>
+      <View style={styles.header}>
+        <View style={{ width: 30 }} />
+        <CloseButton onPress={onClose} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
+        <Text style={styles.title}>{t('plan.title')}</Text>
+        <Text style={styles.subtitle}>{t('plan.subtitle')}</Text>
+
+        <View style={styles.list}>
+          {sorted.map((f, i) => {
+            const wait = longest - f.minutes;
+            return (
+              <View key={f.id} style={[styles.row, i > 0 && styles.rowDivider]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.rowTitle}>
+                    {`${f.temp}°${f.unit} · ${formatMinutes(f.minutes)}`}
+                  </Text>
+                  <Text style={styles.rowSub}>
+                    {wait === 0 ? t('plan.first') : t('plan.later', { time: formatMinutes(wait) })}
+                  </Text>
+                </View>
+                <Pressable onPress={() => onRemove(f.id)} hitSlop={10} style={styles.closeBtn}>
+                  <Close s={14} c={C.ink70} />
+                </Pressable>
+              </View>
+            );
+          })}
         </View>
 
-        <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>{t('plan.title')}</Text>
-          <Text style={styles.subtitle}>{t('plan.subtitle')}</Text>
+        {mixedTemps && <Text style={styles.warning}>{t('plan.mixed_temps')}</Text>}
 
-          <View style={styles.list}>
-            {sorted.map((f, i) => {
-              const wait = longest - f.minutes;
-              return (
-                <View key={f.id} style={[styles.row, i > 0 && styles.rowDivider]}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.rowTitle}>
-                      {`${f.temp}°${f.unit} · ${formatMinutes(f.minutes)}`}
-                    </Text>
-                    <Text style={styles.rowSub}>
-                      {wait === 0 ? t('plan.first') : t('plan.later', { time: formatMinutes(wait) })}
-                    </Text>
-                  </View>
-                  <Pressable onPress={() => onRemove(f.id)} hitSlop={10} style={styles.closeBtn}>
-                    <Close s={14} c={C.ink70} />
-                  </Pressable>
-                </View>
-              );
-            })}
-          </View>
-
-          {mixedTemps && <Text style={styles.warning}>{t('plan.mixed_temps')}</Text>}
-
-          <Pressable
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              onStart();
-            }}
-            style={({ pressed }) => [styles.cta, { opacity: pressed ? 0.8 : 1 }]}
-          >
-            <Play s={14} c={C.onTerracotta} />
-            <Text style={styles.ctaText}>{t('plan.start', { time: formatMinutes(longest) })}</Text>
-          </Pressable>
-        </ScrollView>
-      </View>
-    </Modal>
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            onStart();
+          }}
+          style={({ pressed }) => [styles.cta, { opacity: pressed ? 0.8 : 1 }]}
+        >
+          <Play s={14} c={C.onTerracotta} />
+          <Text style={styles.ctaText}>{t('plan.start', { time: formatMinutes(longest) })}</Text>
+        </Pressable>
+      </ScrollView>
+    </Sheet>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.cream },
-  handle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: C.ink30,
-    alignSelf: 'center',
-    marginTop: 8, marginBottom: 2,
-  },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 8,

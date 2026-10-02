@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
+import { GLASS, GlassFill } from '../glass';
 import { BannerAd } from '../ads';
 import { Bookmark, Flame, Gear, List, Swap, Play, Plus, ShareIcon } from '../icons';
 import { t } from '../i18n';
@@ -94,13 +95,13 @@ export default function ConverterScreen({
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
       <View style={styles.topBar}>
-        <RoundButton onPress={onOpenSaved} size={40}>
+        <RoundButton onPress={onOpenSaved} size={40} accessibilityLabel="Saved recipes">
           <List s={20} />
         </RoundButton>
         <View style={styles.topTitleWrap}>
           <Text style={styles.kicker}>CONVERT</Text>
         </View>
-        <RoundButton onPress={onOpenSettings} size={40}>
+        <RoundButton onPress={onOpenSettings} size={40} accessibilityLabel="Settings">
           <Gear s={19} />
         </RoundButton>
       </View>
@@ -184,6 +185,7 @@ export default function ConverterScreen({
                 accessibilityLabel="Share conversion"
                 style={({ pressed }) => [styles.shareBtn, { opacity: pressed ? 0.6 : 1 }]}
               >
+                <GlassFill clear scheme="light" />
                 <ShareIcon s={16} c={C.onTerracotta} />
               </Pressable>
               <Segmented
@@ -243,6 +245,7 @@ export default function ConverterScreen({
               }}
               style={({ pressed }) => [styles.actionBtn, styles.actionPrimary, { opacity: pressed ? 0.85 : 1 }]}
             >
+              <GlassFill tint={C.onTerracotta} scheme="light" />
               <Play s={14} c={C.terracotta} />
               <Text style={[styles.actionBtnText, { color: C.terracotta }]}>Start timer</Text>
             </Pressable>
@@ -250,6 +253,7 @@ export default function ConverterScreen({
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onSave(); }}
               style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
             >
+              <GlassFill clear scheme="light" />
               <Bookmark s={16} c={C.onTerracotta} />
               <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>Save</Text>
             </Pressable>
@@ -263,6 +267,7 @@ export default function ConverterScreen({
             hitSlop={8}
             style={({ pressed }) => [styles.addToPlan, { opacity: pressed ? 0.6 : 1 }]}
           >
+            <GlassFill clear scheme="light" />
             <Plus s={14} c={C.onTerracotta85} />
             <Text style={styles.addToPlanText}>{t('plan.add')}</Text>
             {!isPro && <Text style={styles.proTag}>PRO</Text>}
@@ -273,6 +278,7 @@ export default function ConverterScreen({
               onPress={onOpenPlan}
               style={({ pressed }) => [styles.planBar, { opacity: pressed ? 0.7 : 1 }]}
             >
+              <GlassFill clear scheme="light" />
               <Text style={styles.planBarText}>
                 {planCount === 1 ? t('plan.open_one') : t('plan.open', { count: planCount })}
               </Text>
@@ -367,7 +373,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   shareBtn: {
     width: 30, height: 30, borderRadius: 15,
-    backgroundColor: C.onTerracotta18,
+    backgroundColor: GLASS ? undefined : C.onTerracotta18,
+    overflow: 'hidden',
     alignItems: 'center', justifyContent: 'center',
   },
   resultKicker: {
@@ -416,9 +423,11 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
+  // On iOS 26 the buttons are glass capsules, as Apple's are.
   actionBtn: {
     height: 48,
-    borderRadius: 14,
+    borderRadius: GLASS ? 24 : 14,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -426,11 +435,11 @@ const makeStyles = (C) => StyleSheet.create({
   },
   actionPrimary: {
     flex: 2,
-    backgroundColor: C.onTerracotta,
+    backgroundColor: GLASS ? undefined : C.onTerracotta,
   },
   actionSecondary: {
     flex: 1,
-    backgroundColor: C.onTerracotta18,
+    backgroundColor: GLASS ? undefined : C.onTerracotta18,
   },
   proTag: {
     fontFamily: FONT.ui,
@@ -445,11 +454,13 @@ const makeStyles = (C) => StyleSheet.create({
     overflow: 'hidden',
   },
   addToPlan: {
-    marginTop: 14,
+    marginTop: GLASS ? 12 : 14,
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    // A glass capsule on iOS 26; a plain text link elsewhere.
+    ...(GLASS ? { minHeight: 36, paddingHorizontal: 14, borderRadius: 18, overflow: 'hidden' } : null),
   },
   addToPlanText: {
     fontFamily: FONT.ui,
@@ -460,12 +471,13 @@ const makeStyles = (C) => StyleSheet.create({
   planBar: {
     marginTop: 10,
     height: 44,
-    borderRadius: 14,
+    borderRadius: GLASS ? 22 : 14,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 1,
+    overflow: 'hidden',
+    borderWidth: GLASS ? 0 : 1,
     borderColor: C.onTerracotta20,
   },
   planBarText: {
