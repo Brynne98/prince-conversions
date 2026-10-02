@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Dimensions, StyleSheet, Platform,
+  View, Text, Animated, Dimensions, StyleSheet, Platform, Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFonts, Fraunces_500Medium, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
@@ -250,13 +251,43 @@ function Root({ themeMode, setThemeMode }) {
     : { temp: ovenTemp, time: ovenTime };
 
   const startTimer = (minutes, label, source, opts) => {
+    const othersRunning = cookTimers.list.some((x) => !x.completed);
     const id = cookTimers.start(minutes, label, opts);
+    if (othersRunning && source !== 'plan') nudgePlanOnce();
     capture('timer_started', {
       source,
       duration_bucket: durationBucket(Math.round(minutes * 60)),
       active_timer_count: cookTimers.list.length + 1,
     });
     return id;
+  };
+
+  // Starting a second timer by hand is the moment "finish together"
+  // helps, so point at it once, ever.
+  const nudgePlanOnce = async () => {
+    try {
+      if (await AsyncStorage.getItem(PLAN_NUDGE_KEY)) return;
+      await AsyncStorage.setItem(PLAN_NUDGE_KEY, '1');
+    } catch {
+      return;
+    }
+    capture('plan_nudge_shown', { is_pro: isPro });
+    if (isPro) {
+      Alert.alert(t('plan.nudge_title'), t('plan.nudge_body_pro'), [
+        { text: t('plan.nudge_ok') },
+      ]);
+      return;
+    }
+    Alert.alert(t('plan.nudge_title'), t('plan.nudge_body_free'), [
+      { text: t('plan.nudge_later'), style: 'cancel' },
+      {
+        text: t('plan.nudge_see_pro'),
+        onPress: () => {
+          setPaywallSurface('finish_together_nudge');
+          setShowPaywall(true);
+        },
+      },
+    ]);
   };
 
   const addToPlan = (temp, tempUnit, minutes) => {
@@ -495,6 +526,7 @@ function Root({ themeMode, setThemeMode }) {
 }
 
 const PLAN_MAX = 4;
+const PLAN_NUDGE_KEY = '@afc/plan-nudge-v1';
 
 function durationBucket(totalSec) {
   if (totalSec < 15 * 60) return 'under_15_min';

@@ -253,19 +253,20 @@ export default function ConverterScreen({
               <Bookmark s={16} c={C.onTerracotta} />
               <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>Save</Text>
             </Pressable>
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                onAddToPlan?.(result.temp, targetUnit, result.time);
-              }}
-              style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
-            >
-              {isPro
-                ? <Plus s={16} c={C.onTerracotta} />
-                : <Text style={styles.proTag}>PRO</Text>}
-              <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>{t('plan.add')}</Text>
-            </Pressable>
           </View>
+
+          <Pressable
+            onPress={() => {
+              Haptics.selectionAsync();
+              onAddToPlan?.(result.temp, targetUnit, result.time);
+            }}
+            hitSlop={8}
+            style={({ pressed }) => [styles.addToPlan, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <Plus s={14} c={C.onTerracotta85} />
+            <Text style={styles.addToPlanText}>{t('plan.add')}</Text>
+            {!isPro && <Text style={styles.proTag}>PRO</Text>}
+          </Pressable>
 
           {planCount > 0 && (
             <Pressable
@@ -442,6 +443,19 @@ const makeStyles = (C) => StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 1,
     overflow: 'hidden',
+  },
+  addToPlan: {
+    marginTop: 14,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  addToPlanText: {
+    fontFamily: FONT.ui,
+    fontSize: 14,
+    fontWeight: '600',
+    color: C.onTerracotta85,
   },
   planBar: {
     marginTop: 10,
