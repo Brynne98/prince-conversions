@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, ScrollView, TextInput, Pressable,
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
@@ -8,6 +8,37 @@ import { FONT, useTheme, useStyles } from '../theme';
 import { Sheet, AppBar, TextButton, Field } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { formatMinutes } from '../convert';
+import { Pencil } from '../icons';
+
+// One emoji can be several characters joined together: a family, a flag, a
+// skin tone. These helpers find where one ends and the next begins.
+const isEmojiJoiner = (c) => c === 0xFE0F || c === 0x200D || c === 0x20E3
+  || (c >= 0x1F3FB && c <= 0x1F3FF) || (c >= 0xE0020 && c <= 0xE007F);
+const isFlagHalf = (c) => c >= 0x1F1E6 && c <= 0x1F1FF;
+// The emoji blocks, the older symbols and dingbats, or anything the keyboard
+// marked to be drawn as emoji (which is how 1️⃣ and ©️ arrive).
+const isEmoji = (g) => {
+  const c = g.codePointAt(0);
+  return (c >= 0x1F000 && c <= 0x1FAFF) || (c >= 0x2600 && c <= 0x27BF) || g.includes('\uFE0F');
+};
+
+// The last whole emoji in `text`, or '' when it holds none. Letters, digits
+// and punctuation do not count, in any script.
+function lastEmoji(text) {
+  const groups = [];
+  for (const ch of text) {
+    const c = ch.codePointAt(0);
+    const g = groups[groups.length - 1];
+    const joins = g && (
+      isEmojiJoiner(c)
+      || g.endsWith('\u200D')
+      || (isFlagHalf(c) && [...g].length === 1 && isFlagHalf(g.codePointAt(0)))
+    );
+    if (joins) groups[groups.length - 1] = g + ch;
+    else groups.push(ch);
+  }
+  return groups.reverse().find(isEmoji) || '';
+}
 
 const EMOJI_OPTS = [
   '🍟','🍗','🐟','🥕','🥓','🍕','🥖','🥔','🧆','🍪','🥩','🌽',
@@ -22,9 +53,54 @@ export default function SaveSheet({
   draft, setDraft,
   ovenValues, airValues, unit,
 }) {
-  const { C } = useTheme();
+  const { C, mode } = useTheme();
   const styles = useStyles(makeStyles);
   const valid = (draft.name || '').trim().length > 0 && (draft.emoji || '').trim().length > 0;
+
+  // A person's own emoji: tapping the emoji opens the keyboard on a hidden
+  // field. Neither platform lets an app open the emoji keyboard itself.
+  const emojiField = useRef(null);
+  const [typing, setTyping] = useState(false);
+  const typeEmoji = (text) => {
+    // A deletion keeps the emoji: a recipe always has one.
+    if (text.length <= draft.emoji.length) return;
+    // The field holds the current emoji, so the last one in it is the newest.
+    const next = lastEmoji(text);
+    if (next && next !== draft.emoji) {
+      setDraft({ ...draft, emoji: next });
+      Haptics.selectionAsync();
+    }
+  };
+  const emojiButton = (
+    <Pressable
+      onPress={() => emojiField.current?.focus()}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityLabel="Type your own emoji"
+      style={[styles.nameEmojiBox, typing && styles.nameEmojiTyping]}
+    >
+      <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
+      <View style={styles.emojiBadge}>
+        <Pencil s={11} c={C.onTerracotta} />
+      </View>
+      <TextInput
+        ref={emojiField}
+        value={draft.emoji}
+        onChangeText={typeEmoji}
+        onFocus={() => setTyping(true)}
+        onBlur={() => setTyping(false)}
+        pointerEvents="none"
+        caretHidden
+        autoCorrect={false}
+        returnKeyType="done"
+        keyboardAppearance={mode}
+        style={styles.emojiHidden}
+      />
+    </Pressable>
+  );
+  const emojiHint = typing && (
+    <Text style={styles.emojiHint}>Switch to the emoji keyboard and pick one.</Text>
+  );
 
   const save = () => {
     if (valid) {
@@ -88,29 +164,24 @@ export default function SaveSheet({
           showsVerticalScrollIndicator={false}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={styles.nameEmojiBox}>
-              <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
-            </View>
+            {emojiButton}
             <Field
               label="Recipe name"
               value={draft.name}
               onChangeText={(t) => setDraft({ ...draft, name: t })}
               returnKeyType="done"
+              keyboardAppearance={mode}
               style={{ flex: 1 }}
             />
           </View>
+          {emojiHint}
           {emojiGrid}
-          <Field
-            label="Custom emoji"
-            value={draft.emoji}
-            onChangeText={(t) => setDraft({ ...draft, emoji: [...t].slice(0, 4).join('') })}
-            returnKeyType="done"
-          />
           <Field
             label="Notes"
             value={draft.note}
             onChangeText={(t) => setDraft({ ...draft, note: t })}
             returnKeyType="done"
+            keyboardAppearance={mode}
           />
           {summary}
         </ScrollView>
@@ -150,9 +221,7 @@ export default function SaveSheet({
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.namePill}>
-            <View style={styles.nameEmojiBox}>
-              <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
-            </View>
+            {emojiButton}
             <TextInput
               value={draft.name}
               onChangeText={(t) => setDraft({ ...draft, name: t })}
@@ -160,20 +229,11 @@ export default function SaveSheet({
               placeholderTextColor={C.ink50}
               style={styles.nameInput}
               returnKeyType="done"
+              keyboardAppearance={mode}
             />
           </View>
 
-          <View style={styles.row}>
-            <Text style={styles.rowLabel}>Custom emoji</Text>
-            <TextInput
-              value={draft.emoji}
-              onChangeText={(t) => setDraft({ ...draft, emoji: [...t].slice(0, 4).join('') })}
-              placeholder="Paste any emoji"
-              placeholderTextColor={C.ink50}
-              style={styles.emojiInput}
-              returnKeyType="done"
-            />
-          </View>
+          {emojiHint}
 
           {emojiGrid}
 
@@ -185,6 +245,7 @@ export default function SaveSheet({
               placeholderTextColor={C.ink50}
               style={styles.notesInput}
               returnKeyType="done"
+              keyboardAppearance={mode}
             />
           </View>
 
@@ -229,36 +290,26 @@ const makeStyles = (C) => StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   nameEmoji: { fontSize: M3 ? 26 : 22 },
+  nameEmojiTyping: { borderWidth: 2, borderColor: C.terracotta },
+  emojiBadge: {
+    position: 'absolute',
+    right: M3 ? -2 : -6,
+    bottom: M3 ? -2 : -6,
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: C.terracotta,
+    borderWidth: 2,
+    borderColor: M3 ? C.cream : C.paper,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  // Out of sight, but still able to hold the keyboard's focus.
+  emojiHidden: { position: 'absolute', width: 1, height: 1, opacity: 0, padding: 0 },
+  emojiHint: { fontFamily: FONT.ui, fontSize: 13, color: C.ink50, paddingHorizontal: 4 },
   nameInput: {
     flex: 1,
     fontFamily: FONT.ui,
     fontSize: 16,
     color: C.ink,
     fontWeight: '500',
-    padding: 0,
-  },
-  row: {
-    backgroundColor: C.paper,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderWidth: 0.5,
-    borderColor: C.ink10,
-  },
-  rowLabel: {
-    fontFamily: FONT.ui,
-    fontSize: 13,
-    color: C.ink50,
-    fontWeight: '500',
-  },
-  emojiInput: {
-    flex: 1,
-    textAlign: 'right',
-    fontSize: 18,
-    color: C.ink,
     padding: 0,
   },
   gridWrap: M3 ? {

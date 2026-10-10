@@ -204,3 +204,13 @@ export const Check = ({ s = 14, c }) => {
     </Svg>
   );
 };
+
+export const Pencil = ({ s = 12, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.ink;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" stroke={stroke} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};

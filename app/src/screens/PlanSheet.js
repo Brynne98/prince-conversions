@@ -20,17 +20,18 @@ export default function PlanSheet({ visible, plan, onClose, onRemove, onStart })
   const mixedTemps = new Set(plan.map((f) => `${f.temp}${f.unit}`)).size > 1;
 
   return (
-    // Android: Material's bottom sheet, closed by its scrim or the back button.
+    // A half-height sheet on iOS; Material's bottom sheet on Android, closed
+    // by its scrim or the back button.
     <Sheet visible={visible} onClose={onClose} bottom>
       {!M3 && (
         <View style={styles.header}>
-          <View style={{ width: 44 }} />
+          <Text style={styles.title}>{t('plan.title')}</Text>
           <CloseButton onPress={onClose} />
         </View>
       )}
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{t('plan.title')}</Text>
+        {M3 && <Text style={styles.title}>{t('plan.title')}</Text>}
         <Text style={styles.subtitle}>{t('plan.subtitle')}</Text>
 
         <View style={styles.list}>
@@ -73,9 +74,12 @@ export default function PlanSheet({ visible, plan, onClose, onRemove, onStart })
 }
 
 const makeStyles = (C) => StyleSheet.create({
+  // Clear of the system's drag indicator at the top of the sheet.
   header: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingLeft: 24,
+    paddingRight: 16,
+    paddingTop: 22,
+    paddingBottom: 4,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -88,12 +92,10 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.ink,
   } : {
     fontFamily: FONT.display,
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '500',
     color: C.ink,
-    textAlign: 'center',
     letterSpacing: -0.4,
-    marginBottom: 8,
   },
   subtitle: M3 ? {
     fontFamily: FONT.ui,
@@ -104,12 +106,10 @@ const makeStyles = (C) => StyleSheet.create({
     marginBottom: 8,
   } : {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    color: C.ink50,
-    textAlign: 'center',
-    lineHeight: 21,
-    marginBottom: 24,
-    paddingHorizontal: 8,
+    fontSize: 14,
+    color: C.ink70,
+    lineHeight: 20,
+    marginBottom: 14,
   },
   // Android: plain Material list items, straight on the sheet.
   list: M3 ? { marginRight: -12 } : {

@@ -9,6 +9,11 @@ import { FONT, useTheme, useStyles } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close, ArrowBack, Check } from './icons';
 
+// Expo's SwiftUI pieces, for the one thing React Native's own sheet cannot do:
+// stop at half height. They exist on iOS only, so they are loaded only there.
+const SwiftUI = Platform.OS === 'ios' ? require('@expo/ui/swift-ui') : null;
+const swiftModifiers = Platform.OS === 'ios' ? require('@expo/ui/swift-ui/modifiers') : null;
+
 // ─── Hold-to-repeat button ────────────────────────────────────────────
 function HoldButton({ onTrigger, children, style }) {
   const timerRef = useRef(null);
@@ -275,14 +280,17 @@ export function AppBar({ title, leading, onLeading, children }) {
 // ─── Sheet ───────────────────────────────────────────────────────────
 // Apple's page sheet, which iOS 26 draws in its own glass style. Android
 // shows it as a full-screen page, edge to edge, so the content is padded
-// clear of the status and navigation bars there (AFC-10). `bottom` makes it
-// Material's bottom sheet on Android instead, for a short list and one
-// action. The grabber is drawn on iOS only: an Android page cannot be
-// dragged away.
+// clear of the status and navigation bars there (AFC-10). `bottom` is for a
+// short list and one action: a half-height sheet on iOS that drags taller,
+// Material's bottom sheet on Android. The grabber is drawn on iOS only: an
+// Android page cannot be dragged away.
 export function Sheet({ visible, onClose, handle = true, bottom = false, children }) {
   const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const android = Platform.OS === 'android';
+  if (bottom && SwiftUI) {
+    return <HalfSheet visible={visible} onClose={onClose}>{children}</HalfSheet>;
+  }
   if (android && bottom) {
     return (
       <Modal
@@ -310,6 +318,36 @@ export function Sheet({ visible, onClose, handle = true, bottom = false, childre
         {children}
       </View>
     </Modal>
+  );
+}
+
+// Apple's sheet at half height, with the app's content inside it. It is
+// painted in the page colour: the sheet's own glass follows the system's
+// light or dark, not the app's, and would turn dark mode's text unreadable.
+function HalfSheet({ visible, onClose, children }) {
+  const { C, mode } = useTheme();
+  const { Host, BottomSheet, Group, RNHostView } = SwiftUI;
+  const { presentationDetents, presentationDragIndicator, presentationBackground } = swiftModifiers;
+  return (
+    <Host colorScheme={mode} style={{ position: 'absolute', width: 1, height: 1 }}>
+      <BottomSheet
+        isPresented={visible}
+        // Only a swipe down is news; a close the app asked for is not.
+        onIsPresentedChange={(open) => { if (!open && visible) onClose(); }}
+      >
+        <Group
+          modifiers={[
+            presentationDetents(['medium', 'large']),
+            presentationDragIndicator('visible'),
+            presentationBackground(C.cream),
+          ]}
+        >
+          <RNHostView>
+            <View style={{ flex: 1 }}>{children}</View>
+          </RNHostView>
+        </Group>
+      </BottomSheet>
+    </Host>
   );
 }
 

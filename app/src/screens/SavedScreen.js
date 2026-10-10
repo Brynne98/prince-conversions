@@ -11,7 +11,7 @@ import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutesShort } from '../convert';
 
 export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0 }) {
-  const { C } = useTheme();
+  const { C, mode } = useTheme();
   const styles = useStyles(makeStyles);
   const [query, setQuery] = useState('');
   const [displayUnit, setDisplayUnit] = useState(unit);
@@ -49,6 +49,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         style={styles.searchInput}
         autoCorrect={false}
         autoCapitalize="none"
+        keyboardAppearance={mode}
       />
     </GlassSurface>
   );
