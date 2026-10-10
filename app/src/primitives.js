@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Pressable, Text, View, Animated, StyleSheet, Modal, Platform,
+  Pressable, Text, View, Animated, StyleSheet, Modal, Platform, Switch,
+  Alert, ActionSheetIOS, TextInput,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, useTheme, useStyles } from './theme';
-import { GLASS, GlassFill, GlassPressable } from './glass';
-import { Plus, Minus, Close } from './icons';
+import { GLASS, M3, GlassFill, GlassPressable } from './glass';
+import { Plus, Minus, Close, ArrowBack, Check } from './icons';
 
 // ─── Hold-to-repeat button ────────────────────────────────────────────
 function HoldButton({ onTrigger, children, style }) {
@@ -49,46 +50,68 @@ function HoldButton({ onTrigger, children, style }) {
   );
 }
 
-// ─── Custom toggle ───────────────────────────────────────────────────
+// ─── Toggle ──────────────────────────────────────────────────────────
+// iOS uses the platform switch, which iOS 26 draws in glass. Only the on
+// colour is the app's.
 export function Toggle({ value, onValueChange, onColor }) {
   const { C } = useTheme();
-  const styles = useStyles(makeStyles);
-  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const change = (v) => {
+    onValueChange?.(v);
+    Haptics.selectionAsync();
+  };
+  if (M3) return <M3Switch value={!!value} onChange={change} />;
+  return (
+    <Switch
+      value={value}
+      onValueChange={change}
+      trackColor={{ false: C.ink10, true: onColor || C.terracotta }}
+      ios_backgroundColor={C.ink10}
+    />
+  );
+}
+
+// Material 3's switch. React Native's own still draws the Material 2 one on
+// Android: a thin track and a shadowed thumb.
+function M3Switch({ value, onChange }) {
+  const { C } = useTheme();
+  const pos = useRef(new Animated.Value(value ? 1 : 0)).current;
   useEffect(() => {
-    Animated.spring(anim, {
-      toValue: value ? 1 : 0,
-      damping: 18,
-      stiffness: 280,
-      useNativeDriver: true,
-    }).start();
-  }, [value, anim]);
-
-  const thumbX = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 20],
-  });
-
+    Animated.timing(pos, { toValue: value ? 1 : 0, duration: 150, useNativeDriver: false }).start();
+  }, [value, pos]);
+  // Inside the 2dp outline: a 16dp thumb at rest, 24dp once on.
+  const size = pos.interpolate({ inputRange: [0, 1], outputRange: [16, 24] });
+  const left = pos.interpolate({ inputRange: [0, 1], outputRange: [6, 22] });
+  const top = pos.interpolate({ inputRange: [0, 1], outputRange: [6, 2] });
   return (
     <Pressable
-      onPress={() => {
-        onValueChange?.(!value);
-        Haptics.selectionAsync();
-      }}
+      onPress={() => onChange(!value)}
       hitSlop={8}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value }}
+      style={{
+        width: 52,
+        height: 32,
+        borderRadius: 16,
+        borderWidth: 2,
+        borderColor: value ? C.terracotta : C.ink50,
+        backgroundColor: value ? C.terracotta : C.surfaceHigh,
+      }}
     >
-      <View style={[styles.toggleTrack, { backgroundColor: C.ink10 }]}>
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            { backgroundColor: onColor || C.terracotta, borderRadius: 14, opacity: anim },
-          ]}
-        />
-        <Animated.View
-          pointerEvents="none"
-          style={[styles.toggleThumb, { transform: [{ translateX: thumbX }] }]}
-        />
-      </View>
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left,
+          top,
+          width: size,
+          height: size,
+          borderRadius: 12,
+          backgroundColor: value ? C.onTerracotta : C.ink50,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {value && <Check s={14} c={C.terracotta} />}
+      </Animated.View>
     </Pressable>
   );
 }
@@ -140,11 +163,14 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
 
   const valueSize = big ? 88 : 64;
   const suffixSize = big ? 36 : 28;
+  // Android: Material's medium tonal icon button.
+  const iconSize = M3 ? 24 : 20;
+  const iconColor = M3 ? C.terracottaDeep : C.ink;
 
   return (
     <View style={styles.stepperRow}>
       <HoldButton onTrigger={dec} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
-        <Minus s={20} c={C.ink} />
+        <Minus s={iconSize} c={iconColor} />
       </HoldButton>
       <View style={styles.stepperValueWrap}>
         {formatTime ? (
@@ -166,16 +192,18 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
         )}
       </View>
       <HoldButton onTrigger={inc} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
-        <Plus s={20} c={C.ink} />
+        <Plus s={iconSize} c={iconColor} />
       </HoldButton>
     </View>
   );
 }
 
 // A circle button. `raised` sits on the page (paper, hairline, shadow);
-// `flat` sits inside a sheet (a faint ink wash). Glass on iOS 26.
+// `flat` sits inside a sheet (a faint ink wash). Glass on iOS 26. On Android
+// it is Material's standard icon button: no container, a 48dp target.
 export function RoundButton({ onPress, children, size = 44, tone = 'raised', accessibilityLabel }) {
   const styles = useStyles(makeStyles);
+  const s = M3 ? 48 : size;
   return (
     <GlassPressable
       onPress={onPress}
@@ -183,8 +211,8 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
-        tone === 'flat' ? styles.roundFlat : styles.roundBtn,
-        { width: size, height: size, borderRadius: size / 2, opacity: pressed ? 0.6 : 1 },
+        M3 ? styles.roundM3 : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
+        { width: s, height: s, borderRadius: s / 2, opacity: pressed ? 0.6 : 1 },
       ]}
     >
       {children}
@@ -192,24 +220,89 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
   );
 }
 
-export function CloseButton({ onPress, size = 30 }) {
+export function CloseButton({ onPress, size = 44 }) {
   const { C } = useTheme();
   return (
     <RoundButton onPress={onPress} size={size} tone="flat" accessibilityLabel="Close">
-      <Close s={16} c={C.ink70} />
+      <Close s={18} c={C.ink70} />
     </RoundButton>
+  );
+}
+
+// A button that is only its label: Material's text button.
+export function TextButton({ label, onPress, disabled = false }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      hitSlop={4}
+      android_ripple={{ color: C.ink10 }}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      style={styles.textBtn}
+    >
+      <Text style={[styles.textBtnLabel, disabled && { color: C.ink30 }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+// ─── Top app bar (Android) ───────────────────────────────────────────
+// Material's small top app bar: the title leads from the left and actions
+// trail. iOS screens keep their own headers.
+export function AppBar({ title, leading, onLeading, children }) {
+  const styles = useStyles(makeStyles);
+  return (
+    <View style={styles.appBar}>
+      {leading && (
+        <RoundButton onPress={onLeading} accessibilityLabel={leading === 'back' ? 'Back' : 'Close'}>
+          {leading === 'back' ? <ArrowBack /> : <Close s={24} />}
+        </RoundButton>
+      )}
+      <Text
+        style={[styles.appBarTitle, !leading && { marginLeft: 12 }]}
+        numberOfLines={1}
+        accessibilityRole="header"
+      >
+        {title}
+      </Text>
+      {children}
+    </View>
   );
 }
 
 // ─── Sheet ───────────────────────────────────────────────────────────
 // Apple's page sheet, which iOS 26 draws in its own glass style. Android
-// shows it full screen, edge to edge, so the content is padded clear of the
-// status and navigation bars there (AFC-10). The grabber is drawn on iOS
-// only: an Android sheet cannot be dragged away.
-export function Sheet({ visible, onClose, handle = true, children }) {
+// shows it as a full-screen page, edge to edge, so the content is padded
+// clear of the status and navigation bars there (AFC-10). `bottom` makes it
+// Material's bottom sheet on Android instead, for a short list and one
+// action. The grabber is drawn on iOS only: an Android page cannot be
+// dragged away.
+export function Sheet({ visible, onClose, handle = true, bottom = false, children }) {
   const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const android = Platform.OS === 'android';
+  if (android && bottom) {
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        statusBarTranslucent
+        navigationBarTranslucent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View style={styles.scrim}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" />
+          <View style={[styles.bottomSheet, { paddingBottom: insets.bottom + 16 }]}>
+            <View style={styles.bottomHandle} />
+            {children}
+          </View>
+        </View>
+      </Modal>
+    );
+  }
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <View style={[styles.sheetRoot, android && { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
@@ -220,8 +313,175 @@ export function Sheet({ visible, onClose, handle = true, children }) {
   );
 }
 
+// ─── Alerts and confirmations ────────────────────────────────────────
+let present = null;   // set by DialogHost while it is mounted
+let scheme = 'light'; // the app's own light or dark, which the system does not know
+
+// An alert. iOS shows Apple's own. Android's system alert still wears
+// Material 2, so the app draws Material 3's dialog there. Same arguments as
+// Alert.alert.
+export function alert(title, message, buttons) {
+  if (M3 && present) {
+    present({ title, message, buttons: buttons?.length ? buttons : [{ text: 'OK' }] });
+    return;
+  }
+  Alert.alert(title, message, buttons, { userInterfaceStyle: scheme });
+}
+
+// Confirming something the person chose to do, like a delete: Apple asks
+// with an action sheet rising from the control (`anchor`), Material with a
+// dialog.
+export function confirmDestructive({ title, message, confirmLabel, onConfirm, anchor }) {
+  if (M3) {
+    alert(title, message, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: confirmLabel, onPress: onConfirm },
+    ]);
+    return;
+  }
+  ActionSheetIOS.showActionSheetWithOptions(
+    {
+      title,
+      message,
+      options: ['Cancel', confirmLabel],
+      cancelButtonIndex: 0,
+      destructiveButtonIndex: 1,
+      anchor,
+      userInterfaceStyle: scheme,
+    },
+    (index) => { if (index === 1) onConfirm(); },
+  );
+}
+
+// Mounted once at the root. Draws Android's dialogs; on iOS it only keeps
+// the system alerts in the app's light or dark.
+export function DialogHost() {
+  const { mode } = useTheme();
+  const styles = useStyles(makeStyles);
+  const [dialog, setDialog] = useState(null);
+  // The last dialog stays drawn while it fades out.
+  const shown = useRef(null);
+  if (dialog) shown.current = dialog;
+  useEffect(() => { scheme = mode; }, [mode]);
+  useEffect(() => {
+    present = setDialog;
+    return () => { present = null; };
+  }, []);
+  if (!M3) return null;
+  const d = shown.current;
+  const close = (button) => {
+    setDialog(null);
+    button?.onPress?.();
+  };
+  return (
+    <Modal
+      visible={!!dialog}
+      transparent
+      statusBarTranslucent
+      navigationBarTranslucent
+      animationType="fade"
+      onRequestClose={() => close(d?.buttons.find((b) => b.style === 'cancel'))}
+    >
+      <View style={[styles.scrim, styles.dialogScrim]}>
+        <View style={styles.dialog} accessibilityViewIsModal>
+          <Text style={styles.dialogTitle} accessibilityRole="header">{d?.title}</Text>
+          {!!d?.message && <Text style={styles.dialogBody}>{d.message}</Text>}
+          <View style={styles.dialogActions}>
+            {d?.buttons.map((b) => (
+              <TextButton key={b.text} label={b.text} onPress={() => close(b)} />
+            ))}
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ─── Text field (Android) ────────────────────────────────────────────
+// Material's outlined text field: the label rides up into the outline once
+// the field is in use.
+export function Field({ label, value, style, ...input }) {
+  const { C } = useTheme();
+  const styles = useStyles(makeStyles);
+  const [focused, setFocused] = useState(false);
+  const up = focused || !!value;
+  return (
+    <View style={[styles.field, focused && styles.fieldFocused, style]}>
+      {up && <Text style={[styles.fieldLabel, focused && { color: C.terracotta }]}>{label}</Text>}
+      <TextInput
+        value={value}
+        placeholder={up ? undefined : label}
+        placeholderTextColor={C.ink70}
+        accessibilityLabel={label}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={styles.fieldInput}
+        {...input}
+      />
+    </View>
+  );
+}
+
 // ─── Segmented control ───────────────────────────────────────────────
-export function Segmented({ options, value, onChange, compact = false, tone = 'default' }) {
+export function Segmented(props) {
+  return M3 ? <ConnectedGroup {...props} /> : <SlidingSegmented {...props} />;
+}
+
+// Android: Material's connected button group, which replaced segmented
+// buttons. The chosen button rounds off fully; the rest keep a squarer
+// inner edge.
+function ConnectedGroup({ options, value, onChange, compact = false, tone = 'default' }) {
+  const { C } = useTheme();
+  const onTerracotta = tone === 'onTerracotta';
+  return (
+    <View style={{ flexDirection: 'row', alignSelf: 'center', gap: 2 }}>
+      {options.map((o, i) => {
+        const active = o.value === value;
+        const lead = active || i === 0 ? 20 : 8;
+        const trail = active || i === options.length - 1 ? 20 : 8;
+        return (
+          <Pressable
+            key={o.value}
+            onPress={() => {
+              if (!active) {
+                onChange(o.value);
+                Haptics.selectionAsync();
+              }
+            }}
+            hitSlop={{ top: 4, bottom: 4 }}
+            android_ripple={{ color: C.ink10 }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            style={{
+              height: 40,
+              paddingHorizontal: compact ? 14 : 16,
+              justifyContent: 'center',
+              overflow: 'hidden',
+              backgroundColor: active
+                ? (onTerracotta ? C.onTerracotta : C.terracotta)
+                : (onTerracotta ? C.onTerracotta18 : C.surfaceHigh),
+              borderTopLeftRadius: lead,
+              borderBottomLeftRadius: lead,
+              borderTopRightRadius: trail,
+              borderBottomRightRadius: trail,
+            }}
+          >
+            <Text style={{
+              fontFamily: FONT.ui,
+              fontSize: 14,
+              fontWeight: '500',
+              color: active
+                ? (onTerracotta ? C.terracotta : C.onTerracotta)
+                : (onTerracotta ? C.onTerracotta : C.ink70),
+            }}>{o.label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function SlidingSegmented({ options, value, onChange, compact = false, tone = 'default' }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
   const onTerracotta = tone === 'onTerracotta';
@@ -235,9 +495,10 @@ export function Segmented({ options, value, onChange, compact = false, tone = 'd
     }).start();
   }, [idx, slide]);
 
-  const padV = compact ? 6 : 8;
+  // Tall enough to hit: about 38pt compact, 44pt full.
+  const padV = compact ? 8 : 10;
   const padH = compact ? 14 : 18;
-  const fontSize = compact ? 13 : 14;
+  const fontSize = compact ? 14 : 15;
 
   const trackBg = onTerracotta ? 'rgba(255,247,238,0.18)' : C.ink06;
   const pillBg = onTerracotta ? '#FFF7EE' : C.paper;
@@ -348,7 +609,7 @@ const makeStyles = (C) => ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 16,
+    gap: M3 ? 8 : 16,
   },
   stepperValueWrap: {
     flex: 1,
@@ -369,7 +630,14 @@ const makeStyles = (C) => ({
     color: C.ink50,
     letterSpacing: -0.5,
   },
-  stepBtn: {
+  stepBtn: M3 ? {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: C.terracottaSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } : {
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -383,27 +651,6 @@ const makeStyles = (C) => ({
     elevation: 1,
     borderWidth: 0.5,
     borderColor: C.ink10,
-  },
-  toggleTrack: {
-    width: 48,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  toggleThumb: {
-    position: 'absolute',
-    top: 2,
-    left: 2,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#FFF7EE',
-    shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
   },
   roundBtn: {
     backgroundColor: C.paper,
@@ -422,12 +669,126 @@ const makeStyles = (C) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  roundM3: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textBtn: {
+    height: 40,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textBtnLabel: {
+    fontFamily: FONT.ui,
+    fontSize: 14,
+    fontWeight: '500',
+    color: C.terracotta,
+  },
+  appBar: {
+    height: 64,
+    paddingHorizontal: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  appBarTitle: {
+    flex: 1,
+    marginLeft: 4,
+    fontFamily: FONT.ui,
+    fontSize: 22,
+    lineHeight: 28,
+    color: C.ink,
+  },
   sheetRoot: { flex: 1, backgroundColor: C.cream },
   sheetHandle: {
     width: 36, height: 4, borderRadius: 2,
     backgroundColor: C.ink30,
     alignSelf: 'center',
     marginTop: 8, marginBottom: 4,
+  },
+  scrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.32)',
+    justifyContent: 'flex-end',
+  },
+  bottomSheet: {
+    maxHeight: '90%',
+    backgroundColor: C.surfaceLow,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+  },
+  bottomHandle: {
+    width: 32, height: 4, borderRadius: 2,
+    backgroundColor: C.ink30,
+    alignSelf: 'center',
+    marginTop: 16, marginBottom: 14,
+  },
+  dialogScrim: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  dialog: {
+    width: '100%',
+    maxWidth: 312,
+    backgroundColor: C.surfaceHigh,
+    borderRadius: 28,
+    paddingTop: 24,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+  },
+  dialogTitle: {
+    fontFamily: FONT.ui,
+    fontSize: 24,
+    lineHeight: 32,
+    color: C.ink,
+  },
+  dialogBody: {
+    fontFamily: FONT.ui,
+    fontSize: 14,
+    lineHeight: 20,
+    color: C.ink70,
+    marginTop: 16,
+  },
+  dialogActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 24,
+    marginRight: -12,
+  },
+  field: {
+    height: 56,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: C.ink30,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+  },
+  // One pixel less padding, so the thicker outline does not nudge the text.
+  fieldFocused: {
+    borderWidth: 2,
+    borderColor: C.terracotta,
+    paddingHorizontal: 15,
+  },
+  fieldLabel: {
+    position: 'absolute',
+    top: -9,
+    left: 12,
+    paddingHorizontal: 4,
+    backgroundColor: C.cream,
+    fontFamily: FONT.ui,
+    fontSize: 12,
+    color: C.ink70,
+  },
+  fieldInput: {
+    fontFamily: FONT.ui,
+    fontSize: 16,
+    color: C.ink,
+    padding: 0,
   },
   segWrap: {
     position: 'relative',
@@ -437,7 +798,12 @@ const makeStyles = (C) => ({
     borderRadius: 999,
     padding: 3,
   },
-  card: {
+  // Android: a tonal Material card, lifted by colour, not shadow.
+  card: M3 ? {
+    backgroundColor: C.surfaceLow,
+    borderRadius: 28,
+    padding: 16,
+  } : {
     backgroundColor: C.paper,
     borderRadius: 24,
     padding: 18,

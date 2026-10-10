@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
-import { GLASS, GlassFill, GlassPressable } from '../glass';
+import { GLASS, M3, GlassFill, GlassPressable } from '../glass';
 
 const CARD_HEIGHT = 70;
 const PEEK = 10;
@@ -128,6 +128,9 @@ export default function TimerStack({
   );
 }
 
+// Material sets labels in sentence case; the iOS looks keep the capitals.
+const cap = (s) => (M3 ? s : s.toUpperCase());
+
 function TimerCard({ timer, onPress, onCancel, onRestart }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
@@ -150,10 +153,12 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
 
   const isDone = timer.completed;
   const isWaiting = !isDone && timer.waitingSec > 0;
-  // iOS 26: a terracotta-tinted glass card, like a Live Activity. Elsewhere
-  // the gradient card.
-  const Body = GLASS ? View : LinearGradient;
-  const bodyProps = GLASS ? {} : {
+  // iOS 26: a terracotta-tinted glass card, like a Live Activity. Android: a
+  // flat terracotta card. Older iPhones: the gradient card.
+  const flat = GLASS || M3;
+  const Body = flat ? View : LinearGradient;
+  const doneColor = '#E07246';
+  const bodyProps = flat ? {} : {
     colors: isDone ? ['#E07246', '#A8451F'] : [C.terracotta, '#B14E29'],
     start: { x: 0, y: 0 },
     end: { x: 1, y: 1 },
@@ -168,25 +173,32 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
       })}
     >
       <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
-        <Body {...bodyProps} style={[styles.card, GLASS && styles.cardGlass]}>
-          <GlassFill tint={isDone ? '#E07246' : C.terracotta} scheme="dark" radius={26} />
+        <Body
+          {...bodyProps}
+          style={[
+            styles.card,
+            GLASS && styles.cardGlass,
+            M3 && { backgroundColor: isDone ? doneColor : C.terracotta },
+          ]}
+        >
+          <GlassFill tint={isDone ? doneColor : C.terracotta} scheme="dark" radius={26} />
           <View style={styles.left}>
             <View style={styles.kickerRow}>
               <Text style={styles.kicker} numberOfLines={1}>
-                {timer.label || 'COOK TIMER'}
+                {timer.label || 'Cook timer'}
               </Text>
               {isDone ? (
                 <View style={[styles.badge, styles.badgeDone]}>
-                  <Text style={[styles.badgeText, { color: C.terracottaDeep }]}>DONE</Text>
+                  <Text style={[styles.badgeText, { color: C.terracottaDeep }]}>{cap('Done')}</Text>
                 </View>
               ) : isWaiting ? (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>GOES IN</Text>
+                  <Text style={styles.badgeText}>{cap('Goes in')}</Text>
                 </View>
               ) : timer.remindHalfway ? (
                 <View style={styles.badge}>
                   <Bell s={11} c={C.onTerracotta} />
-                  <Text style={styles.badgeText}>HALFWAY</Text>
+                  <Text style={styles.badgeText}>{cap('Halfway')}</Text>
                 </View>
               ) : null}
             </View>
@@ -241,7 +253,7 @@ const makeStyles = (C) => StyleSheet.create({
     shadowOpacity: 0.32,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 10 },
-    elevation: 8,
+    elevation: M3 ? 3 : 8,
     overflow: 'hidden',
   },
   cardGlass: { borderRadius: 26, shadowOpacity: 0, elevation: 0 },
@@ -253,11 +265,11 @@ const makeStyles = (C) => StyleSheet.create({
   },
   kicker: {
     fontFamily: FONT.ui,
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: M3 ? 12 : 11,
+    fontWeight: M3 ? '500' : '700',
     color: C.onTerracotta85,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    letterSpacing: M3 ? 0.1 : 0.6,
+    textTransform: M3 ? 'none' : 'uppercase',
     flexShrink: 1,
   },
   badge: {
@@ -274,10 +286,10 @@ const makeStyles = (C) => StyleSheet.create({
   },
   badgeText: {
     fontFamily: FONT.ui,
-    fontSize: 9,
-    fontWeight: '700',
+    fontSize: M3 ? 11 : 9,
+    fontWeight: M3 ? '500' : '700',
     color: C.onTerracotta,
-    letterSpacing: 0.6,
+    letterSpacing: M3 ? 0.1 : 0.6,
   },
   time: {
     fontFamily: FONT.display,
@@ -289,7 +301,7 @@ const makeStyles = (C) => StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   iconBtn: {
-    width: 34, height: 34, borderRadius: 17,
+    width: M3 ? 40 : 44, height: M3 ? 40 : 44, borderRadius: 22,
     backgroundColor: 'rgba(255,247,238,0.18)',
     alignItems: 'center', justifyContent: 'center',
     marginLeft: 8,

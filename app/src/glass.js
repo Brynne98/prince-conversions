@@ -11,6 +11,10 @@ import { useTheme } from './theme';
 // The major version only: point releases read "26.0.1", which Number() makes NaN.
 export const GLASS = Platform.OS === 'ios' && parseInt(String(Platform.Version), 10) >= 26;
 
+// Android wears Material 3, drawn by the app as Health Switch does it. The
+// third look, iOS before 26, is whatever is neither.
+export const M3 = Platform.OS === 'android';
+
 // Paint the glass replaces: Apple's glass draws its own fill, edge and
 // shadow, and a press is answered by the glass itself, not a fade.
 const PAINT = new Set([
@@ -83,11 +87,24 @@ export function GlassSurface({ style, tint, clear, scheme, children }) {
 /**
  * A Pressable whose face is interactive glass on iOS 26: the glass carries
  * the button's shape and content and answers the finger itself, with
- * Apple's shimmer and stretch. Elsewhere it is a plain Pressable in `style`.
+ * Apple's shimmer and stretch. Android gets a ripple; older iPhones a plain
+ * Pressable in `style`.
  * `style` may be a function of { pressed }, as on Pressable.
  */
 export function GlassPressable({ style, tint, clear, scheme, children, ...rest }) {
-  const { mode } = useTheme();
+  const { mode, C } = useTheme();
+  if (M3) {
+    // Material answers a press with a ripple clipped to the button, not a fade.
+    return (
+      <Pressable
+        android_ripple={{ color: C.ink10 }}
+        {...rest}
+        style={[typeof style === 'function' ? style({ pressed: false }) : style, { overflow: 'hidden' }]}
+      >
+        {children}
+      </Pressable>
+    );
+  }
   if (!GLASS) return <Pressable style={style} {...rest}>{children}</Pressable>;
   const resolve = (state) => split(typeof style === 'function' ? style(state) : style);
   return (

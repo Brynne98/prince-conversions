@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Dimensions, StyleSheet, Platform, Alert,
+  View, Text, Animated, Dimensions, StyleSheet, Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -18,6 +18,8 @@ import TimerStack from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
 import { ThemeProvider, useTheme, useStyles } from './src/theme';
+import { M3 } from './src/glass';
+import { alert, DialogHost } from './src/primitives';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
 import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
@@ -273,12 +275,12 @@ function Root({ themeMode, setThemeMode }) {
     }
     capture('plan_nudge_shown', { is_pro: isPro });
     if (isPro) {
-      Alert.alert(t('plan.nudge_title'), t('plan.nudge_body_pro'), [
+      alert(t('plan.nudge_title'), t('plan.nudge_body_pro'), [
         { text: t('plan.nudge_ok') },
       ]);
       return;
     }
-    Alert.alert(t('plan.nudge_title'), t('plan.nudge_body_free'), [
+    alert(t('plan.nudge_title'), t('plan.nudge_body_free'), [
       { text: t('plan.nudge_later'), style: 'cancel' },
       {
         text: t('plan.nudge_see_pro'),
@@ -506,21 +508,18 @@ function Root({ themeMode, setThemeMode }) {
         <AnimatedSplash onDone={() => setSplashGone(true)} />
       )}
 
+      {/* Short messages sit at the top, clear of the buttons that raise them
+          and of the timers at the bottom: between the two top-bar buttons on
+          iOS, under the app bar on Android. */}
       {toast && (
-        <View pointerEvents="none" style={[
-          styles.toastWrap,
-          {
-            bottom:
-              (cookTimers.list.length > 0
-                ? Math.min(cookTimers.list.length, 3) * 78 + 32
-                : 56) + bottomInset,
-          },
-        ]}>
+        <View pointerEvents="none" style={[styles.toastWrap, { top: topInset + (M3 ? 68 : 8) }]}>
           <View style={styles.toast}>
-            <Text style={styles.toastText}>{toast}</Text>
+            <Text style={styles.toastText} numberOfLines={2}>{toast}</Text>
           </View>
         </View>
       )}
+
+      <DialogHost />
     </View>
   );
 }
@@ -537,12 +536,26 @@ function durationBucket(totalSec) {
 
 const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream, overflow: 'hidden' },
-  toastWrap: {
+  toastWrap: M3 ? {
     position: 'absolute',
-    left: 0, right: 0,
+    left: 16, right: 16,
+  } : {
+    position: 'absolute',
+    left: 76, right: 76,
+    minHeight: 44,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  toast: {
+  // Android: Material's snackbar. iOS: a pill.
+  toast: M3 ? {
+    backgroundColor: C.ink,
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    elevation: 6,
+  } : {
     backgroundColor: C.ink,
     paddingVertical: 10,
     paddingHorizontal: 18,
@@ -558,6 +571,6 @@ const makeStyles = (C) => StyleSheet.create({
     // gives high contrast in both light and dark modes.
     color: C.cream,
     fontSize: 14,
-    fontWeight: '500',
+    ...(M3 ? { lineHeight: 20 } : { fontWeight: '500', textAlign: 'center' }),
   },
 });

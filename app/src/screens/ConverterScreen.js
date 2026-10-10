@@ -5,8 +5,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
-import { Stepper, Segmented, Card, RoundButton } from '../primitives';
-import { GLASS, GlassPressable } from '../glass';
+import { Stepper, Segmented, Card, RoundButton, AppBar } from '../primitives';
+import { GLASS, M3, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
 import { Bookmark, Flame, Gear, List, Swap, Play, Plus, ShareIcon } from '../icons';
 import { t } from '../i18n';
@@ -46,8 +46,10 @@ export default function ConverterScreen({
   const tempMax = unit === 'F' ? 500 : 260;
 
   const isOvenToAir = direction === 'oven-to-air';
-  const sourceLabel = isOvenToAir ? 'OVEN RECIPE' : 'AIR FRYER RECIPE';
-  const targetLabel = isOvenToAir ? 'AIR FRYER' : 'OVEN';
+  // Material sets labels in sentence case; the iOS looks keep the spaced capitals.
+  const cap = (s) => (M3 ? s : s.toUpperCase());
+  const sourceLabel = cap(isOvenToAir ? 'Oven recipe' : 'Air fryer recipe');
+  const targetLabel = cap(isOvenToAir ? 'Air fryer' : 'Oven');
 
   // "425°F oven for 25 min → 400°F air fryer for 20 min"
   const share = async () => {
@@ -94,20 +96,31 @@ export default function ConverterScreen({
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
-      <View style={styles.topBar}>
-        <RoundButton onPress={onOpenSaved} size={40} accessibilityLabel="Saved recipes">
-          <List s={20} />
-        </RoundButton>
-        <View style={styles.topTitleWrap}>
-          <Text style={styles.kicker}>CONVERT</Text>
+      {M3 ? (
+        <AppBar title="Convert">
+          <RoundButton onPress={onOpenSaved} accessibilityLabel="Saved recipes">
+            <List s={24} c={C.ink70} />
+          </RoundButton>
+          <RoundButton onPress={onOpenSettings} accessibilityLabel="Settings">
+            <Gear s={24} c={C.ink70} />
+          </RoundButton>
+        </AppBar>
+      ) : (
+        <View style={styles.topBar}>
+          <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
+            <List s={20} />
+          </RoundButton>
+          <View style={styles.topTitleWrap}>
+            <Text style={styles.kicker}>CONVERT</Text>
+          </View>
+          <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
+            <Gear s={19} />
+          </RoundButton>
         </View>
-        <RoundButton onPress={onOpenSettings} size={40} accessibilityLabel="Settings">
-          <Gear s={19} />
-        </RoundButton>
-      </View>
+      )}
 
       {/* Direction toggle */}
-      <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' }}>
+      <View style={styles.directionRow}>
         <Segmented
           options={[
             { value: 'oven-to-air', label: 'Oven → Air fryer' },
@@ -119,7 +132,7 @@ export default function ConverterScreen({
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 0, paddingBottom: 24 + bottomInset }}
+        contentContainerStyle={{ paddingHorizontal: M3 ? 16 : 20, paddingTop: 0, paddingBottom: 24 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
         {/* Source card */}
@@ -127,7 +140,7 @@ export default function ConverterScreen({
           <View style={styles.cardHeader}>
             <View style={styles.cardLabelRow}>
               <View style={styles.flameDot}>
-                <Flame s={14} c={C.terracottaDeep} />
+                <Flame s={M3 ? 16 : 14} c={C.terracottaDeep} />
               </View>
               <Text style={styles.cardLabel}>{sourceLabel}</Text>
             </View>
@@ -164,14 +177,15 @@ export default function ConverterScreen({
         <View style={{ alignItems: 'center', marginVertical: 12 }}>
           <GlassPressable onPress={flip} hitSlop={10} style={styles.flipBtn} accessibilityLabel="Swap direction">
             <Animated.View style={{ transform: [{ rotate: spinDeg }] }}>
-              <Swap s={14} c={C.terracotta} />
+              <Swap s={M3 ? 20 : 18} c={C.terracotta} />
             </Animated.View>
           </GlassPressable>
         </View>
 
         {/* Result card */}
         <LinearGradient
-          colors={[C.terracotta, '#B14E29']}
+          // Flat on Android: Material lifts with colour, not a gradient or a shadow.
+          colors={[C.terracotta, M3 ? C.terracotta : '#B14E29']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.resultCard}
@@ -187,7 +201,7 @@ export default function ConverterScreen({
                 scheme="light"
                 style={({ pressed }) => [styles.shareBtn, { opacity: pressed ? 0.6 : 1 }]}
               >
-                <ShareIcon s={16} c={C.onTerracotta} />
+                <ShareIcon s={18} c={C.onTerracotta} />
               </GlassPressable>
               <Segmented
                 compact
@@ -210,7 +224,7 @@ export default function ConverterScreen({
                 {result.temp}
                 <Text style={styles.resultBigSuffix}>°{targetUnit}</Text>
               </Text>
-              <Text style={styles.resultLabel}>TEMPERATURE</Text>
+              <Text style={styles.resultLabel}>{cap('Temperature')}</Text>
             </View>
             <View style={styles.resultDivider} />
             <View style={styles.resultCol}>
@@ -234,7 +248,7 @@ export default function ConverterScreen({
                   </>
                 )}
               </Text>
-              <Text style={styles.resultLabel}>TIME</Text>
+              <Text style={styles.resultLabel}>{cap('Time')}</Text>
             </View>
           </View>
 
@@ -310,6 +324,9 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'space-between',
   },
   topTitleWrap: { alignItems: 'center' },
+  directionRow: M3
+    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16, alignItems: 'center' }
+    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
   kicker: {
     fontFamily: FONT.ui,
     fontSize: 11,
@@ -324,19 +341,19 @@ const makeStyles = (C) => StyleSheet.create({
   },
   cardLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   flameDot: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
+    width: M3 ? 28 : 22,
+    height: M3 ? 28 : 22,
+    borderRadius: M3 ? 14 : 6,
     backgroundColor: C.terracottaSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardLabel: {
     fontFamily: FONT.ui,
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: M3 ? 14 : 12,
+    fontWeight: M3 ? '500' : '700',
     color: C.ink70,
-    letterSpacing: 0.5,
+    letterSpacing: M3 ? 0.1 : 0.5,
   },
   divider: {
     height: StyleSheet.hairlineWidth,
@@ -344,17 +361,29 @@ const makeStyles = (C) => StyleSheet.create({
     marginVertical: 16,
     marginHorizontal: -4,
   },
-  flipBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  // Android: a small tonal icon button.
+  flipBtn: M3 ? {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: C.surfaceHigh,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } : {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: C.cream,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: C.ink10,
   },
-  resultCard: {
+  resultCard: M3 ? {
+    borderRadius: 28,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  } : {
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingTop: 22,
@@ -376,17 +405,18 @@ const makeStyles = (C) => StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
+  // Matches the °C/°F switch beside it; the hit area reaches 44pt.
   shareBtn: {
-    width: 30, height: 30, borderRadius: 15,
+    width: M3 ? 40 : 38, height: M3 ? 40 : 38, borderRadius: 20,
     backgroundColor: C.onTerracotta18,
     alignItems: 'center', justifyContent: 'center',
   },
   resultKicker: {
     fontFamily: FONT.ui,
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: M3 ? 14 : 12,
+    fontWeight: M3 ? '500' : '700',
     color: C.onTerracotta85,
-    letterSpacing: 1.6,
+    letterSpacing: M3 ? 0.1 : 1.6,
   },
   resultRow: {
     flexDirection: 'row',
@@ -414,8 +444,8 @@ const makeStyles = (C) => StyleSheet.create({
     fontSize: 11,
     color: C.onTerracotta70,
     marginTop: 6,
-    letterSpacing: 0.8,
-    fontWeight: '600',
+    letterSpacing: M3 ? 0.4 : 0.8,
+    fontWeight: M3 ? '500' : '600',
   },
   resultDivider: {
     width: StyleSheet.hairlineWidth,
@@ -427,10 +457,11 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
-  // On iOS 26 the buttons are glass capsules, as Apple's are.
+  // On iOS 26 the buttons are glass capsules, as Apple's are. Android's are
+  // Material's medium buttons: 56dp and fully round.
   actionBtn: {
-    height: 48,
-    borderRadius: GLASS ? 24 : 14,
+    height: M3 ? 56 : 48,
+    borderRadius: M3 ? 28 : GLASS ? 24 : 14,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -462,8 +493,10 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    // A glass capsule on iOS 26; a plain text link elsewhere.
+    // A glass capsule on iOS 26, a Material text button on Android, a plain
+    // text link on older iPhones.
     ...(GLASS ? { height: 36, paddingHorizontal: 14, borderRadius: 18 } : null),
+    ...(M3 ? { height: 40, paddingHorizontal: 12, borderRadius: 20, marginTop: 8 } : null),
   },
   addToPlanText: {
     fontFamily: FONT.ui,
@@ -473,14 +506,14 @@ const makeStyles = (C) => StyleSheet.create({
   },
   planBar: {
     marginTop: 10,
-    height: 44,
-    borderRadius: GLASS ? 22 : 14,
+    height: M3 ? 48 : 44,
+    borderRadius: M3 ? 24 : GLASS ? 22 : 14,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: C.onTerracotta20,
+    // Tonal on Android; an outline elsewhere.
+    ...(M3 ? { backgroundColor: C.onTerracotta18 } : { borderWidth: 1, borderColor: C.onTerracotta20 }),
   },
   planBarText: {
     fontFamily: FONT.ui,
@@ -490,7 +523,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   actionBtnText: {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: M3 ? 16 : 15,
+    fontWeight: M3 ? '500' : '600',
   },
 });

@@ -183,3 +183,24 @@ export const ShareIcon = ({ s = 18, c }) => {
     </Svg>
   );
 };
+
+// Material's back arrow has a stem; Apple's is the bare chevron above.
+export const ArrowBack = ({ s = 24, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.ink;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path d="M20 12H5M11 6l-6 6 6 6" stroke={stroke} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const Check = ({ s = 14, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.ink;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path d="M5 12.5l4.5 4.5L19 7.5" stroke={stroke} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
