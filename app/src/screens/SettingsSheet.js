@@ -6,7 +6,8 @@ import Constants from 'expo-constants';
 import { FONT, useTheme, useStyles } from '../theme';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
-import { Toggle, Sheet, CloseButton } from '../primitives';
+import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
+import { M3 } from '../glass';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
 import { capture, isAnalyticsConfigured } from '../analytics';
@@ -39,13 +40,17 @@ export default function SettingsSheet({
 
   return (
     <Sheet visible={visible} onClose={onClose}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-        <CloseButton onPress={onClose} />
-      </View>
+      {M3 ? (
+        <AppBar title="Settings" leading="back" onLeading={onClose} />
+      ) : (
+        <View style={styles.header}>
+          <Text style={styles.title}>Settings</Text>
+          <CloseButton onPress={onClose} />
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-        <View style={{ paddingHorizontal: 20 }}>
+        <View style={{ paddingHorizontal: M3 ? 16 : 20 }}>
           <Row label="Dark mode" subtitle="Warm-charcoal palette">
             <Toggle
               value={mode === 'dark'}
@@ -71,7 +76,7 @@ export default function SettingsSheet({
               subtitle={t('settings.pro_active_subtitle')}
             >
               <View style={styles.proPill}>
-                <Text style={styles.proPillText}>{t('settings.pro_active_pill')}</Text>
+                <Text style={styles.proPillText}>{M3 ? 'Active' : t('settings.pro_active_pill')}</Text>
               </View>
             </Row>
           ) : (
@@ -96,7 +101,7 @@ export default function SettingsSheet({
           <Row label="About" detail={`v${APP_VERSION}`} isLast />
         </View>
 
-        <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
+        <View style={{ paddingHorizontal: M3 ? 16 : 20, marginTop: 20 }}>
           <BannerAd placement="settings" size="box" />
         </View>
       </ScrollView>
@@ -110,7 +115,8 @@ function Row({ label, subtitle, detail, children, isLast }) {
   return (
     <View style={[
       styles.row,
-      !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.divider },
+      // Material list items carry no dividers.
+      !isLast && !M3 && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.divider },
     ]}>
       <View style={{ flex: 1, paddingRight: 12 }}>
         <Text style={styles.rowLabel}>{label}</Text>
@@ -122,21 +128,23 @@ function Row({ label, subtitle, detail, children, isLast }) {
 }
 
 function PressableRow({ label, subtitle, onPress }) {
+  const { C } = useTheme();
   const styles = useStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
+      android_ripple={{ color: C.ink10 }}
       style={({ pressed }) => [
         styles.row,
         styles.rowDivider,
-        { opacity: pressed ? 0.55 : 1 },
+        { opacity: pressed && !M3 ? 0.55 : 1 },
       ]}
     >
       <View style={{ flex: 1, paddingRight: 12 }}>
         <Text style={styles.rowLabel}>{label}</Text>
         {!!subtitle && <Text style={styles.rowSubtitle}>{subtitle}</Text>}
       </View>
-      <Text style={styles.chevron}>›</Text>
+      {!M3 && <Text style={styles.chevron}>›</Text>}
     </Pressable>
   );
 }
@@ -156,7 +164,14 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.ink,
     letterSpacing: -0.3,
   },
-  row: {
+  row: M3 ? {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 72,
+    paddingVertical: 8,
+    gap: 16,
+  } : {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -164,17 +179,27 @@ const makeStyles = (C) => StyleSheet.create({
     paddingHorizontal: 4,
     gap: 12,
   },
-  rowDivider: {
+  rowDivider: M3 ? {} : {
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: C.divider,
   },
-  rowLabel: {
+  rowLabel: M3 ? {
+    fontFamily: FONT.ui,
+    fontSize: 16,
+    lineHeight: 24,
+    color: C.ink,
+  } : {
     fontFamily: FONT.ui,
     fontSize: 15,
     fontWeight: '500',
     color: C.ink,
   },
-  rowSubtitle: {
+  rowSubtitle: M3 ? {
+    fontFamily: FONT.ui,
+    fontSize: 14,
+    lineHeight: 20,
+    color: C.ink70,
+  } : {
     fontFamily: FONT.ui,
     fontSize: 12,
     color: C.ink50,
@@ -194,14 +219,14 @@ const makeStyles = (C) => StyleSheet.create({
   proPill: {
     paddingVertical: 4,
     paddingHorizontal: 10,
-    borderRadius: 999,
-    backgroundColor: C.terracotta,
+    borderRadius: M3 ? 8 : 999,
+    backgroundColor: M3 ? C.terracottaSoft : C.terracotta,
   },
   proPillText: {
     fontFamily: FONT.ui,
-    fontSize: 11,
-    fontWeight: '700',
-    color: C.onTerracotta,
-    letterSpacing: 0.6,
+    fontSize: M3 ? 12 : 11,
+    fontWeight: M3 ? '500' : '700',
+    color: M3 ? C.terracottaDeep : C.onTerracotta,
+    letterSpacing: M3 ? 0.1 : 0.6,
   },
 });

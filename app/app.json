@@ -5,6 +5,7 @@
     "scheme": "princeconversions",
     "version": "1.4.0",
     "orientation": "portrait",
+    "platforms": ["ios", "android"],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {

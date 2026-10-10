@@ -5,6 +5,9 @@ const LIGHT = {
   cream: '#FAF5EC',
   creamDeep: '#F2EADB',
   paper: '#FFFBF3',
+  // Material's tonal steps, for Android: cards sit low, fields and tracks high.
+  surfaceLow: '#FFFBF3',
+  surfaceHigh: '#EDE3D1',
   ink: '#2A1F18',
   ink70: 'rgba(42,31,24,0.70)',
   ink50: 'rgba(42,31,24,0.50)',
@@ -33,6 +36,8 @@ const DARK = {
   cream:      '#15110C',          // page bg — warm near-black
   creamDeep:  '#221911',          // tags / ad bg — subtle lift
   paper:      '#2D2218',          // cards — clearly elevated above page
+  surfaceLow: '#1F1811',
+  surfaceHigh: '#32271C',
   ink:        '#F2E8D8',          // primary text
   ink70:      'rgba(242,232,216,0.74)',
   ink50:      'rgba(242,232,216,0.58)',

@@ -6,7 +6,8 @@ import Svg, { Circle, G } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Restart } from '../icons';
-import { Toggle, Sheet, CloseButton } from '../primitives';
+import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
+import { GLASS, M3, GlassPressable } from '../glass';
 import { formatRemaining } from '../timer';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -53,13 +54,26 @@ export default function TimerScreen({
     inputRange: [0, 1],
     outputRange: [circumference, 0],
   });
+  // Android: Material's progress ring leaves a gap between the done part and
+  // the rest. A page-coloured arc, a little longer than the done part at both
+  // ends, cuts that gap out of the track.
+  const gap = stroke / 2 + 6;
+  const gapOffset = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [circumference - 2 * gap, -2 * gap],
+  });
+  const gapTurn = (gap / circumference) * 360;
 
   return (
     <Sheet visible={visible} onClose={onClose} handle={false}>
-      <View style={styles.header}>
-        <Text style={styles.kicker}>COOK TIMER</Text>
-        <CloseButton onPress={onClose} />
-      </View>
+      {M3 ? (
+        <AppBar title="Cook timer" leading="close" onLeading={onClose} />
+      ) : (
+        <View style={styles.header}>
+          <Text style={styles.kicker}>COOK TIMER</Text>
+          <CloseButton onPress={onClose} />
+        </View>
+      )}
 
       <View style={styles.center}>
         <View style={{ width: ringSize, height: ringSize, alignItems: 'center', justifyContent: 'center' }}>
@@ -69,10 +83,24 @@ export default function TimerScreen({
                 cx={ringSize / 2}
                 cy={ringSize / 2}
                 r={radius}
-                stroke={C.ink10}
+                stroke={M3 ? C.terracottaSoft : C.ink10}
                 strokeWidth={stroke}
                 fill="none"
               />
+              {M3 && !completed && waitingSec === 0 && (
+                <AnimatedCircle
+                  cx={ringSize / 2}
+                  cy={ringSize / 2}
+                  r={radius}
+                  stroke={C.cream}
+                  strokeWidth={stroke + 2}
+                  fill="none"
+                  rotation={-gapTurn}
+                  origin={`${ringSize / 2}, ${ringSize / 2}`}
+                  strokeDasharray={`${circumference}, ${circumference}`}
+                  strokeDashoffset={gapOffset}
+                />
+              )}
               <AnimatedCircle
                 cx={ringSize / 2}
                 cy={ringSize / 2}
@@ -122,11 +150,12 @@ export default function TimerScreen({
 
         <View style={styles.actionRow}>
           {completed && (
-            <Pressable
+            <GlassPressable
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 onRestart?.();
               }}
+              tint={C.terracotta}
               style={({ pressed }) => [
                 styles.actionBtn,
                 styles.restartBtn,
@@ -135,9 +164,9 @@ export default function TimerScreen({
             >
               <Restart s={18} c={C.onTerracotta} />
               <Text style={styles.restartText}>Restart</Text>
-            </Pressable>
+            </GlassPressable>
           )}
-          <Pressable
+          <GlassPressable
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               onCancel?.();
@@ -150,7 +179,7 @@ export default function TimerScreen({
             ]}
           >
             <Text style={styles.cancelText}>Cancel</Text>
-          </Pressable>
+          </GlassPressable>
         </View>
       </View>
     </Sheet>
@@ -198,12 +227,18 @@ const makeStyles = (C) => StyleSheet.create({
     fontWeight: '500',
   },
   footer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: M3 ? 16 : 20,
     paddingBottom: 32,
     paddingTop: 8,
     gap: 12,
   },
-  halfRow: {
+  // Android: a plain Material list item, with no card around it.
+  halfRow: M3 ? {
+    minHeight: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  } : {
     backgroundColor: C.paper,
     borderRadius: 16,
     paddingVertical: 12,
@@ -214,13 +249,23 @@ const makeStyles = (C) => StyleSheet.create({
     borderWidth: 0.5,
     borderColor: C.ink10,
   },
-  halfLabel: {
+  halfLabel: M3 ? {
+    fontFamily: FONT.ui,
+    fontSize: 16,
+    lineHeight: 24,
+    color: C.ink,
+  } : {
     fontFamily: FONT.ui,
     fontSize: 15,
     fontWeight: '500',
     color: C.ink,
   },
-  halfSub: {
+  halfSub: M3 ? {
+    fontFamily: FONT.ui,
+    fontSize: 14,
+    lineHeight: 20,
+    color: C.ink70,
+  } : {
     fontFamily: FONT.ui,
     fontSize: 12,
     color: C.ink50,
@@ -233,21 +278,23 @@ const makeStyles = (C) => StyleSheet.create({
   actionBtn: {
     flex: 1,
     height: 56,
-    borderRadius: 18,
+    borderRadius: GLASS || M3 ? 28 : 18,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 8,
   },
   cancelBtn: {
-    backgroundColor: C.ink,
+    backgroundColor: M3 ? C.terracottaSoft : C.ink,
   },
   cancelText: {
     fontFamily: FONT.ui,
     fontSize: 16,
-    fontWeight: '600',
-    color: C.cream,
-    letterSpacing: -0.2,
+    fontWeight: M3 ? '500' : '600',
+    // Plain glass on iOS 26, so the label is ink; a tonal button on Android;
+    // a solid ink button on older iPhones.
+    color: M3 ? C.terracottaDeep : GLASS ? C.ink : C.cream,
+    letterSpacing: M3 ? 0 : -0.2,
   },
   restartBtn: {
     backgroundColor: C.terracotta,
@@ -255,9 +302,9 @@ const makeStyles = (C) => StyleSheet.create({
   restartText: {
     fontFamily: FONT.ui,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: M3 ? '500' : '600',
     color: C.onTerracotta,
-    letterSpacing: -0.2,
+    letterSpacing: M3 ? 0 : -0.2,
   },
   doneText: {
     fontFamily: FONT.display,

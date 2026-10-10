@@ -1,11 +1,12 @@
 import React from 'react';
 import {
-  View, Text, Pressable, StyleSheet, ScrollView,
+  View, Text, StyleSheet, ScrollView,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Play } from '../icons';
-import { Sheet, CloseButton } from '../primitives';
+import { Sheet, CloseButton, RoundButton } from '../primitives';
+import { GLASS, M3, GlassPressable } from '../glass';
 import { formatMinutes } from '../convert';
 import { t } from '../i18n';
 
@@ -19,14 +20,18 @@ export default function PlanSheet({ visible, plan, onClose, onRemove, onStart })
   const mixedTemps = new Set(plan.map((f) => `${f.temp}${f.unit}`)).size > 1;
 
   return (
-    <Sheet visible={visible} onClose={onClose}>
-      <View style={styles.header}>
-        <View style={{ width: 30 }} />
-        <CloseButton onPress={onClose} />
-      </View>
+    // A half-height sheet on iOS; Material's bottom sheet on Android, closed
+    // by its scrim or the back button.
+    <Sheet visible={visible} onClose={onClose} bottom>
+      {!M3 && (
+        <View style={styles.header}>
+          <Text style={styles.title}>{t('plan.title')}</Text>
+          <CloseButton onPress={onClose} />
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{t('plan.title')}</Text>
+        {M3 && <Text style={styles.title}>{t('plan.title')}</Text>}
         <Text style={styles.subtitle}>{t('plan.subtitle')}</Text>
 
         <View style={styles.list}>
@@ -42,9 +47,9 @@ export default function PlanSheet({ visible, plan, onClose, onRemove, onStart })
                     {wait === 0 ? t('plan.first') : t('plan.later', { time: formatMinutes(wait) })}
                   </Text>
                 </View>
-                <Pressable onPress={() => onRemove(f.id)} hitSlop={10} style={styles.closeBtn}>
-                  <Close s={14} c={C.ink70} />
-                </Pressable>
+                <RoundButton onPress={() => onRemove(f.id)} size={40} tone="flat" accessibilityLabel="Remove from plan">
+                  <Close s={M3 ? 22 : 16} c={C.ink70} />
+                </RoundButton>
               </View>
             );
           })}
@@ -52,54 +57,62 @@ export default function PlanSheet({ visible, plan, onClose, onRemove, onStart })
 
         {mixedTemps && <Text style={styles.warning}>{t('plan.mixed_temps')}</Text>}
 
-        <Pressable
+        <GlassPressable
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             onStart();
           }}
+          tint={C.terracotta}
           style={({ pressed }) => [styles.cta, { opacity: pressed ? 0.8 : 1 }]}
         >
           <Play s={14} c={C.onTerracotta} />
           <Text style={styles.ctaText}>{t('plan.start', { time: formatMinutes(longest) })}</Text>
-        </Pressable>
+        </GlassPressable>
       </ScrollView>
     </Sheet>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
+  // Clear of the system's drag indicator at the top of the sheet.
   header: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingLeft: 24,
+    paddingRight: 16,
+    paddingTop: 22,
+    paddingBottom: 4,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  closeBtn: {
-    width: 30, height: 30, borderRadius: 15,
-    backgroundColor: C.ink06,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  body: { paddingHorizontal: 24, paddingBottom: 40 },
-  title: {
+  body: M3 ? { paddingHorizontal: 24 } : { paddingHorizontal: 24, paddingBottom: 40 },
+  title: M3 ? {
+    fontFamily: FONT.ui,
+    fontSize: 24,
+    lineHeight: 32,
+    color: C.ink,
+  } : {
     fontFamily: FONT.display,
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '500',
     color: C.ink,
-    textAlign: 'center',
     letterSpacing: -0.4,
-    marginBottom: 8,
   },
-  subtitle: {
+  subtitle: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    color: C.ink50,
-    textAlign: 'center',
-    lineHeight: 21,
-    marginBottom: 24,
-    paddingHorizontal: 8,
+    fontSize: 14,
+    lineHeight: 20,
+    color: C.ink70,
+    marginTop: 4,
+    marginBottom: 8,
+  } : {
+    fontFamily: FONT.ui,
+    fontSize: 14,
+    color: C.ink70,
+    lineHeight: 20,
+    marginBottom: 14,
   },
-  list: {
+  // Android: plain Material list items, straight on the sheet.
+  list: M3 ? { marginRight: -12 } : {
     backgroundColor: C.paper,
     borderRadius: 16,
     paddingHorizontal: 16,
@@ -107,10 +120,16 @@ const makeStyles = (C) => StyleSheet.create({
     borderColor: C.divider,
     marginBottom: 16,
   },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: 12 },
-  rowDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.divider },
-  rowTitle: { fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.ink },
-  rowSub: { fontFamily: FONT.ui, fontSize: 13, color: C.ink50, marginTop: 2 },
+  row: M3
+    ? { flexDirection: 'row', alignItems: 'center', minHeight: 72, gap: 16 }
+    : { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: 12 },
+  rowDivider: M3 ? {} : { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.divider },
+  rowTitle: M3
+    ? { fontFamily: FONT.ui, fontSize: 16, lineHeight: 24, color: C.ink }
+    : { fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.ink },
+  rowSub: M3
+    ? { fontFamily: FONT.ui, fontSize: 14, lineHeight: 20, color: C.ink70 }
+    : { fontFamily: FONT.ui, fontSize: 13, color: C.ink50, marginTop: 2 },
   warning: {
     fontFamily: FONT.ui,
     fontSize: 14,
@@ -123,7 +142,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   cta: {
     backgroundColor: C.terracotta,
-    borderRadius: 16,
+    borderRadius: M3 ? 28 : GLASS ? 26 : 16,
+    ...(M3 ? { height: 56 } : null),
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
@@ -131,5 +151,5 @@ const makeStyles = (C) => StyleSheet.create({
     gap: 8,
     marginTop: 8,
   },
-  ctaText: { fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.onTerracotta },
+  ctaText: { fontFamily: FONT.ui, fontSize: 16, fontWeight: M3 ? '500' : '600', color: C.onTerracotta },
 });
