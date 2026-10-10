@@ -13,7 +13,10 @@ import { t } from '../i18n';
 import { convert, fToC, cToF } from '../convert';
 import { capture } from '../analytics';
 
-const STORE_URL = 'https://apps.apple.com/app/id6764600062';
+const STORE_URL = Platform.select({
+  android: 'https://play.google.com/store/apps/details?id=com.brynneprince.airfryerconverter',
+  default: 'https://apps.apple.com/app/id6764600062',
+});
 
 function fmtMinutes(m) {
   if (m < 60) return `${m} min`;
