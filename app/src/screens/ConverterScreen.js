@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton, AppBar } from '../primitives';
-import { GLASS, M3, GlassPressable } from '../glass';
+import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
 import { Bookmark, Flame, Gear, List, Swap, Play, Plus, ShareIcon } from '../icons';
 import { t } from '../i18n';
@@ -46,8 +46,6 @@ export default function ConverterScreen({
   const tempMax = unit === 'F' ? 500 : 260;
 
   const isOvenToAir = direction === 'oven-to-air';
-  // Material sets labels in sentence case; the iOS looks keep the spaced capitals.
-  const cap = (s) => (M3 ? s : s.toUpperCase());
   const sourceLabel = cap(isOvenToAir ? 'Oven recipe' : 'Air fryer recipe');
   const targetLabel = cap(isOvenToAir ? 'Air fryer' : 'Oven');
 

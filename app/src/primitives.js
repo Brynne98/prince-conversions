@@ -315,13 +315,15 @@ export function Sheet({ visible, onClose, handle = true, bottom = false, childre
 
 // ─── Alerts and confirmations ────────────────────────────────────────
 let present = null;   // set by DialogHost while it is mounted
+// Only iOS has system alerts worth using: Android's wear Material 2, and the
+// web build has none at all.
+const OWN_DIALOGS = Platform.OS !== 'ios';
 let scheme = 'light'; // the app's own light or dark, which the system does not know
 
-// An alert. iOS shows Apple's own. Android's system alert still wears
-// Material 2, so the app draws Material 3's dialog there. Same arguments as
-// Alert.alert.
+// An alert. iOS shows Apple's own; elsewhere the app draws Material 3's
+// dialog. Same arguments as Alert.alert.
 export function alert(title, message, buttons) {
-  if (M3 && present) {
+  if (OWN_DIALOGS && present) {
     present({ title, message, buttons: buttons?.length ? buttons : [{ text: 'OK' }] });
     return;
   }
@@ -332,7 +334,7 @@ export function alert(title, message, buttons) {
 // with an action sheet rising from the control (`anchor`), Material with a
 // dialog.
 export function confirmDestructive({ title, message, confirmLabel, onConfirm, anchor }) {
-  if (M3) {
+  if (OWN_DIALOGS) {
     alert(title, message, [
       { text: 'Cancel', style: 'cancel' },
       { text: confirmLabel, onPress: onConfirm },
@@ -353,24 +355,26 @@ export function confirmDestructive({ title, message, confirmLabel, onConfirm, an
   );
 }
 
-// Mounted once at the root. Draws Android's dialogs; on iOS it only keeps
-// the system alerts in the app's light or dark.
+// Mounted once at the root. Draws the app's own dialogs; on iOS it only
+// keeps the system alerts in the app's light or dark.
 export function DialogHost() {
   const { mode } = useTheme();
   const styles = useStyles(makeStyles);
-  const [dialog, setDialog] = useState(null);
+  // Alerts wait their turn, as the system's do.
+  const [queue, setQueue] = useState([]);
+  const dialog = queue[0] ?? null;
   // The last dialog stays drawn while it fades out.
   const shown = useRef(null);
   if (dialog) shown.current = dialog;
   useEffect(() => { scheme = mode; }, [mode]);
   useEffect(() => {
-    present = setDialog;
+    present = (next) => setQueue((q) => [...q, next]);
     return () => { present = null; };
   }, []);
-  if (!M3) return null;
+  if (!OWN_DIALOGS) return null;
   const d = shown.current;
   const close = (button) => {
-    setDialog(null);
+    setQueue((q) => q.slice(1));
     button?.onPress?.();
   };
   return (
@@ -387,8 +391,8 @@ export function DialogHost() {
           <Text style={styles.dialogTitle} accessibilityRole="header">{d?.title}</Text>
           {!!d?.message && <Text style={styles.dialogBody}>{d.message}</Text>}
           <View style={styles.dialogActions}>
-            {d?.buttons.map((b) => (
-              <TextButton key={b.text} label={b.text} onPress={() => close(b)} />
+            {d?.buttons.map((b, i) => (
+              <TextButton key={i} label={b.text} onPress={() => close(b)} />
             ))}
           </View>
         </View>

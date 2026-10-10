@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
-import { GLASS, M3, GlassFill, GlassPressable } from '../glass';
+import { GLASS, M3, cap, GlassFill, GlassPressable } from '../glass';
 
 const CARD_HEIGHT = 70;
 const PEEK = 10;
@@ -127,9 +127,6 @@ export default function TimerStack({
     </View>
   );
 }
-
-// Material sets labels in sentence case; the iOS looks keep the capitals.
-const cap = (s) => (M3 ? s : s.toUpperCase());
 
 function TimerCard({ timer, onPress, onCancel, onRestart }) {
   const { C } = useTheme();

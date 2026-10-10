@@ -15,6 +15,9 @@ export const GLASS = Platform.OS === 'ios' && parseInt(String(Platform.Version),
 // third look, iOS before 26, is whatever is neither.
 export const M3 = Platform.OS === 'android';
 
+// Material sets labels in sentence case; the iOS looks keep the spaced capitals.
+export const cap = (s) => (M3 ? s : s.toUpperCase());
+
 // Paint the glass replaces: Apple's glass draws its own fill, edge and
 // shadow, and a press is answered by the glass itself, not a fade.
 const PAINT = new Set([

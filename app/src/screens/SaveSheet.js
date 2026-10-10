@@ -6,7 +6,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Sheet, AppBar, TextButton, Field } from '../primitives';
-import { GLASS, M3, GlassPressable } from '../glass';
+import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { formatMinutes } from '../convert';
 
 const EMOJI_OPTS = [
@@ -59,7 +59,7 @@ export default function SaveSheet({
   );
   const summary = (
     <View style={styles.summary}>
-      <Text style={styles.summaryKicker}>{M3 ? 'Saving both' : 'SAVING BOTH'}</Text>
+      <Text style={styles.summaryKicker}>{cap('Saving both')}</Text>
       <View style={styles.summaryRow}>
         <Text style={styles.summaryText}>
           <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
