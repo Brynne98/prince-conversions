@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "store-screenshots",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "/Users/brynneprince/Projects/personal/prince-conversion/design/store-screenshots", "dev", "--port", "3111"],
+      "port": 3111
+    }
+  ]
+}

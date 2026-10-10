@@ -1,0 +1,913 @@
+{
+  "schemaVersion": 2,
+  "appName": "Air Fryer Converter",
+  "themeId": "afc",
+  "connectedCanvas": false,
+  "locales": [
+    "en"
+  ],
+  "locale": "en",
+  "device": "iphone",
+  "orientation": "portrait",
+  "appIcon": "/app-icon.png",
+  "slidesByDevice": {
+    "iphone": [
+      {
+        "id": "afc_1",
+        "layout": "hero",
+        "tone": "cream",
+        "label": {
+          "en": "NO MORE GUESSWORK"
+        },
+        "headline": {
+          "en": "Two numbers.\n*One tap.*"
+        },
+        "screenshot": "/screenshots/apple/iphone/en/convert.png",
+        "transforms": {
+          "caption": {
+            "x": 66,
+            "y": 243.78000000000003,
+            "width": 1188,
+            "height": 462,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 132,
+            "y": 1029.42,
+            "width": 1056,
+            "height": 2151.264187866928,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_2",
+            "text": {
+              "en": "Oven recipe or air fryer —\nget the answer instantly."
+            },
+            "transform": {
+              "x": 105.60000000000001,
+              "y": 751.98,
+              "width": 1108.8,
+              "height": 191.4,
+              "zIndex": 5
+            },
+            "fontSize": 66,
+            "fontWeight": 400,
+            "color": "#5C5048",
+            "align": "center"
+          }
+        ]
+      },
+      {
+        "id": "afc_3",
+        "layout": "device-bottom",
+        "tone": "terracotta",
+        "label": {
+          "en": "OVEN ↔ AIR FRYER"
+        },
+        "headline": {
+          "en": "Cook it *right,*\nevery time."
+        },
+        "screenshot": "/screenshots/apple/iphone/en/convert-reverse.png",
+        "transforms": {
+          "caption": {
+            "x": 66,
+            "y": 243.78000000000003,
+            "width": 1188,
+            "height": 462,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 132,
+            "y": 1029.42,
+            "width": 1056,
+            "height": 2151.264187866928,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_4",
+            "text": {
+              "en": "Accurate temperature & time\nconversions for any recipe."
+            },
+            "transform": {
+              "x": 105.60000000000001,
+              "y": 751.98,
+              "width": 1108.8,
+              "height": 191.4,
+              "zIndex": 5
+            },
+            "fontSize": 66,
+            "fontWeight": 400,
+            "color": "#FBE3D2",
+            "align": "center"
+          }
+        ]
+      },
+      {
+        "id": "afc_5",
+        "layout": "two-devices",
+        "tone": "terracotta",
+        "label": {
+          "en": "YOUR RECIPE BOOK"
+        },
+        "headline": {
+          "en": "Save recipes\nwith a *name*\n*and emoji.*"
+        },
+        "screenshot": "/screenshots/apple/iphone/en/saved.png",
+        "screenshotSecondary": "/screenshots/apple/iphone/en/saved-dark.png",
+        "transforms": {
+          "caption": {
+            "x": 66,
+            "y": 243.78000000000003,
+            "width": 1188,
+            "height": 660,
+            "zIndex": 4
+          },
+          "deviceSecondary": {
+            "x": -264,
+            "y": 1370.8200000000002,
+            "width": 971.5200000000001,
+            "height": 1979.1630528375736,
+            "rotation": -4,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 396,
+            "y": 1227.42,
+            "width": 971.5200000000001,
+            "height": 1979.1630528375736,
+            "zIndex": 3
+          }
+        }
+      },
+      {
+        "id": "afc_6",
+        "layout": "device-bottom",
+        "tone": "cream",
+        "label": {
+          "en": "SMART COOK TIMER"
+        },
+        "headline": {
+          "en": "Set it, *shake it,*\nserve it."
+        },
+        "screenshot": "/screenshots/apple/iphone/en/timer.png",
+        "transforms": {
+          "caption": {
+            "x": 66,
+            "y": 243.78000000000003,
+            "width": 1188,
+            "height": 462,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 132,
+            "y": 1029.42,
+            "width": 1056,
+            "height": 2151.264187866928,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_7",
+            "text": {
+              "en": "A halfway chime — perfect\nfor flipping, never for burning."
+            },
+            "transform": {
+              "x": 105.60000000000001,
+              "y": 751.98,
+              "width": 1108.8,
+              "height": 191.4,
+              "zIndex": 5
+            },
+            "fontSize": 66,
+            "fontWeight": 400,
+            "color": "#5C5048",
+            "align": "center"
+          }
+        ]
+      },
+      {
+        "id": "afc_8",
+        "layout": "no-device",
+        "tone": "dark",
+        "label": {
+          "en": "DESIGNED FOR THE KITCHEN"
+        },
+        "headline": {
+          "en": "Small\ndetails.\n*Big*\n*difference.*"
+        },
+        "screenshot": "",
+        "transforms": {
+          "caption": {
+            "x": 66,
+            "y": 243.78000000000003,
+            "width": 1188,
+            "height": 858,
+            "zIndex": 4
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_9",
+            "text": {
+              "en": "°F or °C, your call"
+            },
+            "transform": {
+              "x": 132,
+              "y": 1348.74,
+              "width": 1108.8,
+              "height": 125.39999999999999,
+              "zIndex": 5
+            },
+            "fontSize": 85.8,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_10",
+            "text": {
+              "en": "Toggle units anywhere, instantly."
+            },
+            "transform": {
+              "x": 132,
+              "y": 1474.14,
+              "width": 1108.8,
+              "height": 99,
+              "zIndex": 5
+            },
+            "fontSize": 58.08,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          },
+          {
+            "id": "afc_11",
+            "text": {
+              "en": "Saved recipes"
+            },
+            "transform": {
+              "x": 132,
+              "y": 1649.88,
+              "width": 1108.8,
+              "height": 125.39999999999999,
+              "zIndex": 5
+            },
+            "fontSize": 85.8,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_12",
+            "text": {
+              "en": "One tap to your favorites."
+            },
+            "transform": {
+              "x": 132,
+              "y": 1775.2800000000002,
+              "width": 1108.8,
+              "height": 99,
+              "zIndex": 5
+            },
+            "fontSize": 58.08,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          },
+          {
+            "id": "afc_13",
+            "text": {
+              "en": "Reverse convert"
+            },
+            "transform": {
+              "x": 132,
+              "y": 1951.02,
+              "width": 1108.8,
+              "height": 125.39999999999999,
+              "zIndex": 5
+            },
+            "fontSize": 85.8,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_14",
+            "text": {
+              "en": "Air fryer back to oven, in one tap."
+            },
+            "transform": {
+              "x": 132,
+              "y": 2076.42,
+              "width": 1108.8,
+              "height": 99,
+              "zIndex": 5
+            },
+            "fontSize": 58.08,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          },
+          {
+            "id": "afc_15",
+            "text": {
+              "en": "Light & dark"
+            },
+            "transform": {
+              "x": 132,
+              "y": 2252.16,
+              "width": 1108.8,
+              "height": 125.39999999999999,
+              "zIndex": 5
+            },
+            "fontSize": 85.8,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_16",
+            "text": {
+              "en": "Warm charcoal for late nights."
+            },
+            "transform": {
+              "x": 132,
+              "y": 2377.56,
+              "width": 1108.8,
+              "height": 99,
+              "zIndex": 5
+            },
+            "fontSize": 58.08,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "afc_17",
+        "layout": "two-devices",
+        "tone": "dark",
+        "label": {
+          "en": "LIGHT & DARK"
+        },
+        "headline": {
+          "en": "Beautiful in\n*any light.*"
+        },
+        "screenshot": "/screenshots/apple/iphone/en/convert-dark.png",
+        "screenshotSecondary": "/screenshots/apple/iphone/en/convert.png",
+        "transforms": {
+          "caption": {
+            "x": 66,
+            "y": 243.78000000000003,
+            "width": 1188,
+            "height": 462,
+            "zIndex": 4
+          },
+          "deviceSecondary": {
+            "x": -264,
+            "y": 1172.8200000000002,
+            "width": 971.5200000000001,
+            "height": 1979.1630528375736,
+            "rotation": -4,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 396,
+            "y": 1029.42,
+            "width": 971.5200000000001,
+            "height": 1979.1630528375736,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_18",
+            "text": {
+              "en": "Warm cream or warm charcoal —\npick your mood in Settings."
+            },
+            "transform": {
+              "x": 105.60000000000001,
+              "y": 751.98,
+              "width": 1108.8,
+              "height": 191.4,
+              "zIndex": 5
+            },
+            "fontSize": 66,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "center"
+          }
+        ]
+      }
+    ],
+    "android": [
+      {
+        "id": "afc_19",
+        "layout": "hero",
+        "tone": "cream",
+        "label": {
+          "en": "NO MORE GUESSWORK"
+        },
+        "headline": {
+          "en": "Two numbers.\n*One tap.*"
+        },
+        "screenshot": "/screenshots/android/phone/en/convert.png",
+        "transforms": {
+          "caption": {
+            "x": 54,
+            "y": 115.19999999999999,
+            "width": 972,
+            "height": 324,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 140.39999999999998,
+            "y": 672.408,
+            "width": 799.2,
+            "height": 1731.6,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_20",
+            "text": {
+              "en": "Oven recipe or air fryer —\nget the answer instantly."
+            },
+            "transform": {
+              "x": 86.4,
+              "y": 477,
+              "width": 907.1999999999999,
+              "height": 137.808,
+              "zIndex": 5
+            },
+            "fontSize": 47.519999999999996,
+            "fontWeight": 400,
+            "color": "#5C5048",
+            "align": "center"
+          }
+        ]
+      },
+      {
+        "id": "afc_21",
+        "layout": "device-bottom",
+        "tone": "terracotta",
+        "label": {
+          "en": "OVEN ↔ AIR FRYER"
+        },
+        "headline": {
+          "en": "Cook it *right,*\nevery time."
+        },
+        "screenshot": "/screenshots/android/phone/en/convert-reverse.png",
+        "transforms": {
+          "caption": {
+            "x": 54,
+            "y": 115.19999999999999,
+            "width": 972,
+            "height": 324,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 140.39999999999998,
+            "y": 672.408,
+            "width": 799.2,
+            "height": 1731.6,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_22",
+            "text": {
+              "en": "Accurate temperature & time\nconversions for any recipe."
+            },
+            "transform": {
+              "x": 86.4,
+              "y": 477,
+              "width": 907.1999999999999,
+              "height": 137.808,
+              "zIndex": 5
+            },
+            "fontSize": 47.519999999999996,
+            "fontWeight": 400,
+            "color": "#FBE3D2",
+            "align": "center"
+          }
+        ]
+      },
+      {
+        "id": "afc_23",
+        "layout": "two-devices",
+        "tone": "terracotta",
+        "label": {
+          "en": "YOUR RECIPE BOOK"
+        },
+        "headline": {
+          "en": "Save recipes\nwith a *name*\n*and emoji.*"
+        },
+        "screenshot": "/screenshots/android/phone/en/saved.png",
+        "screenshotSecondary": "/screenshots/android/phone/en/saved-dark.png",
+        "transforms": {
+          "caption": {
+            "x": 54,
+            "y": 115.19999999999999,
+            "width": 972,
+            "height": 459,
+            "zIndex": 4
+          },
+          "deviceSecondary": {
+            "x": -216,
+            "y": 903.408,
+            "width": 735.2640000000001,
+            "height": 1593.0720000000001,
+            "rotation": -4,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 324,
+            "y": 807.408,
+            "width": 735.2640000000001,
+            "height": 1593.0720000000001,
+            "zIndex": 3
+          }
+        }
+      },
+      {
+        "id": "afc_24",
+        "layout": "device-bottom",
+        "tone": "cream",
+        "label": {
+          "en": "SMART COOK TIMER"
+        },
+        "headline": {
+          "en": "Set it, *shake it,*\nserve it."
+        },
+        "screenshot": "/screenshots/android/phone/en/timer.png",
+        "transforms": {
+          "caption": {
+            "x": 54,
+            "y": 115.19999999999999,
+            "width": 972,
+            "height": 324,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 140.39999999999998,
+            "y": 672.408,
+            "width": 799.2,
+            "height": 1731.6,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_25",
+            "text": {
+              "en": "A halfway chime — perfect\nfor flipping, never for burning."
+            },
+            "transform": {
+              "x": 86.4,
+              "y": 477,
+              "width": 907.1999999999999,
+              "height": 137.808,
+              "zIndex": 5
+            },
+            "fontSize": 47.519999999999996,
+            "fontWeight": 400,
+            "color": "#5C5048",
+            "align": "center"
+          }
+        ]
+      },
+      {
+        "id": "afc_26",
+        "layout": "no-device",
+        "tone": "dark",
+        "label": {
+          "en": "DESIGNED FOR THE KITCHEN"
+        },
+        "headline": {
+          "en": "Small\ndetails.\n*Big*\n*difference.*"
+        },
+        "screenshot": "",
+        "transforms": {
+          "caption": {
+            "x": 54,
+            "y": 115.19999999999999,
+            "width": 972,
+            "height": 594,
+            "zIndex": 4
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_27",
+            "text": {
+              "en": "°F or °C, your call"
+            },
+            "transform": {
+              "x": 108,
+              "y": 881.4,
+              "width": 907.1999999999999,
+              "height": 90.28799999999998,
+              "zIndex": 5
+            },
+            "fontSize": 61.775999999999996,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_28",
+            "text": {
+              "en": "Toggle units anywhere, instantly."
+            },
+            "transform": {
+              "x": 108,
+              "y": 971.688,
+              "width": 907.1999999999999,
+              "height": 71.28,
+              "zIndex": 5
+            },
+            "fontSize": 41.8176,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          },
+          {
+            "id": "afc_29",
+            "text": {
+              "en": "Saved recipes"
+            },
+            "transform": {
+              "x": 108,
+              "y": 1102.2,
+              "width": 907.1999999999999,
+              "height": 90.28799999999998,
+              "zIndex": 5
+            },
+            "fontSize": 61.775999999999996,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_30",
+            "text": {
+              "en": "One tap to your favorites."
+            },
+            "transform": {
+              "x": 108,
+              "y": 1192.488,
+              "width": 907.1999999999999,
+              "height": 71.28,
+              "zIndex": 5
+            },
+            "fontSize": 41.8176,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          },
+          {
+            "id": "afc_31",
+            "text": {
+              "en": "Reverse convert"
+            },
+            "transform": {
+              "x": 108,
+              "y": 1323,
+              "width": 907.1999999999999,
+              "height": 90.28799999999998,
+              "zIndex": 5
+            },
+            "fontSize": 61.775999999999996,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_32",
+            "text": {
+              "en": "Air fryer back to oven, in one tap."
+            },
+            "transform": {
+              "x": 108,
+              "y": 1413.288,
+              "width": 907.1999999999999,
+              "height": 71.28,
+              "zIndex": 5
+            },
+            "fontSize": 41.8176,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          },
+          {
+            "id": "afc_33",
+            "text": {
+              "en": "Light & dark"
+            },
+            "transform": {
+              "x": 108,
+              "y": 1543.8,
+              "width": 907.1999999999999,
+              "height": 90.28799999999998,
+              "zIndex": 5
+            },
+            "fontSize": 61.775999999999996,
+            "fontWeight": 700,
+            "color": "#FBF3E8",
+            "align": "left"
+          },
+          {
+            "id": "afc_34",
+            "text": {
+              "en": "Warm charcoal for late nights."
+            },
+            "transform": {
+              "x": 108,
+              "y": 1634.088,
+              "width": 907.1999999999999,
+              "height": 71.28,
+              "zIndex": 5
+            },
+            "fontSize": 41.8176,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "afc_35",
+        "layout": "two-devices",
+        "tone": "dark",
+        "label": {
+          "en": "LIGHT & DARK"
+        },
+        "headline": {
+          "en": "Beautiful in\n*any light.*"
+        },
+        "screenshot": "/screenshots/android/phone/en/convert-dark.png",
+        "screenshotSecondary": "/screenshots/android/phone/en/convert.png",
+        "transforms": {
+          "caption": {
+            "x": 54,
+            "y": 115.19999999999999,
+            "width": 972,
+            "height": 324,
+            "zIndex": 4
+          },
+          "deviceSecondary": {
+            "x": -216,
+            "y": 768.408,
+            "width": 735.2640000000001,
+            "height": 1593.0720000000001,
+            "rotation": -4,
+            "zIndex": 2
+          },
+          "device": {
+            "x": 324,
+            "y": 672.408,
+            "width": 735.2640000000001,
+            "height": 1593.0720000000001,
+            "zIndex": 3
+          }
+        },
+        "textElements": [
+          {
+            "id": "afc_36",
+            "text": {
+              "en": "Warm cream or warm charcoal —\npick your mood in Settings."
+            },
+            "transform": {
+              "x": 86.4,
+              "y": 477,
+              "width": 907.1999999999999,
+              "height": 137.808,
+              "zIndex": 5
+            },
+            "fontSize": 47.519999999999996,
+            "fontWeight": 400,
+            "color": "#CFC2B4",
+            "align": "center"
+          }
+        ]
+      }
+    ],
+    "ipad": [
+      {
+        "id": "s_mv2vl86u_a",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Made for\nthe big screen."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mv2vl86u_b",
+        "layout": "device-bottom",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Built for\nfocus."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mv2vl86u_c",
+        "layout": "device-top",
+        "label": {
+          "en": "FEATURE 02"
+        },
+        "headline": {
+          "en": "Always within reach."
+        },
+        "screenshot": "",
+        "inverted": true
+      }
+    ],
+    "android-7": [
+      {
+        "id": "s_mv2vl86u_d",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Pocket-sized\npower."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mv2vl86u_e",
+        "layout": "split-landscape",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Wide canvas,\nbigger ideas."
+        },
+        "screenshot": ""
+      }
+    ],
+    "android-10": [
+      {
+        "id": "s_mv2vl86u_f",
+        "layout": "hero",
+        "label": {
+          "en": "MEET YOUR APP"
+        },
+        "headline": {
+          "en": "Made for\nthe big screen."
+        },
+        "screenshot": ""
+      },
+      {
+        "id": "s_mv2vl86u_g",
+        "layout": "split-landscape",
+        "label": {
+          "en": "FEATURE 01"
+        },
+        "headline": {
+          "en": "Wide canvas,\nbigger ideas."
+        },
+        "screenshot": ""
+      }
+    ],
+    "feature-graphic": [
+      {
+        "id": "afc_37",
+        "layout": "feature-graphic",
+        "tone": "terracotta",
+        "label": {},
+        "headline": {
+          "en": "Oven recipe in.\n*Air fryer time out.*"
+        },
+        "screenshot": "/screenshots/android/phone/en/convert.png"
+      }
+    ],
+    "apple-header": [
+      {
+        "id": "afc_38",
+        "layout": "feature-graphic",
+        "tone": "terracotta",
+        "label": {},
+        "headline": {
+          "en": "Oven recipe in.\n*Air fryer time out.*"
+        },
+        "screenshot": "/screenshots/apple/iphone/en/convert.png"
+      }
+    ]
+  }
+}
