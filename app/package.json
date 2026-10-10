@@ -33,6 +33,7 @@
     "i18n-js": "^4.5.3",
     "posthog-react-native": "^4.77.1",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-google-mobile-ads": "17.0.0",
     "react-native-purchases": "^10.10.2",
