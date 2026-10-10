@@ -37,3 +37,22 @@ Only on Brynne's say-so, every time.
 - `console.log` does not reach the dev-server terminal (React Native 0.81);
   show state on screen temporarily instead.
 - Dev builds use Google's test ad units automatically.
+
+## Running the app in a task folder
+
+A new folder has no iPhone project and must not compile one from zero.
+
+- Screen-only change: no build. From the folder's `app/`, start its own code
+  server on a free port, `npx expo start --dev-client --port <port>`, then
+  point the app already on the simulator at it:
+  `xcrun simctl openurl <udid> "princeconversions://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A<port>"`
+  and tap Open.
+- The simulator has no app yet, or native code changed: from `app/`,
+  `SHARED_BUILD_CACHE=1 LANG=en_US.UTF-8 npx expo run:ios --device <udid> --no-bundler`.
+  It installs a finished build with the same native code from
+  `~/Library/Caches/prince-conversions/build-cache` instead of compiling.
+  When nothing matches it compiles once and saves the result for the next
+  folder. Simulators only, not a real phone.
+- `SHARED_BUILD_CACHE` goes on the command line and nowhere else. In a
+  package.json script or an env file it changes the native fingerprint.
+- Old builds in that cache folder can be deleted.
