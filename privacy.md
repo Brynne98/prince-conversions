@@ -4,11 +4,12 @@ title: Privacy Policy — Air Fryer Converter
 
 # Privacy Policy
 
-_Last updated: 2 September 2026_
+_Last updated: 10 October 2026_
 
-This privacy policy applies to the **Air Fryer Converter** iOS app (the
-"App"), published on the App Store under the bundle identifier
-`com.brynneprince.airfryerconverter`.
+This privacy policy applies to the **Air Fryer Converter** app (the
+"App") on both iOS and Android. It is published on the Apple App Store
+and on Google Play as "Oven to Air Fryer Converter", under the
+identifier `com.brynneprince.airfryerconverter`.
 
 The App is a recipe-conversion utility. We try to collect the absolute
 minimum data needed for the App to function, and to be transparent about
@@ -53,24 +54,31 @@ https://posthog.com/privacy
 
 The App displays banner ads via Google AdMob. AdMob may collect:
 
-- **Device identifiers** (Identifier for Advertisers / IDFA, when
-  permitted by the operating system's App Tracking Transparency
-  prompt) — used to deliver personalized ads.
+- **Device identifiers** — used to deliver personalized ads. On iOS
+  this is the Identifier for Advertisers (IDFA), only when you allow it
+  in the App Tracking Transparency prompt. On Android this is the
+  advertising ID, unless you have deleted or reset it in Android
+  settings.
 - **Usage data** (which screens of the App you've opened, ad
   interactions) — used for ad measurement and analytics.
+- **Approximate location**, derived from your IP address — used to
+  choose relevant ads and to meet regional consent rules.
+- **Diagnostics** (crash and performance data from the ads component).
 
-If you decline the App Tracking Transparency prompt, AdMob will continue
-to serve **non-personalized** ads, which use only contextual signals
-and do not link to your identity.
+If you decline tracking on iOS, delete your advertising ID on Android,
+or decline personalized ads in the consent message shown where the law
+requires one, AdMob will continue to serve **non-personalized** ads,
+which use only contextual signals and do not link to your identity.
 
 Google's full privacy policy:
 https://policies.google.com/privacy
 
 ### RevenueCat (in-app purchase processing)
 
-When you tap **Remove Ads**, the App uses RevenueCat to validate the
-purchase receipt with Apple's servers and to remember your purchase
-across reinstalls. RevenueCat may collect:
+Where the in-app purchase is offered, tapping **Remove Ads** uses
+RevenueCat to validate the purchase receipt with Apple's or Google's
+servers and to remember your purchase across reinstalls. RevenueCat may
+collect:
 
 - **An anonymous user identifier** generated automatically by their
   SDK on first launch.
@@ -84,21 +92,28 @@ information you typed into the App.
 RevenueCat's full privacy policy:
 https://www.revenuecat.com/privacy
 
-### Apple StoreKit
+### Apple and Google payments
 
-When you make an in-app purchase, Apple processes payment through
-your Apple ID. We never see your payment details. Apple's privacy
-policy applies to that flow:
+When you make an in-app purchase, Apple (on iOS) or Google Play (on
+Android) processes the payment through your store account. We never see
+your payment details. The store's own privacy policy applies to that
+flow:
 https://www.apple.com/legal/privacy/
+https://policies.google.com/privacy
 
-## App Tracking Transparency
+## Advertising identifier and tracking
 
-On first launch the App requests permission to use your device's
-advertising identifier, in line with Apple's App Tracking Transparency
-framework. You may decline at any time, including by changing the
-setting in iOS **Settings → Privacy & Security → Tracking**. Declining
-does not disable any feature of the App; it only switches AdMob from
-personalized to non-personalized ads.
+**iOS.** The App asks permission to use your device's advertising
+identifier, in line with Apple's App Tracking Transparency framework.
+You may decline at any time, including by changing the setting in iOS
+**Settings → Privacy & Security → Tracking**.
+
+**Android.** The App uses the Android advertising ID for ads. You can
+reset or delete it at any time in Android **Settings → Privacy → Ads**
+(the exact path varies by device).
+
+On either platform, declining does not disable any feature of the App;
+it only switches AdMob from personalized to non-personalized ads.
 
 ## Children
 
@@ -116,8 +131,8 @@ You have the right to:
   Because product analytics is not linked to your name or email address,
   we may not be able to identify a particular anonymous installation
   from your contact details alone.
-- Opt out of personalized advertising at any time via the App
-  Tracking Transparency setting in iOS.
+- Opt out of personalized advertising at any time, via the tracking
+  setting in iOS or the advertising ID setting in Android.
 
 ## Changes to this policy
 
