@@ -50,14 +50,15 @@ export default function AnimatedSplash({ onDone }) {
   done.current = onDone;
   useEffect(() => {
     Animated.sequence([
-      Animated.delay(100),
+      // No wait first: the system splash has already held "425°" alone for
+      // as long as the app took to load.
       Animated.timing(write, {
         toValue: 1,
-        duration: 200,
+        duration: 140,
         easing: Easing.out(Easing.quad),
         useNativeDriver: true,
       }),
-      Animated.delay(160),
+      Animated.delay(320),
       Animated.timing(fade, {
         toValue: 0,
         duration: 240,
