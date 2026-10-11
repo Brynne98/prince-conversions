@@ -472,11 +472,11 @@ export function Segmented(props) {
 // Android: Material's connected button group, which replaced segmented
 // buttons. The chosen button rounds off fully; the rest keep a squarer
 // inner edge.
-function ConnectedGroup({ options, value, onChange, compact = false, tone = 'default' }) {
+function ConnectedGroup({ options, value, onChange, compact = false, tone = 'default', fill = false }) {
   const { C } = useTheme();
   const onTerracotta = tone === 'onTerracotta';
   return (
-    <View style={{ flexDirection: 'row', alignSelf: 'center', gap: 2 }}>
+    <View style={{ flexDirection: 'row', alignSelf: fill ? 'stretch' : 'center', gap: 2 }}>
       {options.map((o, i) => {
         const active = o.value === value;
         const lead = active || i === 0 ? 20 : 8;
@@ -498,6 +498,7 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
               height: 40,
               paddingHorizontal: compact ? 14 : 16,
               justifyContent: 'center',
+              ...(fill ? { flex: 1, alignItems: 'center' } : null),
               overflow: 'hidden',
               backgroundColor: active
                 ? (onTerracotta ? C.onTerracotta : C.terracotta)
@@ -523,7 +524,9 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
   );
 }
 
-function SlidingSegmented({ options, value, onChange, compact = false, tone = 'default' }) {
+// `fill` stretches the control across its parent with equal segments, for
+// labels of unequal length: the thumb is always one equal share wide.
+function SlidingSegmented({ options, value, onChange, compact = false, tone = 'default', fill = false }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
   const onTerracotta = tone === 'onTerracotta';
@@ -548,7 +551,7 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
   const activeColor = onTerracotta ? C.terracotta : C.ink;
 
   return (
-    <View style={[styles.segWrap, { backgroundColor: trackBg }]}>
+    <View style={[styles.segWrap, { backgroundColor: trackBg }, fill && { alignSelf: 'stretch' }]}>
       <SegmentedTrack count={options.length} slide={slide} pillBg={pillBg} scheme={onTerracotta ? 'light' : undefined} />
       {options.map((o) => {
         const active = o.value === value;
@@ -561,7 +564,7 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
                 Haptics.selectionAsync();
               }
             }}
-            style={{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1 }}
+            style={[{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1 }, fill && { flex: 1, alignItems: 'center' }]}
           >
             <Text style={{
               fontFamily: FONT.ui,

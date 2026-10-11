@@ -32,7 +32,8 @@ export default function ConverterScreen({
   ovenTime, setOvenTime,
   direction, setDirection,
   onOpenSaved, onOpenSettings, onSave, onStartTimer,
-  onAddToPlan, onOpenPlan, planCount = 0, isPro = false,
+  onAddToPlan, planCount = 0, planLocked = false,
+  tab = 'converter', setTab, planView,
   topInset = 0, bottomInset = 0,
 }) {
   const { C } = useTheme();
@@ -98,7 +99,7 @@ export default function ConverterScreen({
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
       {M3 ? (
-        <AppBar title="Convert">
+        <AppBar title={tab === 'plan' ? t('plan.tab') : 'Convert'}>
           <RoundButton onPress={onOpenSaved} accessibilityLabel="Saved recipes">
             <List s={24} c={C.ink70} />
           </RoundButton>
@@ -112,7 +113,7 @@ export default function ConverterScreen({
             <List s={20} />
           </RoundButton>
           <View style={styles.topTitleWrap}>
-            <Text style={styles.kicker}>CONVERT</Text>
+            <Text style={styles.kicker}>{tab === 'plan' ? 'PLAN' : 'CONVERT'}</Text>
           </View>
           <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
             <Gear s={19} />
@@ -120,19 +121,24 @@ export default function ConverterScreen({
         </View>
       )}
 
-      {/* Direction toggle */}
+      {/* Converter or Plan. The swap button below flips oven and air fryer. */}
       <View style={styles.directionRow}>
         <Segmented
+          fill
           options={[
-            { value: 'oven-to-air', label: 'Oven → Air fryer' },
-            { value: 'air-to-oven', label: 'Air fryer → Oven' },
+            { value: 'converter', label: t('plan.tab_converter') },
+            { value: 'plan', label: planCount > 0 ? t('plan.tab_count', { n: planCount }) : t('plan.tab') },
           ]}
-          value={direction}
-          onChange={setDirection}
+          value={tab}
+          onChange={setTab}
         />
       </View>
 
+      {/* Both stay mounted, so a tab switch keeps the scroll position and
+          does not ask for a new ad. */}
+      <View style={[styles.pane, tab !== 'plan' && styles.paneHidden]}>{planView}</View>
       <ScrollView
+        style={tab === 'plan' && styles.paneHidden}
         contentContainerStyle={{ paddingHorizontal: M3 ? 16 : 20, paddingTop: 0, paddingBottom: 24 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
@@ -289,22 +295,8 @@ export default function ConverterScreen({
           >
             <Plus s={14} c={C.onTerracotta85} />
             <Text style={styles.addToPlanText}>{t('plan.add')}</Text>
-            {!isPro && <Text style={styles.proTag}>PRO</Text>}
+            {planLocked && <Text style={styles.proTag}>PRO</Text>}
           </GlassPressable>
-
-          {planCount > 0 && (
-            <GlassPressable
-              onPress={onOpenPlan}
-              clear
-              scheme="light"
-              style={({ pressed }) => [styles.planBar, { opacity: pressed ? 0.7 : 1 }]}
-            >
-              <Text style={styles.planBarText}>
-                {planCount === 1 ? t('plan.open_one') : t('plan.open', { count: planCount })}
-              </Text>
-              <Text style={styles.planBarText}>›</Text>
-            </GlassPressable>
-          )}
         </LinearGradient>
 
         <View style={{ marginTop: 22 }}>
@@ -317,6 +309,8 @@ export default function ConverterScreen({
 
 const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
+  pane: { flex: 1 },
+  paneHidden: { display: 'none' },
   topBar: {
     paddingHorizontal: 20,
     paddingTop: 8,
@@ -326,8 +320,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   topTitleWrap: { alignItems: 'center' },
   directionRow: M3
-    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16, alignItems: 'center' }
-    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
+    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16 }
+    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18 },
   kicker: {
     fontFamily: FONT.ui,
     fontSize: 11,
@@ -504,23 +498,6 @@ const makeStyles = (C) => StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: C.onTerracotta85,
-  },
-  planBar: {
-    marginTop: 10,
-    height: M3 ? 48 : 44,
-    borderRadius: M3 ? 24 : GLASS ? 22 : 14,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    // Tonal on Android; an outline elsewhere.
-    ...(M3 ? { backgroundColor: C.onTerracotta18 } : { borderWidth: 1, borderColor: C.onTerracotta20 }),
-  },
-  planBarText: {
-    fontFamily: FONT.ui,
-    fontSize: 15,
-    fontWeight: '600',
-    color: C.onTerracotta,
   },
   actionBtnText: {
     fontFamily: FONT.ui,
