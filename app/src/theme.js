@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import { Appearance, StyleSheet } from 'react-native';
 
 const LIGHT = {
   cream: '#FAF5EC',
@@ -90,6 +90,9 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ mode, setMode, children }) {
+  // Tell the system too, so what it draws itself (a sheet's rim, a
+  // permission prompt) matches the app's own light or dark.
+  useEffect(() => { Appearance.setColorScheme(mode); }, [mode]);
   const value = useMemo(() => ({
     mode,
     C: PALETTES[mode] || LIGHT,
