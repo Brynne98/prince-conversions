@@ -2,36 +2,38 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, Animated, Dimensions, StyleSheet, Platform,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFonts, Fraunces_500Medium, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
 import * as SplashScreen from 'expo-splash-screen';
+import Constants from 'expo-constants';
 
 import ConverterScreen from './src/screens/ConverterScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import SaveSheet from './src/screens/SaveSheet';
 import SettingsSheet from './src/screens/SettingsSheet';
 import PaywallSheet from './src/screens/PaywallSheet';
-import PlanTab from './src/screens/PlanTab';
 import TimerStack, { stackHeight } from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
 import { ThemeProvider, useTheme, useStyles } from './src/theme';
 import { M3 } from './src/glass';
-import { alert, DialogHost } from './src/primitives';
+import { DialogHost } from './src/primitives';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
 import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
+import { syncCookActivities } from './src/liveActivity';
 import { IapProvider, useIap } from './src/iap';
 import { initAds } from './src/ads';
 import { capture, setAnalyticsEnabled } from './src/analytics';
 import { recordTimerCompletion } from './src/review';
 import { recordCompletionForSoftPaywall } from './src/softPaywall';
-import { t } from './src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
-SplashScreen.setOptions?.({ duration: 250, fade: true });
+// Expo Go has its own splash screen and only warns when asked to change it.
+if (Constants.executionEnvironment !== 'storeClient') {
+  SplashScreen.setOptions?.({ duration: 250, fade: true });
+}
 
 export default function App() {
   const [mode, setMode] = useState('light');
@@ -66,21 +68,8 @@ function Root({ themeMode, setThemeMode }) {
   const [showSettings, setShowSettings] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallSurface, setPaywallSurface] = useState('paywall');
-  const [paywallMinutes, setPaywallMinutes] = useState(null);
   const [openTimerId, setOpenTimerId] = useState(null);
-  // "Finish together" foods waiting to be started as one staggered plan.
-  const [plan, setPlan] = useState([]);
-  const [tab, setTab] = useState('converter');
-  // Plans a person without Pro has started, ever. null until read from disk.
-  const [plansUsed, setPlansUsed] = useState(null);
-  const startingPlan = useRef(false);
-  const { isPro, ready: iapReady } = useIap();
-  // Free plans left for a person without Pro. null when it does not apply or
-  // is not known yet: Pro, or the purchase check or the saved count is still
-  // loading. Nothing is locked or counted on a guess.
-  const freeLeft = isPro || !iapReady || plansUsed === null
-    ? null
-    : Math.max(0, FREE_PLANS - plansUsed);
+  const { isPro } = useIap();
   const [splashGone, setSplashGone] = useState(false);
   const [draft, setDraft] = useState({ name: '', emoji: '🍟', note: '' });
   const [toast, setToast] = useState(null);
@@ -99,7 +88,6 @@ function Root({ themeMode, setThemeMode }) {
   const cookTimers = useCookTimers({
     onShake: (t) => showToast(`Shake halfway · ${t.label || 'cooking'}`),
     onDone: (t) => onTimerDoneRef.current?.(t),
-    onPutIn: (timer) => showToast(t('plan.put_in', { label: timer.label }), 4000),
   });
 
   softPaywallGate.current = {
@@ -135,6 +123,15 @@ function Root({ themeMode, setThemeMode }) {
       if (!offered) recordTimerCompletion();
     });
   };
+  // The lock screen and Dynamic Island follow the timers: resync whenever
+  // one starts, ends, restarts or is cancelled, not on every tick.
+  const activitySig = cookTimers.list
+    .map((x) => `${x.id}:${x.startedAt}:${x.endsAt}:${x.completed}`)
+    .join('|');
+  useEffect(() => {
+    syncCookActivities(cookTimers.list);
+  }, [activitySig]);
+
   const openTimer = openTimerId
     ? cookTimers.list.find((t) => t.id === openTimerId)
     : null;
@@ -228,19 +225,6 @@ function Root({ themeMode, setThemeMode }) {
     return () => clearTimeout(timeout);
   }, [hydrated, direction, unit, targetUnit, ovenTemp, ovenTime]);
 
-  useEffect(() => {
-    readPlansUsed().then(setPlansUsed);
-  }, []);
-
-  useEffect(() => {
-    if (tab !== 'plan') return;
-    capture('plan_tab_viewed', {
-      is_pro: isPro,
-      food_count: plan.length,
-      explainer_shown: plan.length === 0,
-    });
-  }, [tab]);
-
   // Hide the splash as soon as fonts are ready; AsyncStorage hydration
   // continues in the background and items pop in when ready.
   useEffect(() => {
@@ -275,87 +259,14 @@ function Root({ themeMode, setThemeMode }) {
     ? { temp: result.temp, time: result.time }
     : { temp: ovenTemp, time: ovenTime };
 
-  const startTimer = (minutes, label, source, opts) => {
-    const othersRunning = cookTimers.list.some((x) => !x.completed);
-    const id = cookTimers.start(minutes, label, opts);
-    if (othersRunning && source !== 'plan') nudgePlanOnce();
+  const startTimer = (minutes, label, source) => {
+    const id = cookTimers.start(minutes, label);
     capture('timer_started', {
       source,
       duration_bucket: durationBucket(Math.round(minutes * 60)),
       active_timer_count: cookTimers.list.length + 1,
     });
     return id;
-  };
-
-  // Starting a second timer by hand is the moment "finish together"
-  // helps, so point at it once, ever.
-  const nudgePlanOnce = async () => {
-    try {
-      if (await AsyncStorage.getItem(PLAN_NUDGE_KEY)) return;
-      await AsyncStorage.setItem(PLAN_NUDGE_KEY, '1');
-    } catch {
-      return;
-    }
-    capture('plan_nudge_shown', { is_pro: isPro });
-    alert(t('plan.nudge_title'), t('plan.nudge_body'), [
-      { text: t('plan.nudge_later'), style: 'cancel' },
-      { text: t('plan.nudge_open'), onPress: () => setTab('plan') },
-    ]);
-  };
-
-  const offerPro = (minutes) => {
-    setPaywallSurface('finish_together');
-    setPaywallMinutes(minutes);
-    setShowPaywall(true);
-  };
-
-  const addToPlan = (temp, tempUnit, minutes) => {
-    if (freeLeft === 0) {
-      offerPro(minutes);
-      return;
-    }
-    if (plan.length >= PLAN_MAX) {
-      showToast(t('plan.full', { max: PLAN_MAX }));
-      return;
-    }
-    setPlan([...plan, { id: 'p' + Date.now(), temp, unit: tempUnit, minutes }]);
-    capture('plan_food_added', { food_count: plan.length + 1 });
-    showToast(t('plan.added'));
-  };
-  // Every plan starts here, so this is where a free plan is spent. The count
-  // is read from disk and saved before any timer starts: it only goes up.
-  // One food alone is an ordinary timer, so it costs nothing.
-  const startPlan = async () => {
-    if (plan.length === 0 || startingPlan.current) return;
-    startingPlan.current = true;
-    try {
-      const foods = plan;
-      const longest = Math.max(...foods.map((f) => f.minutes));
-      if (!isPro && iapReady && foods.length > 1) {
-        const used = await readPlansUsed();
-        if (used >= FREE_PLANS || !(await writePlansUsed(used + 1))) {
-          setPlansUsed(Math.max(used, FREE_PLANS));
-          offerPro(longest);
-          return;
-        }
-        setPlansUsed(used + 1);
-        capture('free_plan_used', { used: used + 1, left: FREE_PLANS - used - 1 });
-      }
-      const planId = 'plan' + Date.now();
-      for (const f of foods) {
-        startTimer(f.minutes, `${f.temp}°${f.unit} · ${f.minutes} min`, 'plan', {
-          delayMs: (longest - f.minutes) * 60 * 1000,
-          planId,
-        });
-      }
-      capture('plan_started', { food_count: foods.length, is_pro: isPro });
-      // Keep any food added while the count was being saved.
-      setPlan((cur) => cur.filter((f) => !foods.includes(f)));
-      setTab('converter');
-      showToast(t('plan.started'));
-    } finally {
-      startingPlan.current = false;
-    }
   };
 
   const openSave = () => {
@@ -416,9 +327,12 @@ function Root({ themeMode, setThemeMode }) {
   });
 
   const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 16 : 8);
-  // Room at the foot of a scrolling screen for the running timers.
-  const timersInset = cookTimers.list.length > 0 ? stackHeight(cookTimers.list) + 20 : 0;
+  // Room at the foot of a scrolling screen for the system's bar (Android's
+  // buttons, the iPhone's home line) and for the running timers above it.
+  // The screens fill the display edge to edge, so nothing else leaves it.
   const bottomInset = insets.bottom;
+  const timersInset = bottomInset
+    + (cookTimers.list.length > 0 ? stackHeight(cookTimers.list) + 20 : 0);
 
   return (
     <View style={[styles.root, { paddingBottom: bottomInset }]}>
@@ -438,22 +352,6 @@ function Root({ themeMode, setThemeMode }) {
           onStartTimer={(min) => {
             startTimer(min, `Air fryer ${airValues.temp}°${unit}`, 'converter');
           }}
-          onAddToPlan={addToPlan}
-          planCount={plan.length}
-          planLocked={freeLeft === 0}
-          tab={tab}
-          setTab={setTab}
-          planView={(
-            <PlanTab
-              visible={tab === 'plan' && splashGone}
-              plan={plan}
-              onRemove={(id) => setPlan(plan.filter((f) => f.id !== id))}
-              onStart={startPlan}
-              onGoToConverter={() => setTab('converter')}
-              freeLeft={freeLeft}
-              bottomInset={timersInset}
-            />
-          )}
           topInset={topInset}
           bottomInset={timersInset}
         />
@@ -504,15 +402,14 @@ function Root({ themeMode, setThemeMode }) {
       <PaywallSheet
         visible={showPaywall}
         surface={paywallSurface}
-        minutes={paywallMinutes}
         onClose={() => setShowPaywall(false)}
       />
 
       <TimerStack
         timers={cookTimers.list}
         onPressTimer={(id) => setOpenTimerId(id)}
-        onCancel={(ids) => {
-          for (const id of [].concat(ids)) cookTimers.cancel(id);
+        onCancel={(id) => {
+          cookTimers.cancel(id);
           capture('timer_cancelled', { surface: 'timer_stack' });
         }}
         onRestart={(id) => {
@@ -541,7 +438,6 @@ function Root({ themeMode, setThemeMode }) {
         startedAt={openTimer?.startedAt ?? 0}
         label={openTimer?.label}
         completed={!!openTimer?.completed}
-        waitingSec={openTimer?.waitingSec ?? 0}
         remindHalfway={openTimer?.remindHalfway ?? true}
         onToggleHalfway={(v) => openTimer && cookTimers.update(openTimer.id, { remindHalfway: v })}
       />
@@ -564,36 +460,6 @@ function Root({ themeMode, setThemeMode }) {
       <DialogHost />
     </View>
   );
-}
-
-const PLAN_MAX = 4;
-const PLAN_NUDGE_KEY = '@afc/plan-nudge-v1';
-
-// A person without Pro may start this many "finish together" plans, ever.
-// Single timers are never counted.
-const FREE_PLANS = 3;
-const FREE_PLANS_KEY = '@afc/free-plans-used-v1';
-
-// A count that can't be read is treated as all used: a storage fault must
-// not hand out free plans.
-async function readPlansUsed() {
-  try {
-    const raw = await AsyncStorage.getItem(FREE_PLANS_KEY);
-    if (raw === null) return 0;
-    const n = parseInt(raw, 10);
-    return Number.isInteger(n) && n >= 0 ? n : FREE_PLANS;
-  } catch {
-    return FREE_PLANS;
-  }
-}
-
-async function writePlansUsed(n) {
-  try {
-    await AsyncStorage.setItem(FREE_PLANS_KEY, String(n));
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function durationBucket(totalSec) {

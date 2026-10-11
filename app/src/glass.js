@@ -98,9 +98,11 @@ export function GlassPressable({ style, tint, clear, scheme, children, ...rest }
   const { mode, C } = useTheme();
   if (M3) {
     // Material answers a press with a ripple clipped to the button, not a fade.
+    // Drawn in front: behind the button, Android ignores its rounded corners
+    // and the ripple shows as a square patch.
     return (
       <Pressable
-        android_ripple={{ color: C.ink10 }}
+        android_ripple={{ color: C.ink10, foreground: true }}
         {...rest}
         style={[typeof style === 'function' ? style({ pressed: false }) : style, { overflow: 'hidden' }]}
       >

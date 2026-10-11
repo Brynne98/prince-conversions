@@ -5,11 +5,12 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
-import { Stepper, Segmented, Card, RoundButton, AppBar } from '../primitives';
+import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
-import { Bookmark, Flame, Gear, List, Swap, Play, Plus, ShareIcon } from '../icons';
-import { t } from '../i18n';
+import {
+  Bookmark, Flame, Gear, List, MaterialList, MaterialSettings, Swap, Play, ShareIcon,
+} from '../icons';
 import { convert, fToC, cToF } from '../convert';
 import { capture } from '../analytics';
 
@@ -32,8 +33,6 @@ export default function ConverterScreen({
   ovenTime, setOvenTime,
   direction, setDirection,
   onOpenSaved, onOpenSettings, onSave, onStartTimer,
-  onAddToPlan, planCount = 0, planLocked = false,
-  tab = 'converter', setTab, planView,
   topInset = 0, bottomInset = 0,
 }) {
   const { C } = useTheme();
@@ -98,47 +97,31 @@ export default function ConverterScreen({
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
-      {M3 ? (
-        <AppBar title={tab === 'plan' ? t('plan.tab') : 'Convert'}>
-          <RoundButton onPress={onOpenSaved} accessibilityLabel="Saved recipes">
-            <List s={24} c={C.ink70} />
-          </RoundButton>
-          <RoundButton onPress={onOpenSettings} accessibilityLabel="Settings">
-            <Gear s={24} c={C.ink70} />
-          </RoundButton>
-        </AppBar>
-      ) : (
-        <View style={styles.topBar}>
-          <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
-            <List s={20} />
-          </RoundButton>
-          <View style={styles.topTitleWrap}>
-            <Text style={styles.kicker}>{tab === 'plan' ? 'PLAN' : 'CONVERT'}</Text>
-          </View>
-          <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
-            <Gear s={19} />
-          </RoundButton>
+      <View style={styles.topBar}>
+        <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
+          {M3 ? <MaterialList s={22} /> : <List s={20} />}
+        </RoundButton>
+        <View style={styles.topTitleWrap}>
+          <Text style={styles.kicker}>CONVERT</Text>
         </View>
-      )}
+        <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
+          {M3 ? <MaterialSettings s={22} /> : <Gear s={19} />}
+        </RoundButton>
+      </View>
 
-      {/* Converter or Plan. The swap button below flips oven and air fryer. */}
+      {/* Direction toggle */}
       <View style={styles.directionRow}>
         <Segmented
-          fill
           options={[
-            { value: 'converter', label: t('plan.tab_converter') },
-            { value: 'plan', label: planCount > 0 ? t('plan.tab_count', { n: planCount }) : t('plan.tab') },
+            { value: 'oven-to-air', label: 'Oven → Air fryer' },
+            { value: 'air-to-oven', label: 'Air fryer → Oven' },
           ]}
-          value={tab}
-          onChange={setTab}
+          value={direction}
+          onChange={setDirection}
         />
       </View>
 
-      {/* Both stay mounted, so a tab switch keeps the scroll position and
-          does not ask for a new ad. */}
-      <View style={[styles.pane, tab !== 'plan' && styles.paneHidden]}>{planView}</View>
       <ScrollView
-        style={tab === 'plan' && styles.paneHidden}
         contentContainerStyle={{ paddingHorizontal: M3 ? 16 : 20, paddingTop: 0, paddingBottom: 24 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
@@ -282,21 +265,6 @@ export default function ConverterScreen({
               <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>Save</Text>
             </GlassPressable>
           </View>
-
-          <GlassPressable
-            onPress={() => {
-              Haptics.selectionAsync();
-              onAddToPlan?.(result.temp, targetUnit, result.time);
-            }}
-            hitSlop={8}
-            clear
-            scheme="light"
-            style={({ pressed }) => [styles.addToPlan, { opacity: pressed ? 0.6 : 1 }]}
-          >
-            <Plus s={14} c={C.onTerracotta85} />
-            <Text style={styles.addToPlanText}>{t('plan.add')}</Text>
-            {planLocked && <Text style={styles.proTag}>PRO</Text>}
-          </GlassPressable>
         </LinearGradient>
 
         <View style={{ marginTop: 22 }}>
@@ -309,8 +277,6 @@ export default function ConverterScreen({
 
 const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
-  pane: { flex: 1 },
-  paneHidden: { display: 'none' },
   topBar: {
     paddingHorizontal: 20,
     paddingTop: 8,
@@ -320,8 +286,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   topTitleWrap: { alignItems: 'center' },
   directionRow: M3
-    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16 }
-    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18 },
+    ? { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, alignItems: 'center' }
+    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
   kicker: {
     fontFamily: FONT.ui,
     fontSize: 11,
@@ -469,35 +435,6 @@ const makeStyles = (C) => StyleSheet.create({
   actionSecondary: {
     flex: 1,
     backgroundColor: C.onTerracotta18,
-  },
-  proTag: {
-    fontFamily: FONT.ui,
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    color: C.terracotta,
-    backgroundColor: C.onTerracotta,
-    borderRadius: 4,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    overflow: 'hidden',
-  },
-  addToPlan: {
-    marginTop: GLASS ? 12 : 14,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    // A glass capsule on iOS 26, a Material text button on Android, a plain
-    // text link on older iPhones.
-    ...(GLASS ? { height: 36, paddingHorizontal: 14, borderRadius: 18 } : null),
-    ...(M3 ? { height: 40, paddingHorizontal: 12, borderRadius: 20, marginTop: 8 } : null),
-  },
-  addToPlanText: {
-    fontFamily: FONT.ui,
-    fontSize: 14,
-    fontWeight: '600',
-    color: C.onTerracotta85,
   },
   actionBtnText: {
     fontFamily: FONT.ui,

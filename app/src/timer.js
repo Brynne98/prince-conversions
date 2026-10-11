@@ -62,7 +62,7 @@ async function saveTimers(list) {
   } catch {}
 }
 
-function makeTimer(id, totalSec, label, remindHalfway, startedAt, planId = null) {
+function makeTimer(id, totalSec, label, remindHalfway, startedAt) {
   return {
     id,
     totalSec,
@@ -70,15 +70,9 @@ function makeTimer(id, totalSec, label, remindHalfway, startedAt, planId = null)
     endsAt: startedAt + totalSec * 1000,
     halfFiredAt: startedAt + Math.floor(totalSec / 2) * 1000,
     halfFired: false,
-    // A "finish together" food that goes in later: it waits until
-    // startedAt, then rings "put in" and starts counting down.
-    putInPending: startedAt > Date.now(),
     completed: false,
     remindHalfway,
     label: label || '',
-    // Foods started together as one "finish together" plan share this, so
-    // they are shown as one card. A restarted food leaves its plan.
-    planId,
     notificationIds: null,
   };
 }
@@ -87,7 +81,7 @@ function makeTimer(id, totalSec, label, remindHalfway, startedAt, planId = null)
 // Active timers count down; on expiry they switch to a "completed" state
 // (don't auto-remove). The done chime then loops every ~2.6s until the
 // user cancels or restarts that timer.
-export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
+export function useCookTimers({ onShake, onDone } = {}) {
   const [timers, setTimers] = useState([]);
   const [now, setNow] = useState(Date.now());
   const [restored, setRestored] = useState(false);
@@ -111,9 +105,7 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
           cancelTimerNotifications(t.notificationIds);
           continue;
         }
-        // Its "put in" moment passed while the app was closed; the OS
-        // alert already rang, so don't ring it again now.
-        keep.push(t.putInPending && nowMs >= t.startedAt ? { ...t, putInPending: false } : t);
+        keep.push(t);
       }
       if (!active) return;
       if (keep.length) {
@@ -166,15 +158,6 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
         next.push(t);
         continue;
       }
-      // A staggered food is due to go in now.
-      if (t.putInPending && now >= t.startedAt) {
-        changed = true;
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        playShake();
-        onPutIn?.(t);
-        next.push({ ...t, putInPending: false });
-        continue;
-      }
       // Just expired: mark completed and fire the first chime.
       if (now >= t.endsAt) {
         changed = true;
@@ -196,13 +179,13 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
       next.push(t);
     }
     if (changed) setTimers(next);
-  }, [now, onShake, onDone, onPutIn]);
+  }, [now, onShake, onDone]);
 
   // Schedule the OS alerts for a timer and attach their ids to it. If the
   // timer was cancelled before scheduling finished, undo the schedule.
   const attachNotifications = async (timer, opts) => {
     const ids = await scheduleTimerNotifications(timer, opts);
-    if (!ids.done && !ids.half && !ids.putIn) return;
+    if (!ids.done && !ids.half) return;
     setTimers((curr) => {
       if (!curr.some((t) => t.id === timer.id)) {
         cancelTimerNotifications(ids);
@@ -215,7 +198,6 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
               notificationIds: {
                 done: ids.done ?? t.notificationIds?.done ?? null,
                 half: ids.half ?? t.notificationIds?.half ?? null,
-                putIn: ids.putIn ?? t.notificationIds?.putIn ?? null,
               },
             }
           : t,
@@ -226,10 +208,8 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
   const start = (minutes, label, opts = {}) => {
     const total = Math.max(1, Math.round(minutes * 60));
     const nowMs = Date.now();
-    // delayMs > 0 makes a timer that waits, then starts by itself.
-    const startedAt = nowMs + Math.max(0, opts.delayMs || 0);
     const id = `t${nowMs}_${Math.random().toString(36).slice(2, 7)}`;
-    const timer = makeTimer(id, total, label, opts.remindHalfway !== false, startedAt, opts.planId);
+    const timer = makeTimer(id, total, label, opts.remindHalfway !== false, nowMs);
     setTimers((curr) => [...curr, timer]);
     setNow(nowMs);
     (async () => {
@@ -275,14 +255,12 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
           : t
       )));
     } else if (!old.halfFired) {
-      attachNotifications({ ...old, remindHalfway: true }, { done: false, half: true, putIn: false });
+      attachNotifications({ ...old, remindHalfway: true }, { done: false, half: true });
     }
   };
 
   const list = timers.map((t) => ({
     ...t,
-    // Seconds until a staggered food goes in; 0 once it is cooking.
-    waitingSec: t.completed ? 0 : Math.max(0, Math.ceil((t.startedAt - now) / 1000)),
     remainingSec: t.completed
       ? 0
       : Math.min(t.totalSec, Math.max(0, Math.ceil((t.endsAt - now) / 1000))),

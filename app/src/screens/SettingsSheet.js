@@ -133,7 +133,7 @@ function PressableRow({ label, subtitle, onPress }) {
   return (
     <Pressable
       onPress={onPress}
-      android_ripple={{ color: C.ink10 }}
+      android_ripple={{ color: C.ink10, foreground: true }}
       style={({ pressed }) => [
         styles.row,
         styles.rowDivider,

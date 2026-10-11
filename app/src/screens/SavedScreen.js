@@ -4,8 +4,8 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
-import { Back, Search, Trash } from '../icons';
-import { RoundButton, Segmented, AppBar, confirmDestructive } from '../primitives';
+import { ArrowBack, Back, Search, Trash } from '../icons';
+import { RoundButton, Segmented, confirmDestructive } from '../primitives';
 import { GLASS, M3, GlassSurface } from '../glass';
 import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutesShort } from '../convert';
@@ -56,35 +56,30 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
 
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
-      {M3 ? (
-        <>
-          <AppBar title="Saved" leading="back" onLeading={onClose} />
-          {/* Material order: the search bar leads, the filters sit under it. */}
-          <View style={{ paddingHorizontal: 16 }}>
-            {searchBar}
-            <View style={styles.toggleRow}>
-              <Text style={styles.subtitle}>{count}</Text>
-              <View style={{ flexDirection: 'row', gap: 8 }}>{unitToggle}{modeToggle}</View>
-            </View>
-          </View>
-        </>
-      ) : (
-        <>
-          <View style={styles.topBar}>
-            <RoundButton onPress={onClose} size={44} accessibilityLabel="Back">
-              <Back s={20} />
-            </RoundButton>
-            <Text style={styles.topTitle}>My Recipes</Text>
-            <View style={{ width: 44 }} />
-          </View>
+      <View style={styles.topBar}>
+        <RoundButton onPress={onClose} size={44} accessibilityLabel="Back">
+          {M3 ? <ArrowBack s={22} /> : <Back s={20} />}
+        </RoundButton>
+        <Text style={styles.topTitle}>My Recipes</Text>
+        <View style={{ width: 44 }} />
+      </View>
 
-          <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-            <Text style={styles.bigTitle}>Saved</Text>
+      {M3 ? (
+        // Material order: the search bar leads, the filters sit under it.
+        <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+          {searchBar}
+          <View style={styles.toggleRow}>
             <Text style={styles.subtitle}>{count}</Text>
-            <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
-            {searchBar}
+            <View style={{ flexDirection: 'row', gap: 8 }}>{unitToggle}{modeToggle}</View>
           </View>
-        </>
+        </View>
+      ) : (
+        <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
+          <Text style={styles.bigTitle}>Saved</Text>
+          <Text style={styles.subtitle}>{count}</Text>
+          <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
+          {searchBar}
+        </View>
       )}
 
       <ScrollView
@@ -158,7 +153,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
     return (
       <Pressable
         onPress={onStart}
-        android_ripple={{ color: C.ink10 }}
+        android_ripple={{ color: C.ink10, foreground: true }}
         style={[
           styles.row,
           first && { borderTopLeftRadius: 16, borderTopRightRadius: 16 },
@@ -173,7 +168,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
           <Text style={styles.rowSupport}>{summary}</Text>
           {!!item.note && <Text style={styles.rowSupport} numberOfLines={1}>{item.note}</Text>}
         </View>
-        <RoundButton onPress={onDelete} accessibilityLabel={`Delete ${item.name}`}>
+        <RoundButton onPress={onDelete} tone="plain" accessibilityLabel={`Delete ${item.name}`}>
           <Trash s={22} />
         </RoundButton>
       </Pressable>
