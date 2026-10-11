@@ -362,7 +362,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   summaryKicker: {
     fontFamily: FONT.ui,
-    fontSize: M3 ? 12 : 10,
+    fontSize: 10,
     fontWeight: M3 ? '500' : '700',
     color: C.terracottaDeep,
     letterSpacing: M3 ? 0.4 : 1,

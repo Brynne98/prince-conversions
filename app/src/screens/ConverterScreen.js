@@ -311,7 +311,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   cardLabel: {
     fontFamily: FONT.ui,
-    fontSize: M3 ? 14 : 12,
+    fontSize: 12,
     fontWeight: M3 ? '500' : '700',
     color: C.ink70,
     letterSpacing: M3 ? 0.1 : 0.5,
@@ -374,7 +374,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   resultKicker: {
     fontFamily: FONT.ui,
-    fontSize: M3 ? 14 : 12,
+    fontSize: 12,
     fontWeight: M3 ? '500' : '700',
     color: C.onTerracotta85,
     letterSpacing: M3 ? 0.1 : 1.6,
@@ -438,7 +438,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   actionBtnText: {
     fontFamily: FONT.ui,
-    fontSize: M3 ? 16 : 15,
+    fontSize: 15,
     fontWeight: M3 ? '500' : '600',
   },
 });

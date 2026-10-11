@@ -221,7 +221,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   badgeText: {
     fontFamily: FONT.ui,
-    fontSize: M3 ? 12 : 11,
+    fontSize: 11,
     fontWeight: M3 ? '500' : '700',
     color: M3 ? C.terracottaDeep : C.onTerracotta,
     letterSpacing: M3 ? 0.5 : 0.8,
@@ -284,7 +284,7 @@ const makeStyles = (C) => StyleSheet.create({
   benefitLabel: {
     flex: 1,
     fontFamily: FONT.ui,
-    fontSize: M3 ? 16 : 15,
+    fontSize: 15,
     fontWeight: M3 ? '400' : '500',
     color: C.ink,
   },
