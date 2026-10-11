@@ -20,7 +20,9 @@
     "restored_body": "Pro is active on this device.",
     "nothing_title": "Nothing to restore",
     "nothing_body": "No previous purchase found.",
-    "restore_failed_title": "Restore failed"
+    "restore_failed_title": "Restore failed",
+    "example_food": "%{time} food",
+    "example_ready": "Both ready at once"
   },
   "settings": {
     "remove_ads": "Get Pro",
@@ -35,7 +37,7 @@
     "att_continue": "Continue"
   },
   "plan": {
-    "add": "Add to plan",
+    "add": "Finish with another food",
     "open": "Finish together · %{count} foods",
     "open_one": "Finish together · 1 food",
     "added": "Added to plan",
@@ -51,7 +53,7 @@
     "clear": "Clear plan",
     "nudge_title": "Cooking several things?",
     "nudge_body_free": "Finish together tells you when to put each food in, so everything is ready at once. Part of Pro.",
-    "nudge_body_pro": "Tap \"Add to plan\" under each result, then Start. Everything is ready at once.",
+    "nudge_body_pro": "Tap \"Finish with another food\" under each result, then Start. Everything is ready at once.",
     "nudge_see_pro": "See Pro",
     "nudge_later": "Not now",
     "nudge_ok": "Got it"
