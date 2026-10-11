@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Dimensions, StyleSheet, Platform,
+  View, Text, Animated, Appearance, Dimensions, StyleSheet, Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -229,13 +229,21 @@ function Root({ themeMode, setThemeMode }) {
     return () => clearTimeout(timeout);
   }, [hydrated, direction, unit, targetUnit, ovenTemp, ovenTime]);
 
-  // Hide the splash as soon as fonts are ready; AsyncStorage hydration
-  // continues in the background and items pop in when ready.
+  // Hide the system splash once the fonts and the saved settings are in, so
+  // the layer that takes over knows whether the app is light or dark.
+  const ready = fontsLoaded && hydrated;
   useEffect(() => {
-    if (fontsLoaded) {
+    if (ready) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [ready]);
+
+  // Tell the system the app's own light or dark, so what it draws itself (a
+  // sheet's rim, a permission prompt) matches. Not before the splash is gone:
+  // the system splash follows the phone's setting and would switch under it.
+  useEffect(() => {
+    if (splashGone) Appearance.setColorScheme(themeMode);
+  }, [splashGone, themeMode]);
 
   // Defer ATT + AdMob init until the splash is fully dismissed.
   // Requesting ATT while another view is animating causes iOS to silently
@@ -446,7 +454,7 @@ function Root({ themeMode, setThemeMode }) {
         onToggleHalfway={(v) => openTimer && cookTimers.update(openTimer.id, { remindHalfway: v })}
       />
 
-      {!splashGone && fontsLoaded && (
+      {!splashGone && ready && (
         <AnimatedSplash onDone={() => setSplashGone(true)} />
       )}
 

@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "platforms": ["ios", "android"],
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.brynneprince.airfryerconverter",
@@ -55,8 +55,12 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
-          "imageWidth": 140,
-          "backgroundColor": "#FAF5EC"
+          "imageWidth": 144,
+          "backgroundColor": "#FAF5EC",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#15110C"
+          }
         }
       ],
       [
