@@ -150,21 +150,25 @@ function Root({ themeMode, setThemeMode }) {
 
   useEffect(() => {
     (async () => {
-      const s = await loadState();
-      if (s) {
-        if (s.unit) setUnit(s.unit);
-        if (s.targetUnit) setTargetUnit(s.targetUnit);
-        else if (s.unit) setTargetUnit(s.unit); // migrate single-unit users
-        if (typeof s.ovenTemp === 'number') setOvenTemp(s.ovenTemp);
-        if (typeof s.ovenTime === 'number') setOvenTime(s.ovenTime);
-        if (s.direction) setDirection(s.direction);
-        if (Array.isArray(s.items)) setItems(s.items);
-        if (s.themeMode === 'dark' || s.themeMode === 'light') setThemeMode(s.themeMode);
-        if (typeof s.analyticsEnabled === 'boolean') {
-          setAnalyticsPreference(s.analyticsEnabled);
+      // The system splash waits for this, so it must always be reached.
+      try {
+        const s = await loadState();
+        if (s) {
+          if (s.unit) setUnit(s.unit);
+          if (s.targetUnit) setTargetUnit(s.targetUnit);
+          else if (s.unit) setTargetUnit(s.unit); // migrate single-unit users
+          if (typeof s.ovenTemp === 'number') setOvenTemp(s.ovenTemp);
+          if (typeof s.ovenTime === 'number') setOvenTime(s.ovenTime);
+          if (s.direction) setDirection(s.direction);
+          if (Array.isArray(s.items)) setItems(s.items);
+          if (s.themeMode === 'dark' || s.themeMode === 'light') setThemeMode(s.themeMode);
+          if (typeof s.analyticsEnabled === 'boolean') {
+            setAnalyticsPreference(s.analyticsEnabled);
+          }
         }
+      } finally {
+        setHydrated(true);
       }
-      setHydrated(true);
     })();
   }, []);
 

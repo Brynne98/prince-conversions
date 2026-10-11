@@ -7,8 +7,9 @@ asset slot. Generates:
   assets/adaptive-icon.png — 1024x1024 RGBA, Android adaptive foreground
                             (kept centered within 66% safe zone)
   assets/favicon.png      — 64x64 RGBA for web
-  assets/splash-icon.png  — 1024x1024 RGBA, used by expo-splash-screen
-                            so native launch matches AnimatedSplash
+
+The splash pictures are cut from adaptive-icon.png afterwards, by
+scripts/make-icon-variants.js.
 
 Run: python3 scripts/build_icons.py
 """
@@ -143,11 +144,6 @@ def main():
     favicon = render_card(64, alpha_corners=True)
     favicon.save(ASSETS / "favicon.png", "PNG")
     print(f"favicon.png     ({favicon.size}, {favicon.mode})")
-
-    # 5. Splash icon (matches native expo-splash-screen image)
-    splash = render_card(1024, alpha_corners=True)
-    splash.save(ASSETS / "splash-icon.png", "PNG")
-    print(f"splash-icon.png ({splash.size}, {splash.mode})")
 
 
 if __name__ == "__main__":
