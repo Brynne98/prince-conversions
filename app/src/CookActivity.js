@@ -44,8 +44,8 @@ const CookActivity = (props) => {
       ]}
     />
   );
-  const rows = props.foods.map((food) => (
-    <HStack key={food.label + food.startAt} spacing={10}>
+  const rows = props.foods.map((food, i) => (
+    <HStack key={i} spacing={10}>
       {ring(food.startAt, food.endAt, 20)}
       <Text modifiers={[font({ size: 15, weight: 'medium' })]}>{food.label}</Text>
       <Spacer />

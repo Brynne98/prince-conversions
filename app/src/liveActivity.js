@@ -50,19 +50,22 @@ export function syncCookActivities(timers) {
     }
     const live = groups(timers.filter((x) => !x.completed));
     for (const [key, entry] of running) {
-      if (!live.has(key)) {
-        entry.instance.end('immediate');
-        running.delete(key);
-      }
+      if (live.has(key)) continue;
+      running.delete(key);
+      // It may already be gone: swiped away, or ended by the system.
+      try { entry.instance.end('immediate'); } catch {}
     }
     for (const [key, list] of live) {
       const props = propsFor(list);
       const sig = JSON.stringify(props);
       const entry = running.get(key);
-      if (!entry) running.set(key, { instance: Activity.start(props), sig });
-      else if (entry.sig !== sig) {
-        entry.instance.update(props);
-        entry.sig = sig;
+      if (entry?.sig === sig) continue;
+      // One activity failing must not stop the others from being kept up.
+      try {
+        if (entry) entry.instance.update(props);
+        running.set(key, { instance: entry ? entry.instance : Activity.start(props), sig });
+      } catch {
+        running.delete(key);
       }
     }
   } catch {}
