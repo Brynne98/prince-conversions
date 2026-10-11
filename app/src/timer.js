@@ -277,3 +277,10 @@ export function formatRemaining(sec) {
   const s = sec % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
+
+// A time of day in the phone's own style, such as "6:42 pm".
+export function clockTime(ms) {
+  return new Date(ms)
+    .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    .toLowerCase();
+}

@@ -123,10 +123,14 @@ function Root({ themeMode, setThemeMode }) {
       if (!offered) recordTimerCompletion();
     });
   };
-  // The lock screen and Dynamic Island follow the timers: resync whenever
-  // one starts, ends, restarts or is cancelled, not on every tick.
+  // The lock screen, Dynamic Island and Android's notification follow the
+  // timers: resync whenever one starts, ends, restarts, is cancelled or has
+  // its reminders changed, not on every tick.
   const activitySig = cookTimers.list
-    .map((x) => `${x.id}:${x.startedAt}:${x.endsAt}:${x.completed}`)
+    .map((x) => [
+      x.id, x.startedAt, x.endsAt, x.completed, x.label,
+      x.remindHalfway, x.halfFired, !!x.notificationIds,
+    ].join(':'))
     .join('|');
   useEffect(() => {
     syncCookActivities(cookTimers.list);

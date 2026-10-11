@@ -34,6 +34,11 @@
     "att_continue": "Continue"
   },
   "timer": {
-    "done": "Done!"
+    "done": "Done!",
+    "done_short": "Done",
+    "ready_at": "Ready at %{time}",
+    "shake_at": "Shake at %{time}",
+    "fallback_label": "Cook timer",
+    "channel_running": "Cook timer running"
   }
 }
