@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
-import { Back, Search, Trash } from '../icons';
+import { ArrowBack, Back, Search, Trash } from '../icons';
 import { RoundButton, Segmented, confirmDestructive } from '../primitives';
 import { GLASS, M3, GlassSurface } from '../glass';
 import { BannerAd } from '../ads';
@@ -58,7 +58,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
     <View style={[styles.root, { paddingTop: topInset }]}>
       <View style={styles.topBar}>
         <RoundButton onPress={onClose} size={44} accessibilityLabel="Back">
-          <Back s={20} />
+          {M3 ? <ArrowBack s={22} /> : <Back s={20} />}
         </RoundButton>
         <Text style={styles.topTitle}>My Recipes</Text>
         <View style={{ width: 44 }} />

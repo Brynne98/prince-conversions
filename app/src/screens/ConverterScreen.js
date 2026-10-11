@@ -8,7 +8,9 @@ import { FONT, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
-import { Bookmark, Flame, Gear, List, Swap, Play, ShareIcon } from '../icons';
+import {
+  Bookmark, Flame, Gear, List, MaterialList, MaterialSettings, Swap, Play, ShareIcon,
+} from '../icons';
 import { convert, fToC, cToF } from '../convert';
 import { capture } from '../analytics';
 
@@ -97,13 +99,13 @@ export default function ConverterScreen({
       {/* Top bar */}
       <View style={styles.topBar}>
         <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
-          <List s={20} />
+          {M3 ? <MaterialList s={22} /> : <List s={20} />}
         </RoundButton>
         <View style={styles.topTitleWrap}>
           <Text style={styles.kicker}>CONVERT</Text>
         </View>
         <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
-          <Gear s={19} />
+          {M3 ? <MaterialSettings s={22} /> : <Gear s={19} />}
         </RoundButton>
       </View>
 
