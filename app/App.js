@@ -66,6 +66,7 @@ function Root({ themeMode, setThemeMode }) {
   const [showSettings, setShowSettings] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallSurface, setPaywallSurface] = useState('paywall');
+  const [paywallMinutes, setPaywallMinutes] = useState(null);
   const [openTimerId, setOpenTimerId] = useState(null);
   // "Finish together" foods waiting to be started as one staggered plan.
   const [plan, setPlan] = useState([]);
@@ -295,6 +296,7 @@ function Root({ themeMode, setThemeMode }) {
   const addToPlan = (temp, tempUnit, minutes) => {
     if (!isPro) {
       setPaywallSurface('finish_together');
+      setPaywallMinutes(minutes);
       setShowPaywall(true);
       return;
     }
@@ -463,6 +465,7 @@ function Root({ themeMode, setThemeMode }) {
       <PaywallSheet
         visible={showPaywall}
         surface={paywallSurface}
+        minutes={paywallMinutes}
         onClose={() => setShowPaywall(false)}
       />
 

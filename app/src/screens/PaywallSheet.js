@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Pressable, StyleSheet, ScrollView,
+  View, Text, Pressable, StyleSheet, ScrollView, Animated, Easing, AccessibilityInfo,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
@@ -9,9 +9,10 @@ import { Sheet, CloseButton, AppBar, TextButton, alert } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
 import { useIap } from '../iap';
 import { capture } from '../analytics';
+import { formatMinutes } from '../convert';
 import { t } from '../i18n';
 
-export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) {
+export default function PaywallSheet({ visible, onClose, surface = 'paywall', minutes }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
   const { configured, isPro, price, buyPro, restorePurchases } = useIap();
@@ -88,6 +89,9 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
     }
   };
 
+  // Opened from "finish together": lead with that feature and show it working.
+  const featured = surface.startsWith('finish_together');
+
   const ctaLabel = price
     ? t('paywall.cta', { price })
     : t('paywall.cta_no_price');
@@ -112,19 +116,25 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
           <Text style={styles.badgeText}>{t('paywall.badge')}</Text>
         </View>
 
-        <Text style={styles.title}>{t('paywall.title')}</Text>
-        <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
+        <Text style={styles.title}>{t(featured ? 'plan.title' : 'paywall.title')}</Text>
+        <Text style={[styles.subtitle, featured && { marginBottom: 20 }]}>
+          {t(featured ? 'plan.subtitle' : 'paywall.subtitle')}
+        </Text>
+
+        {featured && <PlanExample visible={visible} minutes={minutes} />}
 
         <View style={styles.benefits}>
           <Benefit
             icon={<NoAdsIcon c={C.terracotta} />}
             label={t('paywall.benefit_no_banners')}
           />
-          <Benefit
-            icon={<TimerIcon c={C.terracotta} />}
-            label={t('paywall.benefit_finish_together')}
-            divider
-          />
+          {!featured && (
+            <Benefit
+              icon={<TimerIcon c={C.terracotta} />}
+              label={t('paywall.benefit_finish_together')}
+              divider
+            />
+          )}
           <Benefit
             icon={<RestoreIcon c={C.terracotta} />}
             label={t(M3 ? 'paywall.benefit_restore_android' : 'paywall.benefit_restore')}
@@ -162,6 +172,63 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
         <Text style={styles.footer}>{t('paywall.footer')}</Text>
       </ScrollView>
     </Sheet>
+  );
+}
+
+// Two foods on one clock: the time just converted, and a shorter one that
+// goes in later. The bars fill as the cook would run, and end together.
+function PlanExample({ visible, minutes }) {
+  const styles = useStyles(makeStyles);
+  const long = minutes >= 5 ? minutes : 20;
+  const short = Math.round(long * 0.6);
+  const clock = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!visible) return undefined;
+    let anim;
+    AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
+      if (reduce) return;
+      clock.setValue(0);
+      anim = Animated.timing(clock, {
+        toValue: 1, duration: 2200, delay: 500, easing: Easing.linear, useNativeDriver: false,
+      });
+      anim.start();
+    });
+    return () => anim?.stop();
+  }, [visible, clock]);
+
+  const start = 1 - short / long;
+  const rows = [
+    { time: long, note: t('plan.first'), from: 0 },
+    { time: short, note: t('plan.later', { time: formatMinutes(long - short) }), from: start },
+  ];
+
+  return (
+    <View style={styles.example}>
+      {rows.map((r) => (
+        <View key={r.time}>
+          <View style={styles.exampleRow}>
+            <Text style={styles.exampleFood}>
+              {t('paywall.example_food', { time: formatMinutes(r.time) })}
+            </Text>
+            <Text style={styles.exampleNote}>{r.note}</Text>
+          </View>
+          <View style={styles.exampleTrack}>
+            <Animated.View
+              style={[styles.exampleBar, {
+                marginLeft: `${r.from * 100}%`,
+                width: clock.interpolate({
+                  inputRange: [r.from, 1],
+                  outputRange: ['0%', `${(1 - r.from) * 100}%`],
+                  extrapolate: 'clamp',
+                }),
+              }]}
+            />
+          </View>
+        </View>
+      ))}
+      <Text style={styles.exampleReady}>{t('paywall.example_ready')}</Text>
+    </View>
   );
 }
 
@@ -258,6 +325,37 @@ const makeStyles = (C) => StyleSheet.create({
     lineHeight: 21,
     marginBottom: 28,
     paddingHorizontal: 8,
+  },
+  example: {
+    backgroundColor: M3 ? C.surfaceLow : C.paper,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    ...(M3 ? null : { borderWidth: StyleSheet.hairlineWidth, borderColor: C.divider }),
+  },
+  exampleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: 8,
+    marginBottom: 6,
+  },
+  exampleFood: { fontFamily: FONT.ui, fontSize: 14, fontWeight: '600', color: C.ink },
+  exampleNote: { fontFamily: FONT.ui, fontSize: 13, color: C.ink70 },
+  exampleTrack: {
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: C.ink06,
+    marginBottom: 14,
+    overflow: 'hidden',
+  },
+  exampleBar: { height: 10, borderRadius: 5, backgroundColor: C.terracotta },
+  exampleReady: {
+    fontFamily: FONT.ui,
+    fontSize: 13,
+    fontWeight: '600',
+    color: C.terracottaDeep,
+    textAlign: 'right',
   },
   // Android: Material list rows joined into one group by a 2dp gap.
   benefits: M3 ? {
