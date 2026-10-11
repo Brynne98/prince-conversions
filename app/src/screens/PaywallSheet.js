@@ -128,13 +128,11 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall', mi
             icon={<NoAdsIcon c={C.terracotta} />}
             label={t('paywall.benefit_no_banners')}
           />
-          {!featured && (
-            <Benefit
-              icon={<TimerIcon c={C.terracotta} />}
-              label={t('paywall.benefit_finish_together')}
-              divider
-            />
-          )}
+          <Benefit
+            icon={<TimerIcon c={C.terracotta} />}
+            label={t('paywall.benefit_finish_together')}
+            divider
+          />
           <Benefit
             icon={<RestoreIcon c={C.terracotta} />}
             label={t(M3 ? 'paywall.benefit_restore_android' : 'paywall.benefit_restore')}
