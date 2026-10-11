@@ -23,6 +23,7 @@ import { alert, DialogHost } from './src/primitives';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
 import { loadState, saveState } from './src/storage';
 import { useCookTimers } from './src/timer';
+import { syncCookActivities } from './src/liveActivity';
 import { IapProvider, useIap } from './src/iap';
 import { initAds } from './src/ads';
 import { capture, setAnalyticsEnabled } from './src/analytics';
@@ -135,6 +136,15 @@ function Root({ themeMode, setThemeMode }) {
       if (!offered) recordTimerCompletion();
     });
   };
+  // The lock screen and Dynamic Island follow the timers: resync whenever
+  // one starts, ends, restarts or is cancelled, not on every tick.
+  const activitySig = cookTimers.list
+    .map((x) => `${x.id}:${x.planId}:${x.startedAt}:${x.endsAt}:${x.completed}`)
+    .join('|');
+  useEffect(() => {
+    syncCookActivities(cookTimers.list);
+  }, [activitySig]);
+
   const openTimer = openTimerId
     ? cookTimers.list.find((t) => t.id === openTimerId)
     : null;
