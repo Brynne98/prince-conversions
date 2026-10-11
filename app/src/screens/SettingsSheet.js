@@ -185,8 +185,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   rowLabel: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
     color: C.ink,
   } : {
     fontFamily: FONT.ui,
@@ -196,8 +196,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   rowSubtitle: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.ink70,
   } : {
     fontFamily: FONT.ui,
@@ -224,7 +224,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   proPillText: {
     fontFamily: FONT.ui,
-    fontSize: M3 ? 12 : 11,
+    fontSize: 11,
     fontWeight: M3 ? '500' : '700',
     color: M3 ? C.terracottaDeep : C.onTerracotta,
     letterSpacing: M3 ? 0.1 : 0.6,

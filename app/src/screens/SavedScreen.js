@@ -265,15 +265,15 @@ const makeStyles = (C) => StyleSheet.create({
   searchInput: {
     flex: 1,
     fontFamily: FONT.ui,
-    fontSize: M3 ? 16 : 15,
+    fontSize: 15,
     color: C.ink,
     padding: 0,
   },
   empty: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 20 },
   emptyTitle: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 20,
+    lineHeight: 26,
     color: C.ink,
   } : {
     fontFamily: FONT.display,
@@ -337,8 +337,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   rowSupport: {
     fontFamily: FONT.ui,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.ink70,
   },
   tagRow: { flexDirection: 'row', gap: 6, marginTop: 4, flexWrap: 'wrap' },

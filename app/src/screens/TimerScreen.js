@@ -245,8 +245,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   halfLabel: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
     color: C.ink,
   } : {
     fontFamily: FONT.ui,
@@ -256,8 +256,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   halfSub: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 16,
     color: C.ink70,
   } : {
     fontFamily: FONT.ui,
