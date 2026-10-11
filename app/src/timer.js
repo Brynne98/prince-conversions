@@ -62,7 +62,7 @@ async function saveTimers(list) {
   } catch {}
 }
 
-function makeTimer(id, totalSec, label, remindHalfway, startedAt) {
+function makeTimer(id, totalSec, label, remindHalfway, startedAt, planId = null) {
   return {
     id,
     totalSec,
@@ -76,6 +76,9 @@ function makeTimer(id, totalSec, label, remindHalfway, startedAt) {
     completed: false,
     remindHalfway,
     label: label || '',
+    // Foods started together as one "finish together" plan share this, so
+    // they are shown as one card. A restarted food leaves its plan.
+    planId,
     notificationIds: null,
   };
 }
@@ -226,7 +229,7 @@ export function useCookTimers({ onShake, onDone, onPutIn } = {}) {
     // delayMs > 0 makes a timer that waits, then starts by itself.
     const startedAt = nowMs + Math.max(0, opts.delayMs || 0);
     const id = `t${nowMs}_${Math.random().toString(36).slice(2, 7)}`;
-    const timer = makeTimer(id, total, label, opts.remindHalfway !== false, startedAt);
+    const timer = makeTimer(id, total, label, opts.remindHalfway !== false, startedAt, opts.planId);
     setTimers((curr) => [...curr, timer]);
     setNow(nowMs);
     (async () => {

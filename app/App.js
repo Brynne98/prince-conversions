@@ -13,8 +13,8 @@ import SavedScreen from './src/screens/SavedScreen';
 import SaveSheet from './src/screens/SaveSheet';
 import SettingsSheet from './src/screens/SettingsSheet';
 import PaywallSheet from './src/screens/PaywallSheet';
-import PlanSheet from './src/screens/PlanSheet';
-import TimerStack from './src/components/TimerBar';
+import PlanTab from './src/screens/PlanTab';
+import TimerStack, { stackHeight } from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
 import { ThemeProvider, useTheme, useStyles } from './src/theme';
@@ -70,8 +70,12 @@ function Root({ themeMode, setThemeMode }) {
   const [openTimerId, setOpenTimerId] = useState(null);
   // "Finish together" foods waiting to be started as one staggered plan.
   const [plan, setPlan] = useState([]);
-  const [showPlan, setShowPlan] = useState(false);
+  const [tab, setTab] = useState('converter');
+  // Plans a person without Pro has started, ever. null until read from disk.
+  const [plansUsed, setPlansUsed] = useState(null);
+  const startingPlan = useRef(false);
   const { isPro } = useIap();
+  const freeLeft = isPro ? null : Math.max(0, FREE_PLANS - (plansUsed ?? 0));
   const [splashGone, setSplashGone] = useState(false);
   const [draft, setDraft] = useState({ name: '', emoji: '🍟', note: '' });
   const [toast, setToast] = useState(null);
@@ -219,6 +223,19 @@ function Root({ themeMode, setThemeMode }) {
     return () => clearTimeout(timeout);
   }, [hydrated, direction, unit, targetUnit, ovenTemp, ovenTime]);
 
+  useEffect(() => {
+    readPlansUsed().then(setPlansUsed);
+  }, []);
+
+  useEffect(() => {
+    if (tab !== 'plan') return;
+    capture('plan_tab_viewed', {
+      is_pro: isPro,
+      food_count: plan.length,
+      explainer_shown: plan.length === 0,
+    });
+  }, [tab]);
+
   // Hide the splash as soon as fonts are ready; AsyncStorage hydration
   // continues in the background and items pop in when ready.
   useEffect(() => {
@@ -275,29 +292,21 @@ function Root({ themeMode, setThemeMode }) {
       return;
     }
     capture('plan_nudge_shown', { is_pro: isPro });
-    if (isPro) {
-      alert(t('plan.nudge_title'), t('plan.nudge_body_pro'), [
-        { text: t('plan.nudge_ok') },
-      ]);
-      return;
-    }
-    alert(t('plan.nudge_title'), t('plan.nudge_body_free'), [
+    alert(t('plan.nudge_title'), t('plan.nudge_body'), [
       { text: t('plan.nudge_later'), style: 'cancel' },
-      {
-        text: t('plan.nudge_see_pro'),
-        onPress: () => {
-          setPaywallSurface('finish_together_nudge');
-          setShowPaywall(true);
-        },
-      },
+      { text: t('plan.nudge_open'), onPress: () => setTab('plan') },
     ]);
   };
 
+  const offerPro = (minutes) => {
+    setPaywallSurface('finish_together');
+    setPaywallMinutes(minutes);
+    setShowPaywall(true);
+  };
+
   const addToPlan = (temp, tempUnit, minutes) => {
-    if (!isPro) {
-      setPaywallSurface('finish_together');
-      setPaywallMinutes(minutes);
-      setShowPaywall(true);
+    if (freeLeft === 0) {
+      offerPro(minutes);
       return;
     }
     if (plan.length >= PLAN_MAX) {
@@ -308,17 +317,37 @@ function Root({ themeMode, setThemeMode }) {
     capture('plan_food_added', { food_count: plan.length + 1 });
     showToast(t('plan.added'));
   };
-  const startPlan = () => {
-    const longest = Math.max(...plan.map((f) => f.minutes));
-    for (const f of plan) {
-      startTimer(f.minutes, `${f.temp}°${f.unit} · ${f.minutes} min`, 'plan', {
-        delayMs: (longest - f.minutes) * 60 * 1000,
-      });
+  // Every plan starts here, so this is where a free plan is spent. The count
+  // is read from disk and saved before any timer starts: it only goes up.
+  const startPlan = async () => {
+    if (plan.length === 0 || startingPlan.current) return;
+    startingPlan.current = true;
+    try {
+      const longest = Math.max(...plan.map((f) => f.minutes));
+      if (!isPro) {
+        const used = await readPlansUsed();
+        if (used >= FREE_PLANS || !(await writePlansUsed(used + 1))) {
+          setPlansUsed(Math.max(used, FREE_PLANS));
+          offerPro(longest);
+          return;
+        }
+        setPlansUsed(used + 1);
+        capture('free_plan_used', { used: used + 1, left: FREE_PLANS - used - 1 });
+      }
+      const planId = 'plan' + Date.now();
+      for (const f of plan) {
+        startTimer(f.minutes, `${f.temp}°${f.unit} · ${f.minutes} min`, 'plan', {
+          delayMs: (longest - f.minutes) * 60 * 1000,
+          planId,
+        });
+      }
+      capture('plan_started', { food_count: plan.length, is_pro: isPro });
+      setPlan([]);
+      setTab('converter');
+      showToast(t('plan.started'));
+    } finally {
+      startingPlan.current = false;
     }
-    capture('plan_started', { food_count: plan.length });
-    setPlan([]);
-    setShowPlan(false);
-    showToast(t('plan.started'));
   };
 
   const openSave = () => {
@@ -379,6 +408,8 @@ function Root({ themeMode, setThemeMode }) {
   });
 
   const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 16 : 8);
+  // Room at the foot of a scrolling screen for the running timers.
+  const timersInset = cookTimers.list.length > 0 ? stackHeight(cookTimers.list) + 20 : 0;
   const bottomInset = insets.bottom;
 
   return (
@@ -400,11 +431,23 @@ function Root({ themeMode, setThemeMode }) {
             startTimer(min, `Air fryer ${airValues.temp}°${unit}`, 'converter');
           }}
           onAddToPlan={addToPlan}
-          onOpenPlan={() => setShowPlan(true)}
           planCount={plan.length}
-          isPro={isPro}
+          planLocked={freeLeft === 0}
+          tab={tab}
+          setTab={setTab}
+          planView={(
+            <PlanTab
+              visible={tab === 'plan' && splashGone}
+              plan={plan}
+              onRemove={(id) => setPlan(plan.filter((f) => f.id !== id))}
+              onStart={startPlan}
+              onGoToConverter={() => setTab('converter')}
+              freeLeft={freeLeft}
+              bottomInset={timersInset}
+            />
+          )}
           topInset={topInset}
-          bottomInset={cookTimers.list.length > 0 ? 90 : 0}
+          bottomInset={timersInset}
         />
       </Animated.View>
 
@@ -450,18 +493,6 @@ function Root({ themeMode, setThemeMode }) {
         }}
       />
 
-      <PlanSheet
-        visible={showPlan}
-        plan={plan}
-        onClose={() => setShowPlan(false)}
-        onRemove={(id) => {
-          const next = plan.filter((f) => f.id !== id);
-          setPlan(next);
-          if (next.length === 0) setShowPlan(false);
-        }}
-        onStart={startPlan}
-      />
-
       <PaywallSheet
         visible={showPaywall}
         surface={paywallSurface}
@@ -472,8 +503,8 @@ function Root({ themeMode, setThemeMode }) {
       <TimerStack
         timers={cookTimers.list}
         onPressTimer={(id) => setOpenTimerId(id)}
-        onCancel={(id) => {
-          cookTimers.cancel(id);
+        onCancel={(ids) => {
+          for (const id of [].concat(ids)) cookTimers.cancel(id);
           capture('timer_cancelled', { surface: 'timer_stack' });
         }}
         onRestart={(id) => {
@@ -529,6 +560,33 @@ function Root({ themeMode, setThemeMode }) {
 
 const PLAN_MAX = 4;
 const PLAN_NUDGE_KEY = '@afc/plan-nudge-v1';
+
+// A person without Pro may start this many "finish together" plans, ever.
+// Single timers are never counted.
+const FREE_PLANS = 3;
+const FREE_PLANS_KEY = '@afc/free-plans-used-v1';
+
+// A count that can't be read is treated as all used: a storage fault must
+// not hand out free plans.
+async function readPlansUsed() {
+  try {
+    const raw = await AsyncStorage.getItem(FREE_PLANS_KEY);
+    if (raw === null) return 0;
+    const n = parseInt(raw, 10);
+    return Number.isInteger(n) && n >= 0 ? n : FREE_PLANS;
+  } catch {
+    return FREE_PLANS;
+  }
+}
+
+async function writePlansUsed(n) {
+  try {
+    await AsyncStorage.setItem(FREE_PLANS_KEY, String(n));
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function durationBucket(totalSec) {
   if (totalSec < 15 * 60) return 'under_15_min';
