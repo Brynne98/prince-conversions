@@ -202,6 +202,8 @@ function Ring({ frac, waiting, size = 38, C, done }) {
   return (
     <Svg width={size} height={size}>
       <Circle
+        // Keyed: the dashes don't clear when the prop is removed.
+        key={waiting ? 'waiting' : 'track'}
         cx={mid} cy={mid} r={r} fill="none"
         stroke={done ? C.onTerracotta20 : C.ink10}
         strokeWidth={waiting ? 2 : stroke}
@@ -402,7 +404,6 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginRight: -6,
   },
   planTitle: { flex: 1, fontFamily: FONT.ui, fontSize: 14, fontWeight: '600' },
   planReady: {

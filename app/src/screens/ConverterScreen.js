@@ -124,6 +124,7 @@ export default function ConverterScreen({
       {/* Converter or Plan. The swap button below flips oven and air fryer. */}
       <View style={styles.directionRow}>
         <Segmented
+          fill
           options={[
             { value: 'converter', label: t('plan.tab_converter') },
             { value: 'plan', label: planCount > 0 ? t('plan.tab_count', { n: planCount }) : t('plan.tab') },
@@ -315,8 +316,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   topTitleWrap: { alignItems: 'center' },
   directionRow: M3
-    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16, alignItems: 'center' }
-    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
+    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16 }
+    : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18 },
   kicker: {
     fontFamily: FONT.ui,
     fontSize: 11,
