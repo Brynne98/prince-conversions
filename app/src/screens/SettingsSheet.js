@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, Pressable, ScrollView, StyleSheet,
+  View, Text, Pressable, ScrollView, StyleSheet, Linking,
 } from 'react-native';
 import Constants from 'expo-constants';
 import { FONT, useTheme, useStyles } from '../theme';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
+const SITE_URL = 'https://brynne98.github.io/prince-conversions';
 import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
 import { M3 } from '../glass';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
@@ -97,6 +98,15 @@ export default function SettingsSheet({
               }}
             />
           )}
+
+          <PressableRow
+            label="Privacy policy"
+            onPress={() => Linking.openURL(`${SITE_URL}/privacy`)}
+          />
+          <PressableRow
+            label="Terms of use"
+            onPress={() => Linking.openURL(`${SITE_URL}/terms`)}
+          />
 
           <Row label="About" detail={`v${APP_VERSION}`} isLast />
         </View>

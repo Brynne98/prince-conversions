@@ -4,7 +4,7 @@ title: Privacy Policy — Air Fryer Converter
 
 # Privacy Policy
 
-_Last updated: 10 October 2026_
+_Last updated: 12 October 2026_
 
 This privacy policy applies to the **Air Fryer Converter** app (the
 "App") on both iOS and Android. It is published on the Apple App Store
@@ -14,6 +14,14 @@ identifier `com.brynneprince.airfryerconverter`.
 The App is a recipe-conversion utility. We try to collect the absolute
 minimum data needed for the App to function, and to be transparent about
 the third-party services that do collect data on our behalf.
+
+## Who is responsible
+
+The App is published by **Brynne Prince**, an individual developer based
+in South Africa. Brynne Prince decides how and why the data described
+here is used (the "controller" under European law, the "responsible
+party" under South African law). Contact details are at the end of this
+page.
 
 ## Data stored on your device
 
@@ -101,6 +109,44 @@ flow:
 https://www.apple.com/legal/privacy/
 https://policies.google.com/privacy
 
+## Why this data is used
+
+Where the law asks for a legal reason, these are ours:
+
+- **Personalized ads** — your consent, given in the consent message or
+  the tracking prompt. You can withdraw it at any time.
+- **Non-personalized ads and ad measurement** — our legitimate interest
+  in funding a free App.
+- **Product analytics** — our legitimate interest in understanding which
+  features are used. You can switch it off in Settings.
+- **The Remove Ads purchase** — to carry out the purchase you asked for
+  and to restore it later.
+
+## How long data is kept
+
+We do not keep our own copy of any of this data. Data on your device
+stays there until you delete it or remove the App. Data held by PostHog,
+Google and RevenueCat is kept only for as long as each service needs it
+for the purposes above, under that service's own retention rules, which
+are described in the policies linked above.
+
+## Where data is processed
+
+PostHog stores analytics on servers in the European Union. Google and
+RevenueCat may process data in the United States and other countries.
+Where data leaves the European Economic Area, the United Kingdom or
+South Africa, those services rely on the safeguards described in their
+own policies, such as standard contractual clauses.
+
+## Selling and sharing (United States)
+
+We do not sell your personal information for money. Showing personalized
+ads through Google AdMob may count as "selling" or "sharing" under the
+laws of some US states. You can opt out at any time through **Ad privacy
+options** in the App's Settings (shown where it applies), by declining
+tracking on iOS, or by deleting your advertising ID on Android. We do
+not treat you differently for opting out.
+
 ## Advertising identifier and tracking
 
 **iOS.** The App asks permission to use your device's advertising
@@ -117,7 +163,9 @@ it only switches AdMob from personalized to non-personalized ads.
 
 ## Children
 
-The App is not directed at children under 13. We do not knowingly
+The App is not directed at children under 13, or under the age at
+which your country lets a child agree to data use on their own where
+that is higher (up to 16 in parts of Europe). We do not knowingly
 collect any data from children. If you believe a child has provided
 data to us, please contact us at the address below and we will assist.
 
@@ -133,6 +181,11 @@ You have the right to:
   from your contact details alone.
 - Opt out of personalized advertising at any time, via the tracking
   setting in iOS or the advertising ID setting in Android.
+- Ask what data is held about you, ask for it to be corrected, and
+  object to or withdraw consent for any of the uses above.
+- Complain to the data protection authority where you live, for example
+  your national authority in the EU, the Information Commissioner's
+  Office in the UK, or the Information Regulator in South Africa.
 
 ## Changes to this policy
 
@@ -140,6 +193,11 @@ We may update this policy from time to time as the App evolves or as
 required by law. The "last updated" date at the top of this page will
 always reflect the latest version. Material changes will be announced
 in the App's release notes.
+
+## Terms of use
+
+The App's terms of use are at
+https://brynne98.github.io/prince-conversions/terms
 
 ## Contact
 
