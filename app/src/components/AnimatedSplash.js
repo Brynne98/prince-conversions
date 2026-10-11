@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Appearance, StyleSheet, Animated, Easing, Image } from 'react-native';
 import { PALETTES, useTheme } from '../theme';
 
@@ -23,8 +23,9 @@ const MARK = {
 // Takes over from the system splash, which shows "425°" alone on the page
 // colour. Starts as the same picture in the same place, writes the line and
 // "400°" in under it, then fades out so the AdMob/ATT init only fires once
-// the splash is fully gone.
-export default function AnimatedSplash({ onDone }) {
+// the splash is fully gone. It needs none of the app's fonts, so it starts
+// before they load and only waits for them (`ready`) before fading out.
+export default function AnimatedSplash({ ready, onDone }) {
   const fade = useRef(new Animated.Value(1)).current;
   const write = useRef(new Animated.Value(0)).current;
   // The app's own light or dark is a saved choice and can differ from the
@@ -48,10 +49,11 @@ export default function AnimatedSplash({ onDone }) {
   // Run once: a parent re-render hands in a new onDone and must not restart it.
   const done = useRef(onDone);
   done.current = onDone;
+  const [held, setHeld] = useState(false);
   useEffect(() => {
     Animated.sequence([
       // No wait first: the system splash has already held "425°" alone for
-      // as long as the app took to load.
+      // as long as the app took to start.
       Animated.timing(write, {
         toValue: 1,
         duration: 140,
@@ -59,16 +61,21 @@ export default function AnimatedSplash({ onDone }) {
         useNativeDriver: true,
       }),
       Animated.delay(320),
-      Animated.timing(fade, {
-        toValue: 0,
-        duration: 240,
-        easing: Easing.in(Easing.quad),
-        useNativeDriver: true,
-      }),
     ]).start(({ finished }) => {
+      if (finished) setHeld(true);
+    });
+  }, [write]);
+  useEffect(() => {
+    if (!held || !ready) return;
+    Animated.timing(fade, {
+      toValue: 0,
+      duration: 240,
+      easing: Easing.in(Easing.quad),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
       if (finished) done.current?.();
     });
-  }, [fade, write]);
+  }, [held, ready, fade]);
 
   const mark = (images, opacity) => (
     <Animated.View style={[styles.mark, { opacity }]}>

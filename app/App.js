@@ -235,14 +235,14 @@ function Root({ themeMode, setThemeMode }) {
     return () => clearTimeout(timeout);
   }, [hydrated, direction, unit, targetUnit, ovenTemp, ovenTime]);
 
-  // Hide the system splash once the fonts and the saved settings are in, so
-  // the layer that takes over knows whether the app is light or dark.
-  const ready = fontsLoaded && hydrated;
+  // Hide the system splash once the saved settings are in, so the layer that
+  // takes over knows whether the app is light or dark. It does not wait for
+  // the fonts: that layer uses none, and plays while they load.
   useEffect(() => {
-    if (ready) {
+    if (hydrated) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [ready]);
+  }, [hydrated]);
 
   // Tell the system the app's own light or dark, so what it draws itself (a
   // sheet's rim, a permission prompt) matches. Not before the splash is gone:
@@ -333,7 +333,12 @@ function Root({ themeMode, setThemeMode }) {
     });
   };
 
-  if (!fontsLoaded) return null;
+  // The key keeps it one layer, and its animation running, when the screens
+  // join it under the same root.
+  const splash = !splashGone && hydrated && (
+    <AnimatedSplash key="splash" ready={fontsLoaded} onDone={() => setSplashGone(true)} />
+  );
+  if (!fontsLoaded) return <View style={styles.root}>{splash}</View>;
 
   const converterTx = slide.interpolate({
     inputRange: [0, 1],
@@ -460,9 +465,7 @@ function Root({ themeMode, setThemeMode }) {
         onToggleHalfway={(v) => openTimer && cookTimers.update(openTimer.id, { remindHalfway: v })}
       />
 
-      {!splashGone && ready && (
-        <AnimatedSplash onDone={() => setSplashGone(true)} />
-      )}
+      {splash}
 
       {/* Short messages sit at the top, clear of the buttons that raise them
           and of the timers at the bottom: between the two top-bar buttons on
