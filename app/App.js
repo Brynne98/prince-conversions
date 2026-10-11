@@ -32,8 +32,7 @@ import { recordCompletionForSoftPaywall } from './src/softPaywall';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 // Expo Go has its own splash screen and only warns when asked to change it.
 if (Constants.executionEnvironment !== 'storeClient') {
-  // Short: the layer underneath starts as the same picture, and what it
-  // writes in next should not wait behind this fade.
+  // Short: the layer underneath is the same picture on the same colour.
   SplashScreen.setOptions?.({ duration: 100, fade: true });
 }
 

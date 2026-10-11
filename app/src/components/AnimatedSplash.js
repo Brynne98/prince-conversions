@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Appearance, StyleSheet, Animated, Easing, Image } from 'react-native';
+import { Appearance, StyleSheet, Animated, Easing } from 'react-native';
 import { PALETTES, useTheme } from '../theme';
 
 // imageWidth in app.json: the system splash draws its picture this wide.
@@ -10,24 +10,16 @@ const SIZE = 144;
 const launchedDark = Appearance.getColorScheme() === 'dark';
 
 const MARK = {
-  light: {
-    top: require('../../assets/splash-icon.png'),
-    full: require('../../assets/splash-mark.png'),
-  },
-  dark: {
-    top: require('../../assets/splash-icon-dark.png'),
-    full: require('../../assets/splash-mark-dark.png'),
-  },
+  light: require('../../assets/splash-icon.png'),
+  dark: require('../../assets/splash-icon-dark.png'),
 };
 
-// Takes over from the system splash, which shows "425°" alone on the page
-// colour. Starts as the same picture in the same place, writes the line and
-// "400°" in under it, then fades out so the AdMob/ATT init only fires once
+// Takes over from the system splash with the same picture in the same place
+// on the same colour, then fades out so the AdMob/ATT init only fires once
 // the splash is fully gone. It needs none of the app's fonts, so it starts
 // before they load and only waits for them (`ready`) before fading out.
 export default function AnimatedSplash({ ready, onDone }) {
   const fade = useRef(new Animated.Value(1)).current;
-  const write = useRef(new Animated.Value(0)).current;
   // The app's own light or dark is a saved choice and can differ from the
   // phone's. Start in the phone's, as the system splash did, and ease to the
   // app's, so the app never opens on a flash of the other colour.
@@ -49,22 +41,12 @@ export default function AnimatedSplash({ ready, onDone }) {
   // Run once: a parent re-render hands in a new onDone and must not restart it.
   const done = useRef(onDone);
   done.current = onDone;
+  // A beat first, so a change of colour above has eased before the fade.
   const [held, setHeld] = useState(false);
   useEffect(() => {
-    Animated.sequence([
-      // No wait first: the system splash has already held "425°" alone for
-      // as long as the app took to start.
-      Animated.timing(write, {
-        toValue: 1,
-        duration: 140,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
-      Animated.delay(320),
-    ]).start(({ finished }) => {
-      if (finished) setHeld(true);
-    });
-  }, [write]);
+    const timer = setTimeout(() => setHeld(true), 160);
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     if (!held || !ready) return;
     Animated.timing(fade, {
@@ -77,21 +59,14 @@ export default function AnimatedSplash({ ready, onDone }) {
     });
   }, [held, ready, fade]);
 
-  const mark = (images, opacity) => (
-    <Animated.View style={[styles.mark, { opacity }]}>
-      <Image source={images.top} style={styles.image} />
-      <Animated.Image source={images.full} style={[styles.image, { opacity: write }]} />
-    </Animated.View>
-  );
-
   return (
     <Animated.View
       pointerEvents="none"
       style={[styles.root, { opacity: fade }]}
     >
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor }]} />
-      {mark(MARK.light, lightOpacity)}
-      {mark(MARK.dark, dark)}
+      <Animated.Image source={MARK.light} style={[styles.mark, { opacity: lightOpacity }]} />
+      <Animated.Image source={MARK.dark} style={[styles.mark, { opacity: dark }]} />
     </Animated.View>
   );
 }
@@ -104,11 +79,6 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   mark: {
-    position: 'absolute',
-    width: SIZE,
-    height: SIZE,
-  },
-  image: {
     position: 'absolute',
     width: SIZE,
     height: SIZE,
