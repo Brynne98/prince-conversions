@@ -66,7 +66,9 @@ function syncActivities(timers) {
     const staleAt = timer.completed ? undefined : new Date(timer.endsAt);
     // One activity failing must not stop the others from being kept up.
     try {
-      if (entry) quiet(() => entry.instance.update(props, staleAt));
+      // Swiped away or ended by the system: forget it, so a later change
+      // starts a new one.
+      if (entry) entry.instance.update(props, staleAt).catch(() => running.delete(key));
       running.set(key, {
         instance: entry ? entry.instance : Activity.start(props, undefined, staleAt),
         sig,
@@ -94,8 +96,11 @@ function syncNotifications(timers) {
     // notificationIds arrive once notifications are allowed: show it then.
     const sig = JSON.stringify([title, readyAt, shakeAt, !!timer.notificationIds]);
     if (running.get(key)?.sig === sig) continue;
-    running.set(key, { sig });
-    Ongoing.show(key, title, readyAt, shakeAt, timer.endsAt, t('timer.channel_running'));
+    // One notification failing must not stop the others from being kept up.
+    try {
+      Ongoing.show(key, title, readyAt, shakeAt, timer.endsAt, t('timer.channel_running'));
+      running.set(key, { sig });
+    } catch {}
   }
 }
 

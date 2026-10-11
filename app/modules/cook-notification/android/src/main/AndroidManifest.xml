@@ -1,4 +1,0 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Android 16: lets the running timer sit in the status bar as a chip. -->
-    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS"/>
-</manifest>

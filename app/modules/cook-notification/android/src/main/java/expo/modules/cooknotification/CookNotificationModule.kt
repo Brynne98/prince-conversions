@@ -19,10 +19,13 @@ class CookNotificationModule : Module() {
     // Shows the notification for one timer, or replaces the one it has.
     Function("show") { id: String, title: String, text: String, detail: String, endAt: Double, channelName: String ->
       val manager = NotificationManagerCompat.from(context)
-      // Quiet: the timer's own alerts make the sound.
+      // No sound of its own: the timer's alerts make the sound. Not the
+      // "silent" level though, which Android keeps off the lock screen.
       manager.createNotificationChannel(
-        NotificationChannelCompat.Builder(CHANNEL, NotificationManagerCompat.IMPORTANCE_LOW)
+        NotificationChannelCompat.Builder(CHANNEL, NotificationManagerCompat.IMPORTANCE_DEFAULT)
           .setName(channelName)
+          .setSound(null, null)
+          .setVibrationEnabled(false)
           .build()
       )
       val builder = NotificationCompat.Builder(context, CHANNEL)
@@ -40,7 +43,6 @@ class CookNotificationModule : Module() {
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         // It leaves by itself at the end, when the done alert arrives.
         .setTimeoutAfter(maxOf(1L, endAt.toLong() - System.currentTimeMillis()))
-        .setRequestPromotedOngoing(true)
       if (detail.isNotEmpty()) {
         builder.setStyle(NotificationCompat.BigTextStyle().bigText("$text\n$detail"))
       }
