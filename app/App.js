@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Dimensions, StyleSheet, Platform,
+  View, Text, Animated, Appearance, Dimensions, StyleSheet, Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,7 +32,8 @@ import { recordCompletionForSoftPaywall } from './src/softPaywall';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 // Expo Go has its own splash screen and only warns when asked to change it.
 if (Constants.executionEnvironment !== 'storeClient') {
-  SplashScreen.setOptions?.({ duration: 250, fade: true });
+  // Short: the layer underneath is the same picture on the same colour.
+  SplashScreen.setOptions?.({ duration: 100, fade: true });
 }
 
 export default function App() {
@@ -150,21 +151,25 @@ function Root({ themeMode, setThemeMode }) {
 
   useEffect(() => {
     (async () => {
-      const s = await loadState();
-      if (s) {
-        if (s.unit) setUnit(s.unit);
-        if (s.targetUnit) setTargetUnit(s.targetUnit);
-        else if (s.unit) setTargetUnit(s.unit); // migrate single-unit users
-        if (typeof s.ovenTemp === 'number') setOvenTemp(s.ovenTemp);
-        if (typeof s.ovenTime === 'number') setOvenTime(s.ovenTime);
-        if (s.direction) setDirection(s.direction);
-        if (Array.isArray(s.items)) setItems(s.items);
-        if (s.themeMode === 'dark' || s.themeMode === 'light') setThemeMode(s.themeMode);
-        if (typeof s.analyticsEnabled === 'boolean') {
-          setAnalyticsPreference(s.analyticsEnabled);
+      // The system splash waits for this, so it must always be reached.
+      try {
+        const s = await loadState();
+        if (s) {
+          if (s.unit) setUnit(s.unit);
+          if (s.targetUnit) setTargetUnit(s.targetUnit);
+          else if (s.unit) setTargetUnit(s.unit); // migrate single-unit users
+          if (typeof s.ovenTemp === 'number') setOvenTemp(s.ovenTemp);
+          if (typeof s.ovenTime === 'number') setOvenTime(s.ovenTime);
+          if (s.direction) setDirection(s.direction);
+          if (Array.isArray(s.items)) setItems(s.items);
+          if (s.themeMode === 'dark' || s.themeMode === 'light') setThemeMode(s.themeMode);
+          if (typeof s.analyticsEnabled === 'boolean') {
+            setAnalyticsPreference(s.analyticsEnabled);
+          }
         }
+      } finally {
+        setHydrated(true);
       }
-      setHydrated(true);
     })();
   }, []);
 
@@ -229,13 +234,21 @@ function Root({ themeMode, setThemeMode }) {
     return () => clearTimeout(timeout);
   }, [hydrated, direction, unit, targetUnit, ovenTemp, ovenTime]);
 
-  // Hide the splash as soon as fonts are ready; AsyncStorage hydration
-  // continues in the background and items pop in when ready.
+  // Hide the system splash once the saved settings are in, so the layer that
+  // takes over knows whether the app is light or dark. It does not wait for
+  // the fonts: that layer uses none, and plays while they load.
   useEffect(() => {
-    if (fontsLoaded) {
+    if (hydrated) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [hydrated]);
+
+  // Tell the system the app's own light or dark, so what it draws itself (a
+  // sheet's rim, a permission prompt) matches. Not before the splash is gone:
+  // the system splash follows the phone's setting and would switch under it.
+  useEffect(() => {
+    if (splashGone) Appearance.setColorScheme(themeMode);
+  }, [splashGone, themeMode]);
 
   // Defer ATT + AdMob init until the splash is fully dismissed.
   // Requesting ATT while another view is animating causes iOS to silently
@@ -319,7 +332,12 @@ function Root({ themeMode, setThemeMode }) {
     });
   };
 
-  if (!fontsLoaded) return null;
+  // The key keeps it one layer, and its animation running, when the screens
+  // join it under the same root.
+  const splash = !splashGone && hydrated && (
+    <AnimatedSplash key="splash" ready={fontsLoaded} onDone={() => setSplashGone(true)} />
+  );
+  if (!fontsLoaded) return <View style={styles.root}>{splash}</View>;
 
   const converterTx = slide.interpolate({
     inputRange: [0, 1],
@@ -447,9 +465,7 @@ function Root({ themeMode, setThemeMode }) {
         onToggleHalfway={(v) => openTimer && cookTimers.update(openTimer.id, { remindHalfway: v })}
       />
 
-      {!splashGone && fontsLoaded && (
-        <AnimatedSplash onDone={() => setSplashGone(true)} />
-      )}
+      {splash}
 
       {/* Short messages sit at the top, clear of the buttons that raise them
           and of the timers at the bottom: between the two top-bar buttons on

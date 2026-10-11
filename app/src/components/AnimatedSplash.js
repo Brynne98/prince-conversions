@@ -1,20 +1,30 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing, Image } from 'react-native';
-import { C, PALETTES, useTheme } from '../theme';
+import React, { useEffect, useRef, useState } from 'react';
+import { Appearance, StyleSheet, Animated, Easing } from 'react-native';
+import { PALETTES, useTheme } from '../theme';
 
-const TILE = 140;
+// imageWidth in app.json: the system splash draws its picture this wide.
+const SIZE = 144;
 
-// Bridges the native expo-splash-screen image (at imageWidth=140 on a
-// cream background) to the app proper. Renders the same icon at the
-// same size as the native splash, holds for a beat, then fades out so
-// the AdMob/ATT init only fires once the splash is fully gone.
-export default function AnimatedSplash({ onDone }) {
+// The system splash follows the phone's light or dark setting. Read it here,
+// before the app tells the system its own choice.
+const launchedDark = Appearance.getColorScheme() === 'dark';
+
+const MARK = {
+  light: require('../../assets/splash-icon.png'),
+  dark: require('../../assets/splash-icon-dark.png'),
+};
+
+// Takes over from the system splash with the same picture in the same place
+// on the same colour, then fades out so the AdMob/ATT init only fires once
+// the splash is fully gone. It needs none of the app's fonts, so it starts
+// before they load and only waits for them (`ready`) before fading out.
+export default function AnimatedSplash({ ready, onDone }) {
   const fade = useRef(new Animated.Value(1)).current;
-  // The native splash is always cream: it shows before the saved light or
-  // dark choice can be read. Once that loads, ease to the app's own page
-  // colour, so dark mode does not open on a cream flash.
+  // The app's own light or dark is a saved choice and can differ from the
+  // phone's. Start in the phone's, as the system splash did, and ease to the
+  // app's, so the app never opens on a flash of the other colour.
   const { C: theme } = useTheme();
-  const dark = useRef(new Animated.Value(0)).current;
+  const dark = useRef(new Animated.Value(launchedDark ? 1 : 0)).current;
   useEffect(() => {
     Animated.timing(dark, {
       toValue: theme.isDark ? 1 : 0,
@@ -26,20 +36,28 @@ export default function AnimatedSplash({ onDone }) {
     inputRange: [0, 1],
     outputRange: [PALETTES.light.cream, PALETTES.dark.cream],
   });
+  const lightOpacity = dark.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
 
+  // Run once: a parent re-render hands in a new onDone and must not restart it.
+  const done = useRef(onDone);
+  done.current = onDone;
+  // A beat first, so a change of colour above has eased before the fade.
+  const [held, setHeld] = useState(false);
   useEffect(() => {
-    Animated.sequence([
-      Animated.delay(420),
-      Animated.timing(fade, {
-        toValue: 0,
-        duration: 280,
-        easing: Easing.in(Easing.quad),
-        useNativeDriver: true,
-      }),
-    ]).start(({ finished }) => {
-      if (finished) onDone?.();
+    const timer = setTimeout(() => setHeld(true), 160);
+    return () => clearTimeout(timer);
+  }, []);
+  useEffect(() => {
+    if (!held || !ready) return;
+    Animated.timing(fade, {
+      toValue: 0,
+      duration: 240,
+      easing: Easing.in(Easing.quad),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) done.current?.();
     });
-  }, [fade, onDone]);
+  }, [held, ready, fade]);
 
   return (
     <Animated.View
@@ -47,11 +65,8 @@ export default function AnimatedSplash({ onDone }) {
       style={[styles.root, { opacity: fade }]}
     >
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor }]} />
-      <Image
-        source={require('../../assets/splash-icon.png')}
-        style={styles.icon}
-        resizeMode="contain"
-      />
+      <Animated.Image source={MARK.light} style={[styles.mark, { opacity: lightOpacity }]} />
+      <Animated.Image source={MARK.dark} style={[styles.mark, { opacity: dark }]} />
     </Animated.View>
   );
 }
@@ -59,13 +74,13 @@ export default function AnimatedSplash({ onDone }) {
 const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: C.cream,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 9999,
   },
-  icon: {
-    width: TILE,
-    height: TILE,
+  mark: {
+    position: 'absolute',
+    width: SIZE,
+    height: SIZE,
   },
 });

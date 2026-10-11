@@ -7,6 +7,9 @@
 //                                  iOS adds the colour
 //   assets/adaptive-icon-monochrome.png  Android 13+ "Themed icons": only the
 //                                  shape is used, Android adds the colours
+//   assets/splash-icon.png, splash-icon-dark.png   the art alone, shown while
+//                                  the app opens: by the system, then by
+//                                  AnimatedSplash.js in the same place (AFC-36)
 //
 // Run: node scripts/make-icon-variants.js
 
@@ -65,10 +68,24 @@ async function tile({ bg, rule, top, bottom }, file) {
     .toFile(path.join(ASSETS, file));
 }
 
+// The art alone, cropped to a square around it. Android shows only what fits
+// a circle two thirds of its splash area, and the art's corners stay inside
+// it at this crop.
+const CROP = { left: 351, top: 325, width: 372, height: 372 };
+
+async function splash(colours, file) {
+  const art = colours
+    ? await recolour(colours.top, colours.bottom)
+    : sharp(path.join(ASSETS, 'adaptive-icon.png')).ensureAlpha();
+  await art.extract(CROP).png().toFile(path.join(ASSETS, file));
+}
+
 async function main() {
   await tile(DARK, 'icon-ios-dark.png');
   await tile(TINTED, 'icon-ios-tinted.png');
   await (await recolour(WHITE, WHITE)).png().toFile(path.join(ASSETS, 'adaptive-icon-monochrome.png'));
+  await splash(null, 'splash-icon.png');
+  await splash(DARK, 'splash-icon-dark.png');
   console.log('icon variants written to', ASSETS);
 }
 
