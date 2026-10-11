@@ -430,9 +430,12 @@ function Root({ themeMode, setThemeMode }) {
   });
 
   const topInset = Math.max(insets.top, Platform.OS === 'ios' ? 16 : 8);
-  // Room at the foot of a scrolling screen for the running timers.
-  const timersInset = cookTimers.list.length > 0 ? stackHeight(cookTimers.list) + 20 : 0;
+  // Room at the foot of a scrolling screen for the system's bar (Android's
+  // buttons, the iPhone's home line) and for the running timers above it.
+  // The screens fill the display edge to edge, so nothing else leaves it.
   const bottomInset = insets.bottom;
+  const timersInset = bottomInset
+    + (cookTimers.list.length > 0 ? stackHeight(cookTimers.list) + 20 : 0);
 
   return (
     <View style={[styles.root, { paddingBottom: bottomInset }]}>
