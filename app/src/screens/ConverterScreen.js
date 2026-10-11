@@ -134,8 +134,11 @@ export default function ConverterScreen({
         />
       </View>
 
-      {tab === 'plan' ? planView : (
+      {/* Both stay mounted, so a tab switch keeps the scroll position and
+          does not ask for a new ad. */}
+      <View style={[styles.pane, tab !== 'plan' && styles.paneHidden]}>{planView}</View>
       <ScrollView
+        style={tab === 'plan' && styles.paneHidden}
         contentContainerStyle={{ paddingHorizontal: M3 ? 16 : 20, paddingTop: 0, paddingBottom: 24 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
@@ -300,13 +303,14 @@ export default function ConverterScreen({
           <BannerAd placement="converter" size="box" />
         </View>
       </ScrollView>
-      )}
     </View>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
   root: { flex: 1, backgroundColor: C.cream },
+  pane: { flex: 1 },
+  paneHidden: { display: 'none' },
   topBar: {
     paddingHorizontal: 20,
     paddingTop: 8,

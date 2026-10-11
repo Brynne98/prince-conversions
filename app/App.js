@@ -74,8 +74,13 @@ function Root({ themeMode, setThemeMode }) {
   // Plans a person without Pro has started, ever. null until read from disk.
   const [plansUsed, setPlansUsed] = useState(null);
   const startingPlan = useRef(false);
-  const { isPro } = useIap();
-  const freeLeft = isPro ? null : Math.max(0, FREE_PLANS - (plansUsed ?? 0));
+  const { isPro, ready: iapReady } = useIap();
+  // Free plans left for a person without Pro. null when it does not apply or
+  // is not known yet: Pro, or the purchase check or the saved count is still
+  // loading. Nothing is locked or counted on a guess.
+  const freeLeft = isPro || !iapReady || plansUsed === null
+    ? null
+    : Math.max(0, FREE_PLANS - plansUsed);
   const [splashGone, setSplashGone] = useState(false);
   const [draft, setDraft] = useState({ name: '', emoji: '🍟', note: '' });
   const [toast, setToast] = useState(null);
@@ -319,12 +324,14 @@ function Root({ themeMode, setThemeMode }) {
   };
   // Every plan starts here, so this is where a free plan is spent. The count
   // is read from disk and saved before any timer starts: it only goes up.
+  // One food alone is an ordinary timer, so it costs nothing.
   const startPlan = async () => {
     if (plan.length === 0 || startingPlan.current) return;
     startingPlan.current = true;
     try {
-      const longest = Math.max(...plan.map((f) => f.minutes));
-      if (!isPro) {
+      const foods = plan;
+      const longest = Math.max(...foods.map((f) => f.minutes));
+      if (!isPro && iapReady && foods.length > 1) {
         const used = await readPlansUsed();
         if (used >= FREE_PLANS || !(await writePlansUsed(used + 1))) {
           setPlansUsed(Math.max(used, FREE_PLANS));
@@ -335,14 +342,15 @@ function Root({ themeMode, setThemeMode }) {
         capture('free_plan_used', { used: used + 1, left: FREE_PLANS - used - 1 });
       }
       const planId = 'plan' + Date.now();
-      for (const f of plan) {
+      for (const f of foods) {
         startTimer(f.minutes, `${f.temp}°${f.unit} · ${f.minutes} min`, 'plan', {
           delayMs: (longest - f.minutes) * 60 * 1000,
           planId,
         });
       }
-      capture('plan_started', { food_count: plan.length, is_pro: isPro });
-      setPlan([]);
+      capture('plan_started', { food_count: foods.length, is_pro: isPro });
+      // Keep any food added while the count was being saved.
+      setPlan((cur) => cur.filter((f) => !foods.includes(f)));
       setTab('converter');
       showToast(t('plan.started'));
     } finally {
