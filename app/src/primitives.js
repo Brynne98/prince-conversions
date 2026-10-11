@@ -540,6 +540,19 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
     }).start();
   }, [idx, slide]);
 
+  // Where each label sits, so the thumb can match it: labels differ in width
+  // ("Air fryer", "Oven"), and a thumb cut to an equal share sits off-centre.
+  const [spans, setSpans] = useState([]);
+  const measure = (i) => (e) => {
+    const { x, width } = e.nativeEvent.layout;
+    setSpans((prev) => {
+      if (prev[i]?.x === x && prev[i]?.width === width) return prev;
+      const next = [...prev];
+      next[i] = { x, width };
+      return next;
+    });
+  };
+
   // Tall enough to hit: about 38pt compact, 44pt full.
   const padV = compact ? 8 : 10;
   const padH = compact ? 14 : 18;
@@ -552,8 +565,8 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
 
   return (
     <View style={[styles.segWrap, { backgroundColor: trackBg }]}>
-      <SegmentedTrack count={options.length} slide={slide} pillBg={pillBg} scheme={onTerracotta ? 'light' : undefined} />
-      {options.map((o) => {
+      <SegmentedTrack spans={spans.slice(0, options.length)} count={options.length} slide={slide} pillBg={pillBg} scheme={onTerracotta ? 'light' : undefined} />
+      {options.map((o, i) => {
         const active = o.value === value;
         return (
           <Pressable
@@ -564,6 +577,7 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
                 Haptics.selectionAsync();
               }
             }}
+            onLayout={measure(i)}
             style={{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1 }}
           >
             <Text style={{
@@ -581,28 +595,26 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
 }
 
 // On iOS 26 the thumb is a glass pill tinted with the thumb's colour.
-function SegmentedTrack({ count, slide, pillBg, scheme }) {
+function SegmentedTrack({ spans, count, slide, pillBg, scheme }) {
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const { width } = size;
-  const segW = width > 0 ? (width - 6) / count : 0;
-  const left = slide.interpolate({
-    inputRange: Array.from({ length: count }, (_, i) => i),
-    outputRange: Array.from({ length: count }, (_, i) => 3 + i * segW),
-  });
+  const inputRange = Array.from({ length: count }, (_, i) => i);
+  const ready = inputRange.every((i) => spans[i]);
+  const left = ready && slide.interpolate({ inputRange, outputRange: spans.map((s) => s.x) });
+  const width = ready && slide.interpolate({ inputRange, outputRange: spans.map((s) => s.width) });
   return (
     <View
       pointerEvents="none"
       onLayout={(e) => setSize(e.nativeEvent.layout)}
       style={StyleSheet.absoluteFill}
     >
-      {segW > 0 && (
+      {ready && (
         <Animated.View
           style={{
             position: 'absolute',
             top: 3,
             bottom: 3,
             left,
-            width: segW,
+            width,
             borderRadius: 999,
             ...(GLASS ? null : {
               backgroundColor: pillBg,
