@@ -6,12 +6,11 @@ import {
 import { createLiveActivity } from 'expo-widgets';
 
 // The iPhone's Live Activity for what is cooking: the lock screen banner and
-// the Dynamic Island. One per timer, or one per "finish together" plan.
+// the Dynamic Island. One per timer.
 //
-// props: { title, startAt, endAt, foods: [{ label, startAt, endAt }] }, times
-// in milliseconds. Every clock here is drawn by the system from those times,
-// so it keeps counting with the app closed. A food that goes in later shows
-// its full time until its moment comes, then counts down by itself.
+// props: { title, startAt, endAt }, times in milliseconds. Every clock here
+// is drawn by the system from those times, so it keeps counting with the app
+// closed.
 //
 // This function runs outside the app, in the widget's own runtime: it can use
 // only what is declared inside it and the SwiftUI parts imported above.
@@ -20,7 +19,6 @@ const CookActivity = (props) => {
   const ACCENT = '#E27849';
   const range = (from, to) => ({ lower: new Date(from), upper: new Date(to) });
   const whole = range(props.startAt, props.endAt);
-  const isPlan = props.foods.length > 1;
 
   const ring = (from, to, size) => (
     <ProgressView
@@ -44,26 +42,15 @@ const CookActivity = (props) => {
       ]}
     />
   );
-  const rows = props.foods.map((food, i) => (
-    <HStack key={i} spacing={10}>
-      {ring(food.startAt, food.endAt, 20)}
-      <Text modifiers={[font({ size: 15, weight: 'medium' })]}>{food.label}</Text>
-      <Spacer />
-      {clock(range(food.startAt, food.endAt), 17, 64)}
-    </HStack>
-  ));
 
   return {
     banner: (
-      <VStack spacing={10} modifiers={[padding({ all: 16 })]}>
-        <HStack spacing={10}>
-          {!isPlan && ring(props.startAt, props.endAt, 24)}
-          <Text modifiers={[font({ size: 16, weight: 'semibold' })]}>{props.title}</Text>
-          <Spacer />
-          {clock(whole, isPlan ? 17 : 24, isPlan ? 64 : 88)}
-        </HStack>
-        {isPlan && rows}
-      </VStack>
+      <HStack spacing={10} modifiers={[padding({ all: 16 })]}>
+        {ring(props.startAt, props.endAt, 24)}
+        <Text modifiers={[font({ size: 16, weight: 'semibold' })]}>{props.title}</Text>
+        <Spacer />
+        {clock(whole, 24, 88)}
+      </HStack>
     ),
     compactLeading: ring(props.startAt, props.endAt, 20),
     compactTrailing: (
@@ -89,9 +76,6 @@ const CookActivity = (props) => {
         {clock(whole, 20, 72)}
       </VStack>
     ),
-    expandedBottom: isPlan ? (
-      <VStack spacing={8} modifiers={[padding({ horizontal: 8, bottom: 6 })]}>{rows}</VStack>
-    ) : null,
   };
 };
 

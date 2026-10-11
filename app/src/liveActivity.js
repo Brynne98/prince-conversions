@@ -1,5 +1,4 @@
 import { Platform } from 'react-native';
-import { t } from './i18n';
 
 // Keeps the iPhone's Live Activities (lock screen and Dynamic Island) in step
 // with the timers. Everywhere else, and on an iPhone build made before the
@@ -12,34 +11,12 @@ if (Platform.OS === 'ios') {
   } catch {}
 }
 
-// key (plan id, or timer id) -> { instance, sig }
+// timer id -> { instance, sig }
 const running = new Map();
 let cleared = false;
 
-function groups(timers) {
-  const byKey = new Map();
-  for (const timer of timers) {
-    const key = timer.planId || timer.id;
-    if (!byKey.has(key)) byKey.set(key, []);
-    byKey.get(key).push(timer);
-  }
-  return byKey;
-}
-
-function propsFor(list) {
-  const foods = [...list]
-    .sort((a, b) => a.startedAt - b.startedAt)
-    .map((x) => ({ label: x.label || 'Cook timer', startAt: x.startedAt, endAt: x.endsAt }));
-  return {
-    title: foods.length > 1 ? t('plan.title') : foods[0].label,
-    startAt: Math.min(...foods.map((f) => f.startAt)),
-    endAt: Math.max(...foods.map((f) => f.endAt)),
-    foods,
-  };
-}
-
-// One activity per timer, or per plan. It ends when everything in it is done
-// or cancelled: the app's own alert takes over from there.
+// One activity per timer. It ends when the timer is done or cancelled: the
+// app's own alert takes over from there.
 export function syncCookActivities(timers) {
   if (!Activity) return;
   try {
@@ -48,15 +25,19 @@ export function syncCookActivities(timers) {
       cleared = true;
       for (const stale of Activity.getInstances()) stale.end('immediate');
     }
-    const live = groups(timers.filter((x) => !x.completed));
+    const live = new Map(timers.filter((x) => !x.completed).map((x) => [x.id, x]));
     for (const [key, entry] of running) {
       if (live.has(key)) continue;
       running.delete(key);
       // It may already be gone: swiped away, or ended by the system.
       try { entry.instance.end('immediate'); } catch {}
     }
-    for (const [key, list] of live) {
-      const props = propsFor(list);
+    for (const [key, timer] of live) {
+      const props = {
+        title: timer.label || 'Cook timer',
+        startAt: timer.startedAt,
+        endAt: timer.endsAt,
+      };
       const sig = JSON.stringify(props);
       const entry = running.get(key);
       if (entry?.sig === sig) continue;

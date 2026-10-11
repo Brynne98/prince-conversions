@@ -3,16 +3,15 @@ import {
   View, Text, Pressable, StyleSheet, ScrollView,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import Svg, { Path, Circle, Line } from 'react-native-svg';
+import Svg, { Path, Line } from 'react-native-svg';
 import { FONT, useTheme, useStyles } from '../theme';
 import { Sheet, CloseButton, AppBar, TextButton, alert } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
 import { useIap } from '../iap';
 import { capture } from '../analytics';
-import PlanExample from '../components/PlanExample';
 import { t } from '../i18n';
 
-export default function PaywallSheet({ visible, onClose, surface = 'paywall', minutes }) {
+export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) {
   const { C } = useTheme();
   const styles = useStyles(makeStyles);
   const { configured, isPro, price, buyPro, restorePurchases } = useIap();
@@ -89,9 +88,6 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall', mi
     }
   };
 
-  // Opened from "finish together": lead with that feature and show it working.
-  const featured = surface.startsWith('finish_together');
-
   const ctaLabel = price
     ? t('paywall.cta', { price })
     : t('paywall.cta_no_price');
@@ -116,22 +112,13 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall', mi
           <Text style={styles.badgeText}>{t('paywall.badge')}</Text>
         </View>
 
-        <Text style={styles.title}>{t(featured ? 'plan.title' : 'paywall.title')}</Text>
-        <Text style={[styles.subtitle, featured && { marginBottom: 20 }]}>
-          {t(featured ? 'plan.subtitle' : 'paywall.subtitle')}
-        </Text>
-
-        {featured && <PlanExample visible={visible} minutes={minutes} />}
+        <Text style={styles.title}>{t('paywall.title')}</Text>
+        <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
 
         <View style={styles.benefits}>
           <Benefit
             icon={<NoAdsIcon c={C.terracotta} />}
             label={t('paywall.benefit_no_banners')}
-          />
-          <Benefit
-            icon={<TimerIcon c={C.terracotta} />}
-            label={t('paywall.benefit_finish_together')}
-            divider
           />
           <Benefit
             icon={<RestoreIcon c={C.terracotta} />}
@@ -193,16 +180,6 @@ function NoAdsIcon({ c }) {
       />
       <Path d="M18 9l4-2v10l-4-2" stroke={c} strokeWidth={1.8} strokeLinejoin="round" />
       <Line x1={3} y1={21} x2={21} y2={3} stroke={c} strokeWidth={1.8} strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-function TimerIcon({ c }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={13} r={8} stroke={c} strokeWidth={1.8} />
-      <Path d="M12 9v4l2.5 1.5" stroke={c} strokeWidth={1.8} strokeLinecap="round" />
-      <Path d="M9 3h6" stroke={c} strokeWidth={1.8} strokeLinecap="round" />
     </Svg>
   );
 }

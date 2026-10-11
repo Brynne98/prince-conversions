@@ -2,9 +2,8 @@
   "paywall": {
     "badge": "PRO",
     "title": "Air Fryer Pro",
-    "subtitle": "Pay once. No ads, and a whole meal ready at once.",
+    "subtitle": "Pay once. Converter and timers stay free.",
     "benefit_no_banners": "No banners while you cook",
-    "benefit_finish_together": "Unlimited Finish together plans",
     "benefit_restore": "Restore on this Apple ID anytime",
     "benefit_restore_android": "Restore on this Google account anytime",
     "cta": "Get Pro · %{price}",
@@ -20,15 +19,13 @@
     "restored_body": "Pro is active on this device.",
     "nothing_title": "Nothing to restore",
     "nothing_body": "No previous purchase found.",
-    "restore_failed_title": "Restore failed",
-    "example_food": "%{time} food",
-    "example_ready": "Both ready at once"
+    "restore_failed_title": "Restore failed"
   },
   "settings": {
     "remove_ads": "Get Pro",
     "remove_ads_subtitle": "One-time purchase%{price}",
     "pro_active": "Pro",
-    "pro_active_subtitle": "No ads, finish together on. Thanks!",
+    "pro_active_subtitle": "Ads removed. Thanks!",
     "pro_active_pill": "ACTIVE"
   },
   "ads": {
@@ -36,31 +33,7 @@
     "att_body": "Next, iPhone asks if this app may track you. Allowing it shows ads that fit you better, which keeps the converter free.",
     "att_continue": "Continue"
   },
-  "plan": {
-    "add": "Add to plan",
-    "tab_converter": "Converter",
-    "tab": "Plan",
-    "tab_count": "Plan · %{n}",
-    "added": "Added to plan",
-    "full": "A plan holds up to %{max} foods",
-    "title": "Finish together",
-    "subtitle": "Each food goes in at the right moment, so everything is ready at once.",
-    "how": "Convert each food and tap \"Add to plan\". Then come back here and tap Start.",
-    "go_convert": "Add a food from Converter",
-    "first": "Goes in first",
-    "later": "Goes in after %{time}",
-    "mixed_temps": "These foods need different temperatures. Use a dual-zone fryer or a second appliance.",
-    "start": "Start · ready in %{time}",
-    "started": "Plan started",
-    "ready_in": "Ready in %{time}",
-    "done": "Done!",
-    "free_left": "%{left} free plans left",
-    "free_left_one": "1 free plan left",
-    "free_none": "Free plans used. More plans are part of Pro.",
-    "put_in": "Put in now · %{label}",
-    "nudge_title": "Cooking several things?",
-    "nudge_body": "The Plan tab tells you when to put each food in, so everything is ready at once.",
-    "nudge_open": "Open Plan",
-    "nudge_later": "Not now"
+  "timer": {
+    "done": "Done!"
   }
 }

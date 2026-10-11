@@ -11,44 +11,14 @@ import { GLASS, M3, GlassFill, GlassPressable } from '../glass';
 import { t } from '../i18n';
 
 const CARD_HEIGHT = 70;
-const PLAN_HEAD = 44;
-const PLAN_ROW = 52;
-const PLAN_PAD = 8;
 const PEEK = 10;
 const CARD_GAP = 8;
 const MAX_PEEKS = 2;
 
-// Newest first. Foods started as one plan become one item, placed where the
-// newest of them would be. A plan down to one food is an ordinary timer.
-function groupTimers(timers) {
-  const items = [];
-  const byPlan = new Map();
-  for (const timer of [...timers].reverse()) {
-    const group = timer.planId && byPlan.get(timer.planId);
-    if (group) {
-      group.timers.push(timer);
-      continue;
-    }
-    const item = { key: timer.planId || timer.id, timers: [timer] };
-    if (timer.planId) byPlan.set(timer.planId, item);
-    items.push(item);
-  }
-  // Inside a plan: the food that goes in first on top.
-  for (const item of items) item.timers.sort((x, y) => x.startedAt - y.startedAt);
-  return items;
-}
-
-const itemHeight = (item) => (
-  item.timers.length > 1
-    ? PLAN_HEAD + PLAN_ROW * item.timers.length + PLAN_PAD
-    : CARD_HEIGHT
-);
-
 // Height of the collapsed stack, for screens that scroll behind it.
 export function stackHeight(timers) {
-  const items = groupTimers(timers);
-  if (items.length === 0) return 0;
-  return itemHeight(items[0]) + Math.min(items.length - 1, MAX_PEEKS) * PEEK + 12;
+  if (timers.length === 0) return 0;
+  return CARD_HEIGHT + Math.min(timers.length - 1, MAX_PEEKS) * PEEK + 12;
 }
 
 // The cards wear the opposite palette to the screen, dark on light and light
@@ -77,7 +47,8 @@ export default function TimerStack({
     }).start();
   }, [expanded, expand]);
 
-  const items = useMemo(() => groupTimers(timers), [timers]);
+  // Newest first.
+  const items = useMemo(() => [...timers].reverse(), [timers]);
 
   useEffect(() => {
     if (items.length <= 1 && expanded) setExpanded(false);
@@ -85,18 +56,14 @@ export default function TimerStack({
 
   if (items.length === 0) return null;
 
-  const heights = items.map(itemHeight);
-  const frontH = heights[0];
   const visiblePeeks = Math.min(items.length - 1, MAX_PEEKS);
-  const collapsedH = frontH + visiblePeeks * PEEK;
-  const expandedH = heights.reduce((sum, h) => sum + h, 0) + CARD_GAP * (items.length - 1);
+  const collapsedH = CARD_HEIGHT + visiblePeeks * PEEK;
+  const expandedH = items.length * CARD_HEIGHT + CARD_GAP * (items.length - 1);
 
   const containerHeight = expand.interpolate({
     inputRange: [0, 1],
     outputRange: [collapsedH, expandedH],
   });
-
-  let above = 0;
 
   return (
     <View
@@ -113,8 +80,7 @@ export default function TimerStack({
           const collapsedY = -idx * PEEK;
           const collapsedScale = Math.max(0.88, 1 - idx * 0.05);
           const collapsedOpacity = idx > visiblePeeks ? 0 : 1 - idx * 0.18;
-          const expandedY = -above;
-          above += heights[idx] + CARD_GAP;
+          const expandedY = -idx * (CARD_HEIGHT + CARD_GAP);
 
           const translateY = expand.interpolate({
             inputRange: [0, 1],
@@ -128,53 +94,39 @@ export default function TimerStack({
             inputRange: [0, 1],
             outputRange: [collapsedOpacity, 1],
           });
-          // Behind the front card, a taller card is cut to the front's height
-          // so only its edge peeks out.
-          const height = expand.interpolate({
-            inputRange: [0, 1],
-            outputRange: [frontH, heights[idx]],
-          });
 
           const interactive = expanded || idx <= visiblePeeks;
-          const press = (id) => {
+          const press = () => {
             if (!expanded && items.length > 1) {
               Haptics.selectionAsync();
               setExpanded(true);
             } else {
-              onPressTimer?.(id);
+              onPressTimer?.(item.id);
               setExpanded(false);
             }
           };
 
           return (
             <Animated.View
-              key={item.key}
+              key={item.id}
               style={{
                 position: 'absolute',
                 left: 0,
                 right: 0,
                 bottom: 0,
-                height,
+                height: CARD_HEIGHT,
                 zIndex: items.length - idx,
                 transform: [{ translateY }, { scale }],
                 opacity,
               }}
               pointerEvents={interactive ? 'auto' : 'none'}
             >
-              {item.timers.length > 1 ? (
-                <PlanCard
-                  timers={item.timers}
-                  onPress={press}
-                  onCancel={() => onCancel?.(item.timers.map((x) => x.id))}
-                />
-              ) : (
-                <TimerCard
-                  timer={item.timers[0]}
-                  onPress={() => press(item.timers[0].id)}
-                  onCancel={() => onCancel?.(item.timers[0].id)}
-                  onRestart={() => onRestart?.(item.timers[0].id)}
-                />
-              )}
+              <TimerCard
+                timer={item}
+                onPress={press}
+                onCancel={() => onCancel?.(item.id)}
+                onRestart={() => onRestart?.(item.id)}
+              />
             </Animated.View>
           );
         })}
@@ -193,8 +145,8 @@ export default function TimerStack({
   );
 }
 
-// Time passed, as a ring. A food still waiting to go in has a dashed ring.
-function Ring({ frac, waiting, size = 38, C, done }) {
+// Time passed, as a ring.
+function Ring({ frac, size = 38, C, done }) {
   const stroke = 4;
   const r = (size - stroke) / 2;
   const len = 2 * Math.PI * r;
@@ -202,24 +154,19 @@ function Ring({ frac, waiting, size = 38, C, done }) {
   return (
     <Svg width={size} height={size}>
       <Circle
-        // Keyed: the dashes don't clear when the prop is removed.
-        key={waiting ? 'waiting' : 'track'}
         cx={mid} cy={mid} r={r} fill="none"
         stroke={done ? C.onTerracotta20 : C.ink10}
-        strokeWidth={waiting ? 2 : stroke}
-        strokeDasharray={waiting ? '3 5' : undefined}
+        strokeWidth={stroke}
       />
-      {!waiting && (
-        <Circle
-          cx={mid} cy={mid} r={r} fill="none"
-          stroke={done ? C.onTerracotta : C.terracotta}
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={`${len} ${len}`}
-          strokeDashoffset={len * (1 - Math.max(0, Math.min(1, frac)))}
-          transform={`rotate(-90 ${mid} ${mid})`}
-        />
-      )}
+      <Circle
+        cx={mid} cy={mid} r={r} fill="none"
+        stroke={done ? C.onTerracotta : C.terracotta}
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${len} ${len}`}
+        strokeDashoffset={len * (1 - Math.max(0, Math.min(1, frac)))}
+        transform={`rotate(-90 ${mid} ${mid})`}
+      />
     </Svg>
   );
 }
@@ -263,7 +210,6 @@ function IconButton({ onPress, label, done, children }) {
 function TimerCard({ timer, onPress, onCancel, onRestart }) {
   const { C, styles, scheme } = useCardTheme();
   const isDone = timer.completed;
-  const isWaiting = !isDone && timer.waitingSec > 0;
   const pulse = usePulse(isDone);
   const fg = isDone ? C.onTerracotta : C.ink;
 
@@ -278,20 +224,16 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
       <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
         <View style={[styles.card, styles.cardRow, GLASS && styles.cardGlass, isDone && styles.cardDone]}>
           <GlassFill tint={isDone ? C.terracotta : C.paper} scheme={scheme} radius={26} />
-          <Ring frac={timer.elapsedFrac} waiting={isWaiting} C={C} done={isDone} />
+          <Ring frac={timer.elapsedFrac} C={C} done={isDone} />
           <View style={styles.left}>
             <View style={styles.kickerRow}>
               <Text style={[styles.kicker, isDone && { color: C.onTerracotta85 }]} numberOfLines={1}>
                 {timer.label || 'Cook timer'}
               </Text>
-              {!isDone && !isWaiting && timer.remindHalfway && <Bell s={11} c={C.ink50} />}
+              {!isDone && timer.remindHalfway && <Bell s={11} c={C.ink50} />}
             </View>
-            <Text style={[isWaiting ? styles.wait : styles.time, { color: fg }]} numberOfLines={1}>
-              {isDone
-                ? t('plan.done')
-                : isWaiting
-                  ? t('plan.later', { time: formatRemaining(timer.waitingSec) })
-                  : formatRemaining(timer.remainingSec)}
+            <Text style={[styles.time, { color: fg }]} numberOfLines={1}>
+              {isDone ? t('timer.done') : formatRemaining(timer.remainingSec)}
             </Text>
           </View>
 
@@ -306,50 +248,6 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
         </View>
       </Animated.View>
     </Pressable>
-  );
-}
-
-// A running "finish together" plan: when it is ready, and what each food is
-// doing. Cancelling it cancels every food in it.
-function PlanCard({ timers, onPress, onCancel }) {
-  const { C, styles, scheme } = useCardTheme();
-  const allDone = timers.every((x) => x.completed);
-  const pulse = usePulse(allDone);
-  const readySec = Math.max(...timers.map((x) => x.waitingSec + x.remainingSec));
-  const fg = allDone ? C.onTerracotta : C.ink;
-
-  return (
-    <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
-      <View style={[styles.card, GLASS && styles.cardGlass, allDone && styles.cardDone]}>
-        <GlassFill tint={allDone ? C.terracotta : C.paper} scheme={scheme} radius={26} />
-        <Pressable onPress={() => onPress(timers[0].id)} style={styles.planHead}>
-          <Text style={[styles.planTitle, { color: fg }]} numberOfLines={1}>{t('plan.title')}</Text>
-          <Text style={[styles.planReady, allDone && { color: C.onTerracotta85 }]} numberOfLines={1}>
-            {allDone ? t('plan.done') : t('plan.ready_in', { time: formatRemaining(readySec) })}
-          </Text>
-          <IconButton onPress={onCancel} label="Cancel plan" done={allDone}>
-            <Close s={18} c={fg} />
-          </IconButton>
-        </Pressable>
-        {timers.map((timer) => {
-          const isDone = timer.completed;
-          const isWaiting = !isDone && timer.waitingSec > 0;
-          return (
-            <Pressable key={timer.id} onPress={() => onPress(timer.id)} style={styles.planRow}>
-              <Ring frac={timer.elapsedFrac} waiting={isWaiting} size={32} C={C} done={allDone} />
-              <Text style={[styles.planLabel, { color: fg }]} numberOfLines={1}>{timer.label}</Text>
-              <Text style={[isWaiting ? styles.planWait : styles.planTime, !isWaiting && { color: fg }]} numberOfLines={1}>
-                {isDone
-                  ? t('plan.done')
-                  : isWaiting
-                    ? t('plan.later', { time: formatRemaining(timer.waitingSec) })
-                    : formatRemaining(timer.remainingSec)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </Animated.View>
   );
 }
 
@@ -386,46 +284,10 @@ const makeStyles = (C) => StyleSheet.create({
     letterSpacing: -0.5,
     fontVariant: ['tabular-nums'],
   },
-  wait: {
-    fontFamily: FONT.ui,
-    fontSize: 15,
-    fontWeight: '600',
-    marginTop: 3,
-    fontVariant: ['tabular-nums'],
-  },
   iconBtn: {
     width: M3 ? 40 : 44, height: M3 ? 40 : 44, borderRadius: 22,
     backgroundColor: C.ink06,
     alignItems: 'center', justifyContent: 'center',
   },
   iconBtnDone: { backgroundColor: C.onTerracotta18 },
-  planHead: {
-    height: PLAN_HEAD + 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  planTitle: { flex: 1, fontFamily: FONT.ui, fontSize: 14, fontWeight: '600' },
-  planReady: {
-    fontFamily: FONT.ui, fontSize: 13, color: C.ink70, fontVariant: ['tabular-nums'],
-  },
-  planRow: {
-    height: PLAN_ROW,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: C.divider,
-  },
-  planLabel: { flex: 1, fontFamily: FONT.ui, fontSize: 14, fontWeight: M3 ? '500' : '600' },
-  planTime: {
-    fontFamily: FONT.display,
-    fontSize: 20,
-    fontWeight: '500',
-    letterSpacing: -0.4,
-    fontVariant: ['tabular-nums'],
-  },
-  planWait: {
-    fontFamily: FONT.ui, fontSize: 13, color: C.ink70, fontVariant: ['tabular-nums'],
-  },
 });
