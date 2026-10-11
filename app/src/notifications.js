@@ -139,11 +139,15 @@ export async function cancelTimerNotifications(ids) {
   }
 }
 
-// Clears anything the OS is still showing (e.g. a "Done!" banner the user
-// has already dealt with inside the app).
+// Clears the alerts the OS is still showing (e.g. a "Done!" banner the user
+// has already dealt with inside the app). Only the alerts: Android's running
+// notifications for other timers stay.
 export async function dismissDeliveredNotifications() {
   if (!Notifications) return;
   try {
-    await Notifications.dismissAllNotificationsAsync();
+    const shown = await Notifications.getPresentedNotificationsAsync();
+    await Promise.all(shown
+      .filter((n) => n.request.content.data?.kind)
+      .map((n) => Notifications.dismissNotificationAsync(n.request.identifier)));
   } catch {}
 }

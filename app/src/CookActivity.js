@@ -1,59 +1,118 @@
-import { HStack, VStack, Text, ProgressView, Spacer } from '@expo/ui/swift-ui';
+import {
+  HStack, VStack, ZStack, Text, ProgressView, Spacer, Capsule,
+} from '@expo/ui/swift-ui';
 import {
   font, foregroundStyle, padding, tint, frame, monospacedDigit, labelsHidden,
-  multilineTextAlignment, progressViewStyle,
+  multilineTextAlignment, progressViewStyle, opacity, lineLimit,
+  minimumScaleFactor, activityBackgroundTint,
 } from '@expo/ui/swift-ui/modifiers';
 import { createLiveActivity } from 'expo-widgets';
 
-// The iPhone's Live Activity for what is cooking: the lock screen banner and
-// the Dynamic Island. One per timer.
+// The iPhone's Live Activity for what is cooking: the lock screen card and
+// the Dynamic Island. One per timer. It is the in-app timer card again: a
+// ring, the label, a serif clock, and terracotta once the food is done.
 //
-// props: { title, startAt, endAt }, times in milliseconds. Every clock here
-// is drawn by the system from those times, so it keeps counting with the app
-// closed.
+// props: { title, startAt, endAt, shake, done, readyAt, endedAt, doneTitle,
+// doneShort }. Times are in milliseconds and the rest is wording, handed in
+// because nothing can be imported here. Every clock is drawn by the system
+// from those times, so it keeps counting with the app closed.
 //
 // This function runs outside the app, in the widget's own runtime: it can use
 // only what is declared inside it and the SwiftUI parts imported above.
-const CookActivity = (props) => {
+const CookActivity = (props, environment) => {
   'widget';
   const ACCENT = '#E27849';
-  const range = (from, to) => ({ lower: new Date(from), upper: new Date(to) });
-  const whole = range(props.startAt, props.endAt);
+  const CARD = '#2D2218';
+  const INK = '#F2E8D8';
+  const TERRACOTTA = '#C2562E';
+  const CREAM = '#FFF7EE';
+  // The system marks the activity stale at the end time, so this turns to
+  // done by itself when the app is asleep and cannot say so.
+  const done = !!props.done || !!environment?.isStale || Date.now() >= props.endAt;
+  // The always-on lock screen: no large bright fill.
+  const dimmed = !!environment?.isLuminanceReduced;
+  const whole = { lower: new Date(props.startAt), upper: new Date(props.endAt) };
+  // The system draws its own small clock with a timed ring or bar; the clear,
+  // tiny type hides it, since the time is already shown beside it.
+  const noClock = [labelsHidden(), font({ size: 1 }), foregroundStyle('#00000000')];
 
-  const ring = (from, to, size) => (
+  const ring = (size, color) => (
     <ProgressView
-      timerInterval={range(from, to)}
-      countsDown={false}
-      // The system draws its own small clock inside the ring; the clear,
-      // tiny type hides it, since the time is already shown beside it.
+      {...(done ? { value: 1 } : { timerInterval: whole, countsDown: false })}
       modifiers={[
-        progressViewStyle('circular'), labelsHidden(), tint(ACCENT),
-        font({ size: 1 }), foregroundStyle('#00000000'),
+        progressViewStyle('circular'), tint(color), ...noClock,
         frame({ width: size, height: size }),
       ]}
     />
   );
-  const clock = (interval, size, width) => (
+  const clock = (size, width, color) => (
     <Text
-      timerInterval={interval}
+      timerInterval={whole}
       modifiers={[
-        font({ size, weight: 'semibold' }), monospacedDigit(),
-        multilineTextAlignment('trailing'), frame({ width }),
+        font({ size, weight: 'medium', design: 'serif' }), monospacedDigit(),
+        foregroundStyle(color), multilineTextAlignment('trailing'),
+        lineLimit(1), minimumScaleFactor(0.6), frame({ width }),
       ]}
     />
   );
+  // Time passed, with a tick in the middle when a shake reminder is set.
+  const bar = (
+    <ZStack>
+      <ProgressView
+        timerInterval={whole}
+        countsDown={false}
+        modifiers={[progressViewStyle('linear'), tint(ACCENT), ...noClock]}
+      />
+      {props.shake ? (
+        <Capsule modifiers={[foregroundStyle(INK), frame({ width: 2, height: 12 })]} />
+      ) : null}
+    </ZStack>
+  );
+  const small = (text, size) => (
+    <Text modifiers={[font({ size }), opacity(done ? 0.85 : 0.62), lineLimit(1)]}>{text}</Text>
+  );
+  // The label, and under it either when it is ready or "Done!".
+  const words = (alignment, doneSize) => (
+    <VStack alignment={alignment} spacing={1}>
+      {small(props.title, 13)}
+      {done ? (
+        <Text modifiers={[font({ size: doneSize, weight: 'medium', design: 'serif' }), lineLimit(1)]}>
+          {props.doneTitle}
+        </Text>
+      ) : (
+        <Text modifiers={[font({ size: 16, weight: 'semibold' }), lineLimit(1), minimumScaleFactor(0.8)]}>
+          {props.readyAt}
+        </Text>
+      )}
+    </VStack>
+  );
 
+  const filled = done && !dimmed;
   return {
     banner: (
-      <HStack spacing={10} modifiers={[padding({ all: 16 })]}>
-        {ring(props.startAt, props.endAt, 24)}
-        <Text modifiers={[font({ size: 16, weight: 'semibold' })]}>{props.title}</Text>
-        <Spacer />
-        {clock(whole, 24, 88)}
-      </HStack>
+      <VStack
+        spacing={12}
+        modifiers={[
+          padding({ horizontal: 18, vertical: 16 }),
+          foregroundStyle(filled ? CREAM : INK),
+          activityBackgroundTint(filled ? TERRACOTTA : CARD),
+        ]}
+      >
+        <HStack spacing={10}>
+          {ring(38, filled ? CREAM : ACCENT)}
+          {words('leading', 30)}
+          <Spacer />
+          {done ? small(props.endedAt, 13) : clock(38, 112, INK)}
+        </HStack>
+        {done ? null : bar}
+      </VStack>
     ),
-    compactLeading: ring(props.startAt, props.endAt, 20),
-    compactTrailing: (
+    compactLeading: ring(20, ACCENT),
+    compactTrailing: done ? (
+      <Text modifiers={[font({ size: 14, weight: 'semibold' }), foregroundStyle(ACCENT)]}>
+        {props.doneShort}
+      </Text>
+    ) : (
       <Text
         timerInterval={whole}
         modifiers={[
@@ -62,19 +121,23 @@ const CookActivity = (props) => {
         ]}
       />
     ),
-    minimal: ring(props.startAt, props.endAt, 20),
+    minimal: ring(20, ACCENT),
+    // The words sit in the middle: the side regions are too narrow for them.
     expandedLeading: (
-      <VStack modifiers={[padding({ leading: 6, top: 4 })]}>
-        {ring(props.startAt, props.endAt, 28)}
-      </VStack>
+      <VStack modifiers={[padding({ leading: 6, top: 6 })]}>{ring(34, ACCENT)}</VStack>
     ),
     expandedCenter: (
-      <Text modifiers={[font({ size: 15, weight: 'semibold' })]}>{props.title}</Text>
+      <VStack modifiers={[padding({ top: 6 }), foregroundStyle('#FFFFFF')]}>
+        {words('center', 24)}
+      </VStack>
     ),
     expandedTrailing: (
-      <VStack modifiers={[padding({ trailing: 6, top: 4 }), foregroundStyle(ACCENT)]}>
-        {clock(whole, 20, 72)}
+      <VStack modifiers={[padding({ trailing: 6, top: 6 }), foregroundStyle('#FFFFFF')]}>
+        {done ? small(props.endedAt, 13) : clock(34, 100, ACCENT)}
       </VStack>
+    ),
+    expandedBottom: done ? null : (
+      <VStack modifiers={[padding({ horizontal: 6, top: 10, bottom: 4 })]}>{bar}</VStack>
     ),
   };
 };
