@@ -11,7 +11,11 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.brynneprince.airfryerconverter",
-      "icon": "./assets/icon-ios.png",
+      "icon": {
+        "light": "./assets/icon-ios.png",
+        "dark": "./assets/icon-ios-dark.png",
+        "tinted": "./assets/icon-ios-tinted.png"
+      },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
@@ -23,6 +27,7 @@
       "package": "com.brynneprince.airfryerconverter",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon-monochrome.png",
         "backgroundColor": "#FAF5EC"
       },
       "permissions": [
