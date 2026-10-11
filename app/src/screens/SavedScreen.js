@@ -158,7 +158,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
     return (
       <Pressable
         onPress={onStart}
-        android_ripple={{ color: C.ink10 }}
+        android_ripple={{ color: C.ink10, foreground: true }}
         style={[
           styles.row,
           first && { borderTopLeftRadius: 16, borderTopRightRadius: 16 },

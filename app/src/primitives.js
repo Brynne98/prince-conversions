@@ -243,7 +243,7 @@ export function TextButton({ label, onPress, disabled = false }) {
       onPress={onPress}
       disabled={disabled}
       hitSlop={4}
-      android_ripple={{ color: C.ink10 }}
+      android_ripple={{ color: C.ink10, foreground: true }}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       style={styles.textBtn}
@@ -491,7 +491,7 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
               }
             }}
             hitSlop={{ top: 4, bottom: 4 }}
-            android_ripple={{ color: C.ink10 }}
+            android_ripple={{ color: C.ink10, foreground: true }}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
             style={{
