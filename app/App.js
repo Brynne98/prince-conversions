@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFonts, Fraunces_500Medium, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
 import * as SplashScreen from 'expo-splash-screen';
+import Constants from 'expo-constants';
 
 import ConverterScreen from './src/screens/ConverterScreen';
 import SavedScreen from './src/screens/SavedScreen';
@@ -32,7 +33,10 @@ import { recordCompletionForSoftPaywall } from './src/softPaywall';
 import { t } from './src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
-SplashScreen.setOptions?.({ duration: 250, fade: true });
+// Expo Go has its own splash screen and only warns when asked to change it.
+if (Constants.executionEnvironment !== 'storeClient') {
+  SplashScreen.setOptions?.({ duration: 250, fade: true });
+}
 
 export default function App() {
   const [mode, setMode] = useState('light');
