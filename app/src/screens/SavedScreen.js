@@ -10,7 +10,7 @@ import { GLASS, M3, GlassSurface } from '../glass';
 import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutesShort } from '../convert';
 
-export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0 }) {
+export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0, bottomInset = 0 }) {
   const { C, mode } = useTheme();
   const styles = useStyles(makeStyles);
   const [query, setQuery] = useState('');
@@ -127,7 +127,10 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         )}
       </ScrollView>
 
-      <View style={styles.stickyBanner}>
+      {/* The page runs under the system's bar (Android's buttons, the iPhone's
+          home line), so the ad is lifted clear of it: a covered ad breaks the
+          ad network's rules. */}
+      <View style={[styles.stickyBanner, { paddingBottom: Math.max(24, bottomInset + 8) }]}>
         <BannerAd placement="saved_sticky" />
       </View>
     </View>
@@ -362,7 +365,6 @@ const makeStyles = (C) => StyleSheet.create({
   stickyBanner: {
     paddingHorizontal: M3 ? 16 : 20,
     paddingTop: 8,
-    paddingBottom: 24,
     backgroundColor: C.cream,
   },
 });

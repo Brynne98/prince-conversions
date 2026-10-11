@@ -375,6 +375,7 @@ function Root({ themeMode, setThemeMode }) {
           }}
           unit={unit}
           topInset={topInset}
+          bottomInset={bottomInset}
         />
       </Animated.View>
 
