@@ -5,7 +5,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, useTheme, useStyles } from '../theme';
-import { Stepper, Segmented, Card, RoundButton, AppBar } from '../primitives';
+import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
 import { Bookmark, Flame, Gear, List, Swap, Play, ShareIcon } from '../icons';
@@ -95,28 +95,17 @@ export default function ConverterScreen({
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
-      {M3 ? (
-        <AppBar title="Convert">
-          <RoundButton onPress={onOpenSaved} accessibilityLabel="Saved recipes">
-            <List s={24} c={C.ink70} />
-          </RoundButton>
-          <RoundButton onPress={onOpenSettings} accessibilityLabel="Settings">
-            <Gear s={24} c={C.ink70} />
-          </RoundButton>
-        </AppBar>
-      ) : (
-        <View style={styles.topBar}>
-          <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
-            <List s={20} />
-          </RoundButton>
-          <View style={styles.topTitleWrap}>
-            <Text style={styles.kicker}>CONVERT</Text>
-          </View>
-          <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
-            <Gear s={19} />
-          </RoundButton>
+      <View style={styles.topBar}>
+        <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
+          <List s={20} />
+        </RoundButton>
+        <View style={styles.topTitleWrap}>
+          <Text style={styles.kicker}>CONVERT</Text>
         </View>
-      )}
+        <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
+          <Gear s={19} />
+        </RoundButton>
+      </View>
 
       {/* Direction toggle */}
       <View style={styles.directionRow}>
@@ -295,7 +284,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   topTitleWrap: { alignItems: 'center' },
   directionRow: M3
-    ? { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16, alignItems: 'center' }
+    ? { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, alignItems: 'center' }
     : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
   kicker: {
     fontFamily: FONT.ui,

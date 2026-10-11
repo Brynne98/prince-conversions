@@ -208,7 +208,9 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
 // it is Material's standard icon button: no container, a 48dp target.
 export function RoundButton({ onPress, children, size = 44, tone = 'raised', accessibilityLabel }) {
   const styles = useStyles(makeStyles);
-  const s = M3 ? 48 : size;
+  // 'plain' is Material's icon button, for Android's top app bar.
+  const plain = tone === 'plain';
+  const s = plain ? 48 : size;
   return (
     <GlassPressable
       onPress={onPress}
@@ -216,7 +218,7 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
-        M3 ? styles.roundM3 : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
+        plain ? styles.roundM3 : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
         { width: s, height: s, borderRadius: s / 2, opacity: pressed ? 0.6 : 1 },
       ]}
     >
@@ -254,14 +256,15 @@ export function TextButton({ label, onPress, disabled = false }) {
 }
 
 // ─── Top app bar (Android) ───────────────────────────────────────────
-// Material's small top app bar: the title leads from the left and actions
-// trail. iOS screens keep their own headers.
+// Material's small top app bar, for the full-screen pages: the title leads
+// from the left and actions trail. The main screens and iOS have their own
+// headers.
 export function AppBar({ title, leading, onLeading, children }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.appBar}>
       {leading && (
-        <RoundButton onPress={onLeading} accessibilityLabel={leading === 'back' ? 'Back' : 'Close'}>
+        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel={leading === 'back' ? 'Back' : 'Close'}>
           {leading === 'back' ? <ArrowBack /> : <Close s={24} />}
         </RoundButton>
       )}
