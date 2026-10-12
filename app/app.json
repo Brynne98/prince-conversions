@@ -95,7 +95,8 @@
       "eas": {
         "projectId": "ad23e342-6da3-4d83-b69e-5d1ca2af6400"
       },
-      "revenueCatIosApiKey": "appl_eWvOgxDYqxmPUybJsFvFneEcXhn"
+      "revenueCatIosApiKey": "appl_eWvOgxDYqxmPUybJsFvFneEcXhn",
+      "revenueCatAndroidApiKey": "goog_XrzIVwbvfxFxyEimUbIaoQBEQHJ"
     },
     "owner": "brynne98"
   }

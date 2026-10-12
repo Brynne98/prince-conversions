@@ -16,9 +16,8 @@ if (!IS_EXPO_GO) {
   } catch {}
 }
 
-// Per-platform RevenueCat public SDK keys. Android stays empty until the
-// Play app exists in RevenueCat; an empty key means IAP reports itself as
-// "not configured" instead of erroring against the wrong store.
+// Per-platform RevenueCat public SDK keys. A missing key means IAP reports
+// itself as "not configured" instead of erroring against the wrong store.
 const API_KEY = Platform.select({
   ios: Constants?.expoConfig?.extra?.revenueCatIosApiKey,
   android: Constants?.expoConfig?.extra?.revenueCatAndroidApiKey,
