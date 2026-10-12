@@ -20,9 +20,10 @@ const MARK = {
 // before they load and only waits for them (`ready`) before fading out.
 export default function AnimatedSplash({ ready, onDone }) {
   const fade = useRef(new Animated.Value(1)).current;
-  // The app's own light or dark is a saved choice and can differ from the
-  // phone's. Start in the phone's, as the system splash did, and ease to the
-  // app's, so the app never opens on a flash of the other colour.
+  // The app's light or dark follows the phone until the owner picks one, and
+  // a saved pick can differ from the phone's. Start in the phone's, as the
+  // system splash did, and ease to the app's, so the app never opens on a
+  // flash of the other colour.
   const { C: theme } = useTheme();
   const dark = useRef(new Animated.Value(launchedDark ? 1 : 0)).current;
   useEffect(() => {

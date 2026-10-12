@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Appearance, Dimensions, StyleSheet, Platform,
+  View, Text, Animated, Appearance, Dimensions, StyleSheet, Platform, useColorScheme,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,12 +37,15 @@ if (Constants.executionEnvironment !== 'storeClient') {
 }
 
 export default function App() {
-  const [mode, setMode] = useState('light');
+  // The owner's pick in Settings. Until there is one, follow the phone.
+  const [choice, setChoice] = useState(null);
+  const phone = useColorScheme();
+  const mode = choice ?? (phone === 'dark' ? 'dark' : 'light');
   return (
     <SafeAreaProvider>
-      <ThemeProvider mode={mode} setMode={setMode}>
+      <ThemeProvider mode={mode} setMode={setChoice}>
         <IapProvider>
-          <Root themeMode={mode} setThemeMode={setMode} />
+          <Root themeChoice={choice} />
           <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
         </IapProvider>
       </ThemeProvider>
@@ -50,8 +53,8 @@ export default function App() {
   );
 }
 
-function Root({ themeMode, setThemeMode }) {
-  const { C } = useTheme();
+function Root({ themeChoice }) {
+  const { C, mode: themeMode, setMode: setThemeMode } = useTheme();
   const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const [hydrated, setHydrated] = useState(false);
@@ -182,7 +185,8 @@ function Root({ themeMode, setThemeMode }) {
       ovenTime,
       direction,
       items,
-      themeMode,
+      // Only a pick is saved: saving the phone's setting would freeze it.
+      themeMode: themeChoice,
       analyticsEnabled,
     });
   }, [
@@ -193,7 +197,7 @@ function Root({ themeMode, setThemeMode }) {
     ovenTime,
     direction,
     items,
-    themeMode,
+    themeChoice,
     analyticsEnabled,
   ]);
 
@@ -243,12 +247,13 @@ function Root({ themeMode, setThemeMode }) {
     }
   }, [hydrated]);
 
-  // Tell the system the app's own light or dark, so what it draws itself (a
-  // sheet's rim, a permission prompt) matches. Not before the splash is gone:
-  // the system splash follows the phone's setting and would switch under it.
+  // Tell the system the owner's pick, so what it draws itself (a sheet's rim,
+  // a permission prompt) matches. With no pick the system already agrees.
+  // Not before the splash is gone: the system splash follows the phone's
+  // setting and would switch under it.
   useEffect(() => {
-    if (splashGone) Appearance.setColorScheme(themeMode);
-  }, [splashGone, themeMode]);
+    if (splashGone && themeChoice) Appearance.setColorScheme(themeChoice);
+  }, [splashGone, themeChoice]);
 
   // Defer ATT + AdMob init until the splash is fully dismissed.
   // Requesting ATT while another view is animating causes iOS to silently
