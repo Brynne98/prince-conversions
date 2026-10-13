@@ -3,9 +3,8 @@ import {
   Pressable, Text, View, Animated, StyleSheet, Modal, Platform, Switch,
   Alert, ActionSheetIOS, TextInput,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FONT, GROW, RADIUS, EDGE, useTheme, useStyles } from './theme';
+import { FONT, GROW, RADIUS, EDGE, buzz, useTheme, useStyles, useReduceMotion } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close, ArrowBack, Check } from './icons';
 import { t } from './i18n';
@@ -30,12 +29,12 @@ function HoldButton({ onTrigger, children, style }) {
 
   const start = () => {
     stop();
-    Haptics.selectionAsync();
+    buzz.choice();
     triggerRef.current?.();
     let delay = 320;
     const tick = () => {
       triggerRef.current?.();
-      Haptics.selectionAsync();
+      buzz.choice();
       delay = Math.max(35, delay * 0.8);
       timerRef.current = setTimeout(tick, delay);
     };
@@ -63,7 +62,7 @@ export function Toggle({ value, onValueChange, onColor }) {
   const { C } = useTheme();
   const change = (v) => {
     onValueChange?.(v);
-    Haptics.selectionAsync();
+    buzz.choice();
   };
   if (M3) return <M3Switch value={!!value} onChange={change} />;
   return (
@@ -175,7 +174,7 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
 
   return (
     <View style={styles.stepperRow}>
-      <HoldButton onTrigger={dec} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
+      <HoldButton onTrigger={dec} style={styles.stepBtn}>
         <Minus s={iconSize} c={iconColor} />
       </HoldButton>
       <View style={styles.stepperValueWrap}>
@@ -200,7 +199,7 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
           </Text>
         )}
       </View>
-      <HoldButton onTrigger={inc} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
+      <HoldButton onTrigger={inc} style={styles.stepBtn}>
         <Plus s={iconSize} c={iconColor} />
       </HoldButton>
     </View>
@@ -221,9 +220,9 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
       hitSlop={8}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [
+      style={[
         plain ? styles.roundM3 : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
-        { width: s, height: s, borderRadius: s / 2, opacity: pressed ? 0.6 : 1 },
+        { width: s, height: s, borderRadius: s / 2 },
       ]}
     >
       {children}
@@ -519,7 +518,7 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
             onPress={() => {
               if (!active) {
                 onChange(o.value);
-                Haptics.selectionAsync();
+                buzz.choice();
               }
             }}
             hitSlop={{ top: 4, bottom: 4 }}
@@ -561,13 +560,14 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
   const onTerracotta = tone === 'onTerracotta';
   const idx = Math.max(0, options.findIndex(o => o.value === value));
   const slide = useRef(new Animated.Value(idx)).current;
+  const still = useReduceMotion();
   useEffect(() => {
     Animated.timing(slide, {
       toValue: idx,
-      duration: 180,
+      duration: still ? 0 : 180,
       useNativeDriver: false,
     }).start();
-  }, [idx, slide]);
+  }, [idx, slide, still]);
 
   // Where each label sits, so the thumb can match it: labels differ in width
   // ("Air fryer", "Oven"), and a thumb cut to an equal share sits off-centre.
@@ -582,8 +582,6 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
     });
   };
 
-  // Tall enough to hit: about 38pt compact, 44pt full.
-  const padV = compact ? 8 : 10;
   const padH = compact ? 14 : 18;
   const fontSize = compact ? 14 : 15;
 
@@ -603,11 +601,15 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
             onPress={() => {
               if (!active) {
                 onChange(o.value);
-                Haptics.selectionAsync();
+                buzz.choice();
               }
             }}
             onLayout={measure(i)}
-            style={{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1, flexShrink: 1 }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            // With the track's 3pt edge above and below, a 44pt target.
+            hitSlop={{ top: 3, bottom: 3 }}
+            style={{ minHeight: 38, justifyContent: 'center', paddingHorizontal: padH, zIndex: 1, flexShrink: 1 }}
           >
             <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar} style={{
               fontFamily: FONT.ui,

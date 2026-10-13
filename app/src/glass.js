@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { GlassView } from 'expo-glass-effect';
-import { useTheme } from './theme';
+import { PRESSED, useTheme } from './theme';
 
 /**
  * iOS 26 and later: Apple's Liquid Glass behind controls. Older iPhones and
@@ -49,6 +49,10 @@ function glassProps({ tint, clear, scheme }, mode) {
   };
 }
 
+// The pressed look of a plain Pressable on the iOS looks: one fade. Android
+// ripples instead.
+export const fade = ({ pressed }) => !M3 && pressed && { opacity: PRESSED };
+
 /**
  * A glass layer filling its parent, behind the parent's content, for shapes
  * that move or hold more than a button (the segmented thumb, a timer card).
@@ -91,10 +95,12 @@ export function GlassSurface({ style, tint, clear, scheme, children }) {
  * A Pressable whose face is interactive glass on iOS 26: the glass carries
  * the button's shape and content and answers the finger itself, with
  * Apple's shimmer and stretch. Android gets a ripple; older iPhones a plain
- * Pressable in `style`.
+ * Pressable in `style` that fades while pressed.
  * `style` may be a function of { pressed }, as on Pressable.
+ * Announced as a button unless the caller names another role.
  */
-export function GlassPressable({ style, tint, clear, scheme, children, ...rest }) {
+export function GlassPressable({ style, tint, clear, scheme, children, accessibilityRole = 'button', ...props }) {
+  const rest = { accessibilityRole, ...props };
   const { mode, C } = useTheme();
   if (M3) {
     // Material answers a press with a ripple clipped to the button, not a fade.
@@ -110,7 +116,13 @@ export function GlassPressable({ style, tint, clear, scheme, children, ...rest }
       </Pressable>
     );
   }
-  if (!GLASS) return <Pressable style={style} {...rest}>{children}</Pressable>;
+  if (!GLASS) {
+    return (
+      <Pressable style={(state) => [typeof style === 'function' ? style(state) : style, fade(state)]} {...rest}>
+        {children}
+      </Pressable>
+    );
+  }
   const resolve = (state) => split(typeof style === 'function' ? style(state) : style);
   return (
     <Pressable {...rest} style={(state) => resolve(state).place}>

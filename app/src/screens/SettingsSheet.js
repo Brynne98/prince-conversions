@@ -9,7 +9,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 const SITE_URL = 'https://brynne98.github.io/prince-conversions';
 import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
 import { Chevron } from '../icons';
-import { M3, cap } from '../glass';
+import { M3, cap, fade } from '../glass';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
 import { capture, isAnalyticsConfigured } from '../analytics';
@@ -145,11 +145,8 @@ function PressableRow({ label, subtitle, onPress }) {
     <Pressable
       onPress={onPress}
       android_ripple={{ color: C.ink10, foreground: true }}
-      style={({ pressed }) => [
-        styles.row,
-        styles.rowDivider,
-        { opacity: pressed && !M3 ? 0.55 : 1 },
-      ]}
+      accessibilityRole="button"
+      style={(state) => [styles.row, styles.rowDivider, fade(state)]}
     >
       <View style={{ flex: 1, paddingRight: 12 }}>
         <Text style={styles.rowLabel}>{label}</Text>

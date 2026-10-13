@@ -2,11 +2,10 @@ import React, { useMemo, useState } from 'react';
 import {
   View, Text, ScrollView, Pressable, TextInput, StyleSheet, findNodeHandle,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FONT, GROW, RADIUS, EDGE, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, buzz, useTheme, useStyles } from '../theme';
 import { Back, Search, Trash } from '../icons';
 import { RoundButton, Segmented, AppBar, confirmDestructive } from '../primitives';
-import { GLASS, M3, GlassSurface } from '../glass';
+import { GLASS, M3, GlassSurface, fade } from '../glass';
 import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutes } from '../convert';
 import { t } from '../i18n';
@@ -132,13 +131,13 @@ export default function SavedScreen({
                     // iOS 26 grows the sheet out of the bin button.
                     anchor: findNodeHandle(e?.currentTarget) ?? undefined,
                     onConfirm: () => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      buzz.action();
                       onDelete(it.id);
                     },
                   });
                 }}
                 onStart={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  buzz.action();
                   onStart?.(it, displayMode);
                 }}
               />
@@ -204,7 +203,8 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
   return (
     <Pressable
       onPress={onStart}
-      style={({ pressed }) => [styles.row, { opacity: pressed ? 0.85 : 1 }]}
+      accessibilityRole="button"
+      style={(state) => [styles.row, fade(state)]}
     >
       <View style={[styles.rowEmojiBox, { backgroundColor: tagBg }]}>
         <Text style={styles.rowEmoji}>{item.emoji}</Text>
