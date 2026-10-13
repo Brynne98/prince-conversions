@@ -284,6 +284,8 @@ function Root({ themeChoice }) {
   slideToRef.current = slideTo;
   const edgeSwipe = useRef(PanResponder.create({
     onMoveShouldSetPanResponderCapture: (_, g) => g.x0 < 24 && g.dx > 8 && g.dx > Math.abs(g.dy) * 2,
+    // A drag that starts while the screen is still sliding in takes over from it.
+    onPanResponderGrant: () => slide.stopAnimation(),
     onPanResponderMove: (_, g) => slide.setValue(1 - Math.min(1, Math.max(0, g.dx / screenW))),
     onPanResponderRelease: (_, g) => {
       if (g.dx > screenW / 3 || g.vx > 0.5) setView('converter');
