@@ -8,7 +8,6 @@
     "delete": "Elimina",
     "oven": "Forno",
     "air_fryer": "Friggitrice ad aria",
-    "air_short": "Friggitrice",
     "min": "min",
     "hr": "h"
   },
@@ -31,7 +30,6 @@
     "timer_label": "Friggitrice ad aria %{temp}"
   },
   "saved": {
-    "title": "Le mie ricette",
     "count": {
       "one": "%{count} ricetta",
       "other": "%{count} ricette"
@@ -39,6 +37,7 @@
     "search": "Cerca ricette",
     "empty_title": "Ancora niente di salvato",
     "empty_body": "Converti una ricetta e tocca “Salva” per conservare tempo e temperatura perfetti.",
+    "no_match": "Nessuna ricetta corrisponde",
     "delete_title": "Eliminare “%{name}”?",
     "delete_message": "L’operazione non può essere annullata.",
     "delete_a11y": "Elimina %{name}",
@@ -64,7 +63,7 @@
     "pizza": "Pizza"
   },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Paghi una volta. Convertitore e timer restano gratuiti.",
     "benefit_no_banners": "Nessun banner mentre cucini",
@@ -89,7 +88,6 @@
   "settings": {
     "title": "Impostazioni",
     "dark_mode": "Modalità scura",
-    "dark_mode_subtitle": "Palette antracite calda",
     "analytics": "Condividi statistiche anonime",
     "analytics_subtitle": "Solo eventi di utilizzo, mai il contenuto delle ricette",
     "remove_ads": "Ottieni Pro",
@@ -128,6 +126,6 @@
     "toast_shake": "Scuoti a metà cottura · %{label}",
     "toast_shake_fallback": "cottura",
     "toast_done": "Pronto · %{label}",
-    "toast_started": "Timer · %{name}"
+    "toast_started": "Timer avviato · %{name}"
   }
 }

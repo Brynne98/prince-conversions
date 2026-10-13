@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View, Text, Pressable, StyleSheet, Animated,
+  View, Text, Pressable, StyleSheet, Animated, BackHandler,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
@@ -34,7 +34,6 @@ function useCardTheme() {
 export default function TimerStack({
   timers, onPressTimer, onCancel, onRestart, bottomInset = 0,
 }) {
-  const { C: pageC } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const expand = useRef(new Animated.Value(0)).current;
 
@@ -54,6 +53,16 @@ export default function TimerStack({
     if (items.length <= 1 && expanded) setExpanded(false);
   }, [items.length, expanded]);
 
+  // Android's back button closes the opened stack.
+  useEffect(() => {
+    if (!expanded) return undefined;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      setExpanded(false);
+      return true;
+    });
+    return () => sub.remove();
+  }, [expanded]);
+
   if (items.length === 0) return null;
 
   const visiblePeeks = Math.min(items.length - 1, MAX_PEEKS);
@@ -66,87 +75,91 @@ export default function TimerStack({
   });
 
   return (
-    <View
-      pointerEvents="box-none"
-      style={{
-        position: 'absolute',
-        left: 12,
-        right: 12,
-        bottom: 12 + bottomInset,
-      }}
-    >
-      <Animated.View style={{ height: containerHeight }}>
-        {items.map((item, idx) => {
-          const collapsedY = -idx * PEEK;
-          const collapsedScale = Math.max(0.88, 1 - idx * 0.05);
-          const collapsedOpacity = idx > visiblePeeks ? 0 : 1 - idx * 0.18;
-          const expandedY = -idx * (CARD_HEIGHT + CARD_GAP);
-
-          const translateY = expand.interpolate({
-            inputRange: [0, 1],
-            outputRange: [collapsedY, expandedY],
-          });
-          const scale = expand.interpolate({
-            inputRange: [0, 1],
-            outputRange: [collapsedScale, 1],
-          });
-          const opacity = expand.interpolate({
-            inputRange: [0, 1],
-            outputRange: [collapsedOpacity, 1],
-          });
-
-          const interactive = expanded || idx <= visiblePeeks;
-          const press = () => {
-            if (!expanded && items.length > 1) {
-              Haptics.selectionAsync();
-              setExpanded(true);
-            } else {
-              onPressTimer?.(item.id);
-              setExpanded(false);
-            }
-          };
-
-          return (
-            <Animated.View
-              key={item.id}
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: CARD_HEIGHT,
-                zIndex: items.length - idx,
-                transform: [{ translateY }, { scale }],
-                opacity,
-              }}
-              pointerEvents={interactive ? 'auto' : 'none'}
-            >
-              <TimerCard
-                timer={item}
-                onPress={press}
-                onCancel={() => onCancel?.(item.id)}
-                onRestart={() => onRestart?.(item.id)}
-              />
-            </Animated.View>
-          );
-        })}
-      </Animated.View>
-
-      {expanded && (
+    <>
+      {/* The opened stack dims the screen under it; a tap there closes it. */}
+      <Animated.View
+        pointerEvents={expanded ? 'auto' : 'none'}
+        style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.32)', opacity: expand }]}
+      >
         <Pressable
+          style={StyleSheet.absoluteFill}
           onPress={() => setExpanded(false)}
-          hitSlop={8}
-          style={{ position: 'absolute', top: -22, left: 0, right: 0, alignItems: 'center', paddingVertical: 8 }}
-        >
-          <View style={{ width: 40, height: 5, borderRadius: 3, backgroundColor: pageC.ink30 }} />
-        </Pressable>
-      )}
-    </View>
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
+        />
+      </Animated.View>
+      <View
+        pointerEvents="box-none"
+        style={{
+          position: 'absolute',
+          left: 12,
+          right: 12,
+          bottom: 12 + bottomInset,
+        }}
+      >
+        <Animated.View style={{ height: containerHeight }}>
+          {items.map((item, idx) => {
+            const collapsedY = -idx * PEEK;
+            const collapsedScale = Math.max(0.88, 1 - idx * 0.05);
+            const collapsedOpacity = idx > visiblePeeks ? 0 : 1 - idx * 0.18;
+            const expandedY = -idx * (CARD_HEIGHT + CARD_GAP);
+
+            const translateY = expand.interpolate({
+              inputRange: [0, 1],
+              outputRange: [collapsedY, expandedY],
+            });
+            const scale = expand.interpolate({
+              inputRange: [0, 1],
+              outputRange: [collapsedScale, 1],
+            });
+            const opacity = expand.interpolate({
+              inputRange: [0, 1],
+              outputRange: [collapsedOpacity, 1],
+            });
+
+            const interactive = expanded || idx <= visiblePeeks;
+            const press = () => {
+              if (!expanded && items.length > 1) {
+                Haptics.selectionAsync();
+                setExpanded(true);
+              } else {
+                onPressTimer?.(item.id);
+                setExpanded(false);
+              }
+            };
+
+            return (
+              <Animated.View
+                key={item.id}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: CARD_HEIGHT,
+                  zIndex: items.length - idx,
+                  transform: [{ translateY }, { scale }],
+                  opacity,
+                }}
+                pointerEvents={interactive ? 'auto' : 'none'}
+              >
+                <TimerCard
+                  timer={item}
+                  onPress={press}
+                  onCancel={() => onCancel?.(item.id)}
+                  onRestart={() => onRestart?.(item.id)}
+                />
+              </Animated.View>
+            );
+          })}
+        </Animated.View>
+      </View>
+    </>
   );
 }
 
 // Time passed, as a ring.
-function Ring({ frac, size = 38, C, done }) {
+function Ring({ frac, size = 38, C, filled }) {
   const stroke = 4;
   const r = (size - stroke) / 2;
   const len = 2 * Math.PI * r;
@@ -155,12 +168,12 @@ function Ring({ frac, size = 38, C, done }) {
     <Svg width={size} height={size}>
       <Circle
         cx={mid} cy={mid} r={r} fill="none"
-        stroke={done ? C.onTerracotta20 : C.ink10}
+        stroke={filled ? C.onTerracotta20 : C.ink10}
         strokeWidth={stroke}
       />
       <Circle
         cx={mid} cy={mid} r={r} fill="none"
-        stroke={done ? C.onTerracotta : C.terracotta}
+        stroke={filled ? C.onTerracotta : C.terracotta}
         strokeWidth={stroke}
         strokeLinecap="round"
         strokeDasharray={`${len} ${len}`}
@@ -191,7 +204,7 @@ function usePulse(active) {
   return pulse;
 }
 
-function IconButton({ onPress, label, done, children }) {
+function IconButton({ onPress, label, filled, children }) {
   const { styles, scheme } = useCardTheme();
   return (
     <GlassPressable
@@ -200,7 +213,7 @@ function IconButton({ onPress, label, done, children }) {
       clear
       scheme={scheme}
       accessibilityLabel={label}
-      style={({ pressed }) => [styles.iconBtn, done && styles.iconBtnDone, { opacity: pressed ? 0.7 : 1 }]}
+      style={({ pressed }) => [styles.iconBtn, filled && styles.iconBtnFilled, { opacity: pressed ? 0.7 : 1 }]}
     >
       {children}
     </GlassPressable>
@@ -211,43 +224,48 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
   const { C, styles, scheme } = useCardTheme();
   const isDone = timer.completed;
   const pulse = usePulse(isDone);
-  const fg = isDone ? C.onTerracotta : C.ink;
+  // A finished card keeps its own colour, with only "Done!" and the ring in
+  // orange: a whole orange card blends into the result card behind it. iOS 26
+  // tints the glass instead, which stays apart.
+  const filled = isDone && GLASS;
+  const fg = filled ? C.onTerracotta : C.ink;
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flex: 1,
-        transform: [{ scale: pressed ? 0.985 : 1 }],
-      })}
-    >
-      <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
-        <View style={[styles.card, styles.cardRow, GLASS && styles.cardGlass, isDone && styles.cardDone]}>
-          <GlassFill tint={isDone ? C.terracotta : C.paper} scheme={scheme} radius={RADIUS.lg} />
-          <Ring frac={timer.elapsedFrac} C={C} done={isDone} />
-          <View style={styles.left}>
-            <View style={styles.kickerRow}>
-              <Text style={[styles.kicker, isDone && { color: C.onTerracotta85 }]} numberOfLines={1} maxFontSizeMultiplier={GROW.display}>
-                {timer.label || t('timer.fallback_label')}
-              </Text>
-              {!isDone && timer.remindHalfway && <Bell s={11} c={C.ink50} />}
-            </View>
-            <Text style={[styles.time, { color: fg }]} numberOfLines={1} maxFontSizeMultiplier={GROW.display}>
-              {isDone ? t('timer.done') : formatRemaining(timer.remainingSec)}
+    <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
+      {/* A press ripples on Android, as every other control there, and
+          shrinks the card on iOS. */}
+      <Pressable
+        onPress={onPress}
+        android_ripple={{ color: C.ink10, foreground: true }}
+        style={({ pressed }) => [
+          styles.card, styles.cardRow, GLASS && styles.cardGlass,
+          !M3 && { transform: [{ scale: pressed ? 0.985 : 1 }] },
+        ]}
+      >
+        <GlassFill tint={filled ? C.terracotta : C.paper} scheme={scheme} radius={RADIUS.lg} />
+        <Ring frac={timer.elapsedFrac} C={C} filled={filled} />
+        <View style={styles.left}>
+          <View style={styles.kickerRow}>
+            <Text style={[styles.kicker, filled && { color: C.onTerracotta85 }]} numberOfLines={1} maxFontSizeMultiplier={GROW.display}>
+              {timer.label || t('timer.fallback_label')}
             </Text>
+            {!isDone && timer.remindHalfway && <Bell s={11} c={C.ink50} />}
           </View>
-
-          {isDone && (
-            <IconButton onPress={onRestart} label={t('timer.restart_a11y')} done>
-              <Restart s={18} c={fg} />
-            </IconButton>
-          )}
-          <IconButton onPress={onCancel} label={t('timer.stop')} done={isDone}>
-            <Close s={18} c={fg} />
-          </IconButton>
+          <Text style={[styles.time, { color: isDone && !filled ? C.terracotta : fg }]} numberOfLines={1} maxFontSizeMultiplier={GROW.display}>
+            {isDone ? t('timer.done') : formatRemaining(timer.remainingSec)}
+          </Text>
         </View>
-      </Animated.View>
-    </Pressable>
+
+        {isDone && (
+          <IconButton onPress={onRestart} label={t('timer.restart_a11y')} filled={filled}>
+            <Restart s={18} c={fg} />
+          </IconButton>
+        )}
+        <IconButton onPress={onCancel} label={t('timer.stop')} filled={filled}>
+          <Close s={18} c={fg} />
+        </IconButton>
+      </Pressable>
+    </Animated.View>
   );
 }
 
@@ -268,7 +286,6 @@ const makeStyles = (C) => StyleSheet.create({
   },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   cardGlass: { shadowOpacity: 0, elevation: 0 },
-  cardDone: { backgroundColor: C.terracotta },
   left: { flex: 1, minWidth: 0 },
   kickerRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   kicker: {
@@ -291,5 +308,5 @@ const makeStyles = (C) => StyleSheet.create({
     backgroundColor: C.ink06,
     alignItems: 'center', justifyContent: 'center',
   },
-  iconBtnDone: { backgroundColor: C.onTerracotta18 },
+  iconBtnFilled: { backgroundColor: C.onTerracotta18 },
 });

@@ -137,9 +137,9 @@ function TimeRich({ minutes, baseStyle, suffixStyle }) {
   return (
     <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>
       {h}
-      <Text style={suffixStyle}>{t('common.hr')}</Text>
+      <Text style={suffixStyle}> {t('common.hr')}</Text>
       {m > 0 ? ` ${m}` : ''}
-      {m > 0 ? <Text style={suffixStyle}>{t('common.min')}</Text> : null}
+      {m > 0 ? <Text style={suffixStyle}> {t('common.min')}</Text> : null}
     </Text>
   );
 }
@@ -260,15 +260,14 @@ export function TextButton({ label, onPress, disabled = false }) {
 }
 
 // ─── Top app bar (Android) ───────────────────────────────────────────
-// Material's small top app bar, for the full-screen pages: the title leads
-// from the left and actions trail. The main screens and iOS have their own
-// headers.
+// Material's small top app bar, on every Android screen and page: the title
+// leads from the left and actions trail. iOS has its own headers.
 export function AppBar({ title, leading, onLeading, children }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.appBar}>
       {leading && (
-        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel={leading === 'back' ? 'Back' : 'Close'}>
+        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel={t(leading === 'back' ? 'common.back' : 'common.close')}>
           {leading === 'back' ? <ArrowBack /> : <Close s={24} />}
         </RoundButton>
       )}

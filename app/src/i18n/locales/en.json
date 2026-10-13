@@ -8,7 +8,6 @@
     "delete": "Delete",
     "oven": "Oven",
     "air_fryer": "Air fryer",
-    "air_short": "Air",
     "min": "min",
     "hr": "hr"
   },
@@ -31,7 +30,6 @@
     "timer_label": "Air fryer %{temp}"
   },
   "saved": {
-    "title": "My Recipes",
     "count": {
       "one": "%{count} recipe",
       "other": "%{count} recipes"
@@ -39,6 +37,7 @@
     "search": "Search recipes",
     "empty_title": "Nothing saved yet",
     "empty_body": "Convert a recipe and tap “Save” to keep\nyour perfect time and temperature.",
+    "no_match": "No recipes match",
     "delete_title": "Delete “%{name}”?",
     "delete_message": "This can’t be undone.",
     "delete_a11y": "Delete %{name}",
@@ -64,7 +63,7 @@
     "pizza": "Pizza"
   },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Pay once. Converter and timers stay free.",
     "benefit_no_banners": "No banners while you cook",
@@ -89,9 +88,8 @@
   "settings": {
     "title": "Settings",
     "dark_mode": "Dark mode",
-    "dark_mode_subtitle": "Warm-charcoal palette",
     "analytics": "Share anonymous analytics",
-    "analytics_subtitle": "Usage events only — never recipe content",
+    "analytics_subtitle": "Usage events only, never recipe content",
     "remove_ads": "Get Pro",
     "remove_ads_subtitle": "One-time purchase%{price}",
     "pro_active": "Pro",
@@ -128,6 +126,6 @@
     "toast_shake": "Shake halfway · %{label}",
     "toast_shake_fallback": "cooking",
     "toast_done": "Done · %{label}",
-    "toast_started": "Timer · %{name}"
+    "toast_started": "Timer started · %{name}"
   }
 }

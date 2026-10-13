@@ -8,7 +8,6 @@
     "delete": "Verwijder",
     "oven": "Oven",
     "air_fryer": "Airfryer",
-    "air_short": "Airfryer",
     "min": "min",
     "hr": "u"
   },
@@ -31,7 +30,6 @@
     "timer_label": "Airfryer %{temp}"
   },
   "saved": {
-    "title": "Mijn recepten",
     "count": {
       "one": "%{count} recept",
       "other": "%{count} recepten"
@@ -39,6 +37,7 @@
     "search": "Zoek recepten",
     "empty_title": "Nog niets bewaard",
     "empty_body": "Reken een recept om en tik op ‘Bewaar’ om je perfecte tijd en temperatuur te houden.",
+    "no_match": "Geen recepten gevonden",
     "delete_title": "‘%{name}’ verwijderen?",
     "delete_message": "Dit kan niet ongedaan worden gemaakt.",
     "delete_a11y": "Verwijder %{name}",
@@ -64,7 +63,7 @@
     "pizza": "Pizza"
   },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Eén keer betalen. Omrekenen en timers blijven gratis.",
     "benefit_no_banners": "Geen banners tijdens het koken",
@@ -89,7 +88,6 @@
   "settings": {
     "title": "Instellingen",
     "dark_mode": "Donkere modus",
-    "dark_mode_subtitle": "Warm antracietpalet",
     "analytics": "Deel anonieme statistieken",
     "analytics_subtitle": "Alleen gebruiksgegevens, nooit de inhoud van recepten",
     "remove_ads": "Neem Pro",
@@ -128,6 +126,6 @@
     "toast_shake": "Halverwege schudden · %{label}",
     "toast_shake_fallback": "eten",
     "toast_done": "Klaar · %{label}",
-    "toast_started": "Timer · %{name}"
+    "toast_started": "Timer loopt · %{name}"
   }
 }

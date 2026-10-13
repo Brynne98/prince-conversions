@@ -5,7 +5,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { FONT, GROW, RADIUS, EDGE, BUTTON, LABEL, useTheme, useStyles } from '../theme';
-import { Stepper, Segmented, Card, RoundButton } from '../primitives';
+import { Stepper, Segmented, Card, RoundButton, AppBar } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
 import {
@@ -95,17 +95,28 @@ export default function ConverterScreen({
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
-      <View style={styles.topBar}>
-        <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel={t('converter.saved_recipes')}>
-          {M3 ? <MaterialList s={22} /> : <List s={20} />}
-        </RoundButton>
-        <View style={styles.topTitleWrap}>
-          <Text style={styles.kicker} maxFontSizeMultiplier={GROW.bar}>{t('converter.kicker').toUpperCase()}</Text>
+      {M3 ? (
+        <AppBar title={t('converter.kicker')}>
+          <RoundButton onPress={onOpenSaved} tone="plain" accessibilityLabel={t('converter.saved_recipes')}>
+            <MaterialList />
+          </RoundButton>
+          <RoundButton onPress={onOpenSettings} tone="plain" accessibilityLabel={t('settings.title')}>
+            <MaterialSettings />
+          </RoundButton>
+        </AppBar>
+      ) : (
+        <View style={styles.topBar}>
+          <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel={t('converter.saved_recipes')}>
+            <List s={20} />
+          </RoundButton>
+          <View style={styles.topTitleWrap}>
+            <Text style={styles.kicker} maxFontSizeMultiplier={GROW.bar}>{t('converter.kicker').toUpperCase()}</Text>
+          </View>
+          <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel={t('settings.title')}>
+            <Gear s={19} />
+          </RoundButton>
         </View>
-        <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel={t('settings.title')}>
-          {M3 ? <MaterialSettings s={22} /> : <Gear s={19} />}
-        </RoundButton>
-      </View>
+      )}
 
       {/* Direction toggle */}
       <View style={styles.directionRow}>
@@ -237,9 +248,9 @@ export default function ConverterScreen({
                 ) : (
                   <>
                     {Math.floor(result.time / 60)}
-                    <Text style={styles.resultBigSuffix}>{t('common.hr')}</Text>
+                    <Text style={styles.resultBigSuffix}> {t('common.hr')}</Text>
                     {result.time % 60 > 0 ? ` ${result.time % 60}` : ''}
-                    {result.time % 60 > 0 ? <Text style={styles.resultBigSuffix}>{t('common.min')}</Text> : null}
+                    {result.time % 60 > 0 ? <Text style={styles.resultBigSuffix}> {t('common.min')}</Text> : null}
                   </>
                 )}
               </Text>
@@ -307,7 +318,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   topTitleWrap: { alignItems: 'center' },
   directionRow: M3
-    ? { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, alignItems: 'center' }
+    ? { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16, alignItems: 'center' }
     : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
   kicker: { ...LABEL, color: C.terracotta },
   cardHeader: {
