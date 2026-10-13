@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Appearance, BackHandler, Dimensions, StyleSheet, Platform, useColorScheme,
+  View, Text, Animated, Appearance, BackHandler, Dimensions, PanResponder, StyleSheet, Platform, useColorScheme,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ import PaywallSheet from './src/screens/PaywallSheet';
 import TimerStack, { stackHeight } from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
-import { ThemeProvider, useTheme, useStyles, GROW } from './src/theme';
+import { ThemeProvider, useTheme, useStyles, useReduceMotion, GROW } from './src/theme';
 import { M3 } from './src/glass';
 import { DialogHost } from './src/primitives';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
@@ -267,13 +267,30 @@ function Root({ themeChoice }) {
 
   const screenW = Dimensions.get('window').width;
   const slide = useRef(new Animated.Value(0)).current;
+  const still = useReduceMotion();
+  const slideTo = (toValue) => Animated.timing(slide, {
+    toValue,
+    duration: still ? 0 : 320,
+    useNativeDriver: true,
+  }).start();
   useEffect(() => {
-    Animated.timing(slide, {
-      toValue: view === 'saved' ? 1 : 0,
-      duration: 320,
-      useNativeDriver: true,
-    }).start();
-  }, [view, slide]);
+    slideTo(view === 'saved' ? 1 : 0);
+  }, [view, slide]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // iPhone: a drag from the left edge pulls Saved recipes back off, as the
+  // system's own back swipe does. Past a third of the way, or flicked, it
+  // goes; otherwise it settles back.
+  const slideToRef = useRef(slideTo);
+  slideToRef.current = slideTo;
+  const edgeSwipe = useRef(PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (_, g) => g.x0 < 24 && g.dx > 8 && g.dx > Math.abs(g.dy) * 2,
+    onPanResponderMove: (_, g) => slide.setValue(1 - Math.min(1, Math.max(0, g.dx / screenW))),
+    onPanResponderRelease: (_, g) => {
+      if (g.dx > screenW / 3 || g.vx > 0.5) setView('converter');
+      else slideToRef.current(1);
+    },
+    onPanResponderTerminate: () => slideToRef.current(1),
+  })).current;
 
   // Android's back button leaves Saved recipes for the main screen, not the
   // app. The pages that open over a screen close themselves.
@@ -400,7 +417,10 @@ function Root({ themeChoice }) {
         />
       </Animated.View>
 
-      <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ translateX: savedTx }] }]}>
+      <Animated.View
+        style={[StyleSheet.absoluteFill, { transform: [{ translateX: savedTx }] }]}
+        {...(Platform.OS === 'ios' ? edgeSwipe.panHandlers : null)}
+      >
         <SavedScreen
           items={items}
           onClose={() => setView('converter')}

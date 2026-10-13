@@ -3,8 +3,7 @@ import {
   View, Text, ScrollView, Pressable, StyleSheet, Platform, Animated, Easing, Share,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
-import { FONT, GROW, RADIUS, EDGE, BUTTON, LABEL, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, BUTTON, LABEL, buzz, useTheme, useStyles, useReduceMotion } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
@@ -48,7 +47,7 @@ export default function ConverterScreen({
 
   // "425°F oven for 25 min → 400°F air fryer for 20 min"
   const share = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    buzz.tap();
     const from = t(isOvenToAir ? 'converter.share_oven' : 'converter.share_air', {
       temp: `${ovenTemp}°${unit}`, time: formatMinutes(ovenTime),
     });
@@ -66,15 +65,16 @@ export default function ConverterScreen({
     } catch {}
   };
 
+  const still = useReduceMotion();
   const spinTurns = useRef(0);
   const spin = useRef(new Animated.Value(0)).current;
   const flip = () => {
     setDirection(isOvenToAir ? 'air-to-oven' : 'oven-to-air');
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    buzz.tap();
     spinTurns.current += 1;
     Animated.timing(spin, {
       toValue: spinTurns.current,
-      duration: 420,
+      duration: still ? 0 : 420,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
@@ -89,7 +89,6 @@ export default function ConverterScreen({
     if (u === unit) return;
     setOvenTemp(u === 'F' ? cToF(ovenTemp) : fToC(ovenTemp));
     setUnit(u);
-    Haptics.selectionAsync();
   };
 
   return (
@@ -187,7 +186,7 @@ export default function ConverterScreen({
                 accessibilityLabel={t('converter.share')}
                 clear
                 scheme="light"
-                style={({ pressed }) => [styles.shareBtn, { opacity: pressed ? 0.6 : 1 }]}
+                style={styles.shareBtn}
               >
                 <ShareIcon s={18} c={C.onTerracotta} />
               </GlassPressable>
@@ -196,12 +195,7 @@ export default function ConverterScreen({
                 tone="onTerracotta"
                 options={[{ value: 'C', label: '°C' }, { value: 'F', label: '°F' }]}
                 value={targetUnit}
-                onChange={(u) => {
-                  if (u !== targetUnit) {
-                    setTargetUnit(u);
-                    Haptics.selectionAsync();
-                  }
-                }}
+                onChange={setTargetUnit}
               />
             </View>
           </View>
@@ -250,12 +244,12 @@ export default function ConverterScreen({
           <View style={styles.actionRow}>
             <GlassPressable
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                buzz.action();
                 onStartTimer?.(result.time);
               }}
               tint={C.onTerracotta}
               scheme="light"
-              style={({ pressed }) => [styles.actionBtn, styles.actionPrimary, { opacity: pressed ? 0.85 : 1 }]}
+              style={[styles.actionBtn, styles.actionPrimary]}
             >
               <Play s={14} c={C.terracotta} />
               <Text
@@ -269,10 +263,10 @@ export default function ConverterScreen({
               </Text>
             </GlassPressable>
             <GlassPressable
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onSave(); }}
+              onPress={() => { buzz.action(); onSave(); }}
               clear
               scheme="light"
-              style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
+              style={[styles.actionBtn, styles.actionSecondary]}
             >
               <Bookmark s={16} c={C.onTerracotta} />
               <Text

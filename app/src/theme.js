@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const LIGHT = {
   cream: '#FAF5EC',
@@ -102,6 +103,34 @@ export const LABEL = {
   fontWeight: '700',
   letterSpacing: 1,
 };
+
+// How far a pressed control fades on the iOS looks. Android ripples instead,
+// and glass on iOS 26 answers the finger itself.
+export const PRESSED = 0.6;
+
+// One buzz per tap, chosen by what the tap does, not by where it is.
+export const buzz = {
+  // Picking between values: a switch, a segment, a step, an emoji.
+  choice: () => Haptics.selectionAsync(),
+  // A small action beside the main ones: share, swap, restore.
+  tap: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+  // A main button: start, stop, restart, save, delete, buy.
+  action: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
+  // Something was kept: a recipe saved, a purchase made.
+  success: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
+};
+
+// True while the phone's Reduce Motion setting is on: slides, spins and
+// pulses then jump to where they end.
+export function useReduceMotion() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setOn);
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setOn);
+    return () => sub.remove();
+  }, []);
+  return on;
+}
 
 const ThemeContext = createContext({
   mode: 'light',

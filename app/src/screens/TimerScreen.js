@@ -3,8 +3,7 @@ import {
   View, Text, Pressable, StyleSheet, Animated, Dimensions,
 } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import * as Haptics from 'expo-haptics';
-import { FONT, GROW, RADIUS, EDGE, BUTTON, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, BUTTON, buzz, useTheme, useStyles } from '../theme';
 import { Restart } from '../icons';
 import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
@@ -150,15 +149,11 @@ export default function TimerScreen({
           {completed && (
             <GlassPressable
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                buzz.action();
                 onRestart?.();
               }}
               tint={C.terracotta}
-              style={({ pressed }) => [
-                styles.actionBtn,
-                styles.restartBtn,
-                { opacity: pressed ? 0.85 : 1 },
-              ]}
+              style={[styles.actionBtn, styles.restartBtn]}
             >
               <Restart s={18} c={C.onTerracotta} />
               <Text style={styles.restartText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar}>{t('timer.restart')}</Text>
@@ -166,15 +161,11 @@ export default function TimerScreen({
           )}
           <GlassPressable
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              buzz.action();
               onCancel?.();
               onClose?.();
             }}
-            style={({ pressed }) => [
-              styles.actionBtn,
-              styles.stopBtn,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
+            style={[styles.actionBtn, styles.stopBtn]}
           >
             {/* Stopping a running timer throws its time away, so it reads as
                 a delete; a finished one has nothing left to lose. */}

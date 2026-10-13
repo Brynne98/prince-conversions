@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, Pressable, StyleSheet, ScrollView,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FONT, RADIUS, EDGE, BUTTON, LABEL, useTheme, useStyles } from '../theme';
+import { FONT, RADIUS, EDGE, BUTTON, LABEL, PRESSED, buzz, useTheme, useStyles } from '../theme';
 import { Sheet, SheetHeader, AppBar, TextButton, alert } from '../primitives';
 import { NoAds, RestorePurchase } from '../icons';
-import { GLASS, M3, GlassPressable } from '../glass';
+import { GLASS, M3, GlassPressable, fade } from '../glass';
 import { useIap } from '../iap';
 import { capture } from '../analytics';
 import { t } from '../i18n';
@@ -43,11 +42,11 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
     }
     if (busy) return;
     setBusy(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    buzz.action();
     try {
       const owned = await buyPro();
       if (owned) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        buzz.success();
         alert(t('paywall.thanks_title'), t('paywall.thanks_body'));
         onClose?.();
       }
@@ -70,7 +69,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
     }
     if (busy) return;
     setBusy(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    buzz.tap();
     try {
       const owned = await restorePurchases();
       alert(
@@ -128,10 +127,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
           onPress={onBuy}
           disabled={busy}
           tint={C.terracotta}
-          style={({ pressed }) => [
-            styles.cta,
-            { opacity: pressed || busy ? 0.7 : 1 },
-          ]}
+          style={[styles.cta, busy && { opacity: PRESSED }]}
         >
           <Text style={styles.ctaText}>{ctaLabel}</Text>
         </GlassPressable>
@@ -145,7 +141,8 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
             onPress={onRestore}
             disabled={busy}
             hitSlop={8}
-            style={({ pressed }) => ({ opacity: pressed || busy ? 0.55 : 1 })}
+            accessibilityRole="button"
+            style={(state) => fade({ pressed: state.pressed || busy })}
           >
             <Text style={styles.restore}>{t('paywall.restore')}</Text>
           </Pressable>

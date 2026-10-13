@@ -3,10 +3,9 @@ import {
   View, Text, ScrollView, TextInput, Pressable,
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FONT, GROW, RADIUS, EDGE, LABEL, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, LABEL, buzz, useTheme, useStyles } from '../theme';
 import { Sheet, SheetHeader, AppBar, TextButton, Field } from '../primitives';
-import { GLASS, M3, cap, GlassPressable } from '../glass';
+import { GLASS, M3, cap, GlassPressable, fade } from '../glass';
 import { formatMinutes } from '../convert';
 import { Pencil } from '../icons';
 import { t } from '../i18n';
@@ -69,7 +68,7 @@ export default function SaveSheet({
     const next = lastEmoji(text);
     if (next && next !== draft.emoji) {
       setDraft({ ...draft, emoji: next });
-      Haptics.selectionAsync();
+      buzz.choice();
     }
   };
   const emojiButton = (
@@ -78,7 +77,7 @@ export default function SaveSheet({
       hitSlop={6}
       accessibilityRole="button"
       accessibilityLabel={t('save.emoji_a11y')}
-      style={[styles.nameEmojiBox, typing && styles.nameEmojiTyping]}
+      style={(state) => [styles.nameEmojiBox, typing && styles.nameEmojiTyping, fade(state)]}
     >
       <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
       <View style={styles.emojiBadge}>
@@ -105,7 +104,7 @@ export default function SaveSheet({
 
   const save = () => {
     if (valid) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      buzz.success();
       onSave();
     }
   };
@@ -124,9 +123,12 @@ export default function SaveSheet({
             key={e}
             onPress={() => {
               setDraft({ ...draft, emoji: e });
-              Haptics.selectionAsync();
+              buzz.choice();
             }}
-            style={[styles.gridItem, active && { backgroundColor: C.terracottaSoft }]}
+            accessibilityRole="button"
+            accessibilityLabel={e}
+            accessibilityState={{ selected: active }}
+            style={(state) => [styles.gridItem, active && { backgroundColor: C.terracottaSoft }, fade(state)]}
           >
             <Text style={styles.gridEmoji}>{e}</Text>
           </Pressable>
