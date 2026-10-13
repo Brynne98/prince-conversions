@@ -8,7 +8,6 @@
     "delete": "Eliminar",
     "oven": "Horno",
     "air_fryer": "Freidora de aire",
-    "air_short": "Freidora",
     "min": "min",
     "hr": "h"
   },
@@ -31,8 +30,6 @@
     "timer_label": "Freidora de aire %{temp}"
   },
   "saved": {
-    "title": "Mis recetas",
-    "big_title": "Guardadas",
     "count": {
       "one": "%{count} receta",
       "other": "%{count} recetas"
@@ -40,6 +37,7 @@
     "search": "Buscar recetas",
     "empty_title": "Aún no hay nada guardado",
     "empty_body": "Convierte una receta y toca «Guardar» para conservar el tiempo y la temperatura perfectos.",
+    "no_match": "Ninguna receta coincide",
     "delete_title": "¿Eliminar «%{name}»?",
     "delete_message": "Esta acción no se puede deshacer.",
     "delete_a11y": "Eliminar %{name}",
@@ -65,7 +63,7 @@
     "pizza": "Pizza"
   },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Paga una vez. El conversor y los temporizadores siguen siendo gratis.",
     "benefit_no_banners": "Sin banners mientras cocinas",
@@ -90,7 +88,6 @@
   "settings": {
     "title": "Ajustes",
     "dark_mode": "Modo oscuro",
-    "dark_mode_subtitle": "Paleta de gris cálido",
     "analytics": "Compartir estadísticas anónimas",
     "analytics_subtitle": "Solo eventos de uso, nunca el contenido de tus recetas",
     "remove_ads": "Obtener Pro",
@@ -129,6 +126,6 @@
     "toast_shake": "Agitar a la mitad · %{label}",
     "toast_shake_fallback": "cocción",
     "toast_done": "Listo · %{label}",
-    "toast_started": "Temporizador · %{name}"
+    "toast_started": "Temporizador en marcha · %{name}"
   }
 }

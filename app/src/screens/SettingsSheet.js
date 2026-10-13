@@ -42,7 +42,8 @@ export default function SettingsSheet({
   return (
     <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title={t('settings.title')} leading="back" onLeading={onClose} />
+        // An X, as on the other pages that slide up.
+        <AppBar title={t('settings.title')} leading="close" onLeading={onClose} />
       ) : (
         <View style={styles.header}>
           <Text style={styles.title}>{t('settings.title')}</Text>
@@ -51,8 +52,10 @@ export default function SettingsSheet({
       )}
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-        <View style={{ paddingHorizontal: M3 ? 16 : 20 }}>
-          <Row label={t('settings.dark_mode')} subtitle={t('settings.dark_mode_subtitle')}>
+        {/* Android's rows carry their own side padding, so a press ripples
+            from edge to edge. */}
+        <View style={{ paddingHorizontal: M3 ? 0 : 20 }}>
+          <Row label={t('settings.dark_mode')}>
             <Toggle
               value={mode === 'dark'}
               onValueChange={(v) => setMode?.(v ? 'dark' : 'light')}
@@ -180,6 +183,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: 72,
     paddingVertical: 8,
+    paddingHorizontal: 16,
     gap: 16,
   } : {
     flexDirection: 'row',
@@ -195,8 +199,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   rowLabel: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
     color: C.ink,
   } : {
     fontFamily: FONT.ui,
@@ -212,13 +216,13 @@ const makeStyles = (C) => StyleSheet.create({
   } : {
     fontFamily: FONT.ui,
     fontSize: 12,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 2,
   },
   rowDetail: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: C.ink50,
+    color: C.ink70,
   },
   chevron: {
     fontFamily: FONT.ui,

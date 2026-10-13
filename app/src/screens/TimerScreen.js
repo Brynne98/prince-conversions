@@ -233,7 +233,7 @@ const makeStyles = (C) => StyleSheet.create({
   labelText: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 8,
     fontWeight: '500',
   },
@@ -262,8 +262,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   halfLabel: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
     color: C.ink,
   } : {
     fontFamily: FONT.ui,
@@ -279,7 +279,7 @@ const makeStyles = (C) => StyleSheet.create({
   } : {
     fontFamily: FONT.ui,
     fontSize: 12,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 2,
   },
   actionRow: {
@@ -329,7 +329,7 @@ const makeStyles = (C) => StyleSheet.create({
   doneSub: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 8,
     fontWeight: '500',
   },

@@ -8,7 +8,6 @@
     "delete": "Löschen",
     "oven": "Ofen",
     "air_fryer": "Airfryer",
-    "air_short": "Airfryer",
     "min": "Min.",
     "hr": "Std."
   },
@@ -31,8 +30,6 @@
     "timer_label": "Airfryer %{temp}"
   },
   "saved": {
-    "title": "Meine Rezepte",
-    "big_title": "Gespeichert",
     "count": {
       "one": "%{count} Rezept",
       "other": "%{count} Rezepte"
@@ -40,6 +37,7 @@
     "search": "Rezepte suchen",
     "empty_title": "Noch nichts gespeichert",
     "empty_body": "Rechne ein Rezept um und tippe auf „Speichern“, um deine perfekte Zeit und Temperatur zu behalten.",
+    "no_match": "Keine passenden Rezepte",
     "delete_title": "„%{name}“ löschen?",
     "delete_message": "Das lässt sich nicht rückgängig machen.",
     "delete_a11y": "%{name} löschen",
@@ -65,7 +63,7 @@
     "pizza": "Pizza"
   },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Einmal zahlen. Umrechner und Timer bleiben kostenlos.",
     "benefit_no_banners": "Keine Banner beim Kochen",
@@ -90,7 +88,6 @@
   "settings": {
     "title": "Einstellungen",
     "dark_mode": "Dunkelmodus",
-    "dark_mode_subtitle": "Warme Anthrazit-Palette",
     "analytics": "Anonyme Nutzungsdaten teilen",
     "analytics_subtitle": "Nur Nutzungsereignisse, nie Rezeptinhalte",
     "remove_ads": "Pro holen",
@@ -129,6 +126,6 @@
     "toast_shake": "Zur Halbzeit schütteln · %{label}",
     "toast_shake_fallback": "Essen",
     "toast_done": "Fertig · %{label}",
-    "toast_started": "Timer · %{name}"
+    "toast_started": "Timer läuft · %{name}"
   }
 }
