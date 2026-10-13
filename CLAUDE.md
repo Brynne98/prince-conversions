@@ -22,8 +22,10 @@ Only on Brynne's say-so, every time.
   `npx eas-cli build --platform ios --profile production --auto-submit`
   (build on EAS, then send to App Store Connect / TestFlight). Build numbers
   are kept on EAS (`appVersionSource: remote`, `autoIncrement`).
-- **Android:** no release command yet. `eas.json` has no Android submit
-  settings.
+- **Android:** `./build-and-submit.sh android`. Same build, then sent to
+  Google Play's internal testing track as a draft: press release in Play
+  Console to hand it to testers. The Google upload key is kept on the Expo
+  account, not in the repo.
 
 ## Local checks
 
