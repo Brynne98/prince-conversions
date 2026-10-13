@@ -26,12 +26,27 @@ Only on Brynne's say-so, every time.
   Google Play's internal testing track as a draft: press release in Play
   Console to hand it to testers. The Google upload key is kept on the Expo
   account, not in the repo.
+- **App Store listing text:** `app/store.config.json` holds the name,
+  subtitle, description, keywords, promo text and What's New for all nine
+  App Store languages. Before a release, write the new What's New in every
+  language, then run `npx eas-cli metadata:push` in `app/`. It changes text
+  only: the file lists no screenshots and no review contact (the repo is
+  public), and a language missing from the file is left as it is, not removed.
+  Apple refuses the push while a version waits for review. After editing text
+  in App Store Connect by hand, copy it back into the file;
+  `npx eas-cli metadata:pull` overwrites the file and adds the review contact
+  and screenshots, so never commit its output as it comes.
+- **Google Play listing text:** `app/store/google-play/<language>/`, typed
+  into Play Console by hand. The name and full description must match the
+  App Store ones; the short description is Play's own.
 
 ## Local checks
 
 - `npx expo export --platform all` (run in `app/`) must exit 0.
 - `node scripts/check-locales.js` (run in `app/`) must exit 0: every language
   file in `app/src/i18n/locales/` holds the same keys as `en.json`.
+- `node scripts/check-store-listing.js` (run in `app/`) must exit 0: no empty
+  listing field, nothing over a store's length limit, in either store.
 - iOS run: `LANG=en_US.UTF-8 npx expo run:ios` (pod install crashes without it).
 - Android run: AVD `AFC_Test_API_36` (`-port 5560 -no-window`), then
   `ANDROID_HOME=$HOME/Library/Android/sdk npx expo run:android --device AFC_Test_API_36`.
