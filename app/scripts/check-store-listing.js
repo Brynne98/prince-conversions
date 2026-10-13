@@ -20,7 +20,9 @@ const fail = (msg) => { console.log(msg); bad += 1; };
 const size = (s) => [...s].length;
 
 // The repo is public, and a push must change text only.
-if (apple.review) fail('apple: review contact block must stay out of the repo');
+for (const key of Object.keys(apple)) {
+  if (key !== 'copyright' && key !== 'info') fail(`apple: ${key} must stay out of the file`);
+}
 
 for (const lang of APPLE) {
   const info = apple.info[lang];

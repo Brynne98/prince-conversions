@@ -2,13 +2,6 @@
   "configVersion": 0,
   "apple": {
     "copyright": "2026 Brynne Prince",
-    "release": {
-      "automaticRelease": true
-    },
-    "categories": [
-      "FOOD_AND_DRINK",
-      "UTILITIES"
-    ],
     "info": {
       "en-US": {
         "title": "Oven to Air Fryer Converter",
