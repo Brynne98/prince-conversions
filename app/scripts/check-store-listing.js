@@ -4,10 +4,7 @@
 const fs = require('fs');
 
 const apple = require('../store.config.json').apple;
-// Written and kept, but not on the App Store: a push only sends the languages
-// in store.config.json. Move one back there to put it on the store again.
-const held = require('../store/apple-held-languages.json').info;
-const info = { ...held, ...apple.info };
+const { info } = apple;
 const playDir = `${__dirname}/../store/google-play`;
 
 // English (U.K.) and Spanish (Mexico) reuse the English and Spanish text.
@@ -31,7 +28,6 @@ for (const key of Object.keys(apple)) {
 for (const lang of APPLE) {
   const text = info[lang];
   if (!text) { fail(`apple ${lang}: missing`); continue; }
-  if (apple.info[lang] && held[lang]) fail(`apple ${lang}: in both files`);
   if (text.screenshots) fail(`apple ${lang}: screenshots must not be listed`);
   for (const [field, max] of Object.entries(APPLE_MAX)) {
     const value = text[field] ?? '';
@@ -66,5 +62,5 @@ for (const [lang, from] of Object.entries(PLAY)) {
   if (read('full_description') !== text.description) fail(`play ${lang}: full_description differs from the App Store one`);
 }
 
-console.log(bad ? `${bad} problem(s)` : `ok: ${APPLE.length} App Store languages (${Object.keys(apple.info).join(', ')} pushed), ${Object.keys(PLAY).length} Google Play languages`);
+console.log(bad ? `${bad} problem(s)` : `ok: ${APPLE.length} App Store languages, ${Object.keys(PLAY).length} Google Play languages`);
 process.exit(bad ? 1 : 0);

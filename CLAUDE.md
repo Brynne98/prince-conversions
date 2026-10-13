@@ -29,10 +29,9 @@ Only on Brynne's say-so, every time.
 - **App Store listing text:** `app/store.config.json` holds the name,
   subtitle, description, keywords, promo text and What's New for the
   languages on the App Store: the seven the app speaks (English, German,
-  French, Spanish, Italian, Dutch, Portuguese Brazil). It replaces the text
-  once typed into App Store Connect by hand. English (U.K.) and Spanish
-  (Mexico) are kept in `app/store/apple-held-languages.json` and not pushed;
-  move one into `store.config.json` to put it on the store. Before a release,
+  French, Spanish, Italian, Dutch, Portuguese Brazil), plus English (U.K.)
+  and Spanish (Mexico), which must repeat the English and Spanish text. It
+  replaces the text once typed into App Store Connect by hand. Before a release,
   write the new What's New in every language, then run
   `npx eas-cli metadata:push` in `app/`. It changes text only: the file lists
   no screenshots and no review contact (the repo is public). A push never

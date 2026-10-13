@@ -26,6 +26,29 @@
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
         "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
       },
+      "en-GB": {
+        "title": "Oven to Air Fryer Converter",
+        "subtitle": "Cook Time Calculator & Timer",
+        "promoText": "Convert any oven recipe to air fryer time and temperature in one tap. Works both ways, in °F or °C, with a built-in cook timer and a halfway shake reminder.",
+        "description": "The simplest way to convert recipes between your oven and air fryer - in either direction.\nType in the temperature and time, and Air Fryer Converter instantly shows you the equivalent settings. Cooking an oven recipe in your air fryer? Done. Found an air fryer recipe, but only have an oven? Just flip the direction with one tap.\n\nConvert both ways - oven to air fryer, air fryer to oven\nWorks in °C and °F - switch anytime\nSave your favorite conversions as named recipes with emojis\nBuilt-in cooking timer with a smart halfway-point alert - perfect for flipping or shaking food\nBeautiful dark mode\nClean, simple, distraction-free\n\nStop guessing how long to cook chicken, fries, or vegetables. Stop overcooking dinner. Just enter your recipe and start cooking - Air Fryer Converter does the math.\nPro version - Remove ads with a single one-time purchase. No subscriptions, ever.",
+        "keywords": [
+          "airfryer",
+          "convertor",
+          "conversion",
+          "chart",
+          "recipes",
+          "temperature",
+          "cooking",
+          "convection",
+          "celsius",
+          "fahrenheit",
+          "calc"
+        ],
+        "releaseNotes": "• Now in German, French, Spanish, Italian, Dutch and Portuguese\n• Small improvements and fixes",
+        "marketingUrl": "https://brynne98.github.io/prince-conversions/",
+        "supportUrl": "https://brynne98.github.io/prince-conversions/",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+      },
       "de-DE": {
         "title": "Ofen & Airfryer Umrechner",
         "subtitle": "Rezept Zeit & Temperatur",
@@ -74,6 +97,29 @@
         "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
       },
       "es-ES": {
+        "title": "Convertidor Freidora de Aire",
+        "subtitle": "Calculadora de tiempo y temp",
+        "promoText": "Convierte cualquier receta de horno a tiempo y temperatura de freidora de aire con un toque. En ambos sentidos, en °C o °F, con temporizador y aviso a mitad de cocción.",
+        "description": "La forma más sencilla de convertir recetas entre tu horno y tu freidora de aire, en ambos sentidos.\nIntroduce la temperatura y el tiempo, y la app te muestra al instante los ajustes equivalentes. ¿Quieres cocinar una receta de horno en tu freidora de aire? Hecho. ¿Has encontrado una receta para freidora de aire pero solo tienes horno? Cambia el sentido con un toque.\n\nConvierte en ambos sentidos: de horno a freidora de aire y al revés\nFunciona en °C y °F: cambia cuando quieras\nGuarda tus conversiones favoritas como recetas con nombre y emoji\nTemporizador integrado con aviso a mitad de cocción: ideal para dar la vuelta o agitar\nModo oscuro\nLimpio, sencillo, sin distracciones\n\nDeja de adivinar cuánto tardan el pollo, las patatas fritas o las verduras. Introduce tu receta y empieza a cocinar.\nVersión Pro: quita los anuncios con una única compra. Sin suscripciones.",
+        "keywords": [
+          "cocina",
+          "horno",
+          "receta",
+          "hornear",
+          "asar",
+          "recalentar",
+          "celsius",
+          "fahrenheit",
+          "temporizador",
+          "airfryer",
+          "patatas"
+        ],
+        "releaseNotes": "• La app ya está en español\n• Pequeñas mejoras y correcciones",
+        "marketingUrl": "https://brynne98.github.io/prince-conversions/",
+        "supportUrl": "https://brynne98.github.io/prince-conversions/",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+      },
+      "es-MX": {
         "title": "Convertidor Freidora de Aire",
         "subtitle": "Calculadora de tiempo y temp",
         "promoText": "Convierte cualquier receta de horno a tiempo y temperatura de freidora de aire con un toque. En ambos sentidos, en °C o °F, con temporizador y aviso a mitad de cocción.",
