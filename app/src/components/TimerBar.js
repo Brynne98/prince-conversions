@@ -84,6 +84,7 @@ export default function TimerStack({
         <Pressable
           style={StyleSheet.absoluteFill}
           onPress={() => setExpanded(false)}
+          accessibilityRole="button"
           accessibilityLabel={t('common.close')}
         />
       </Animated.View>
