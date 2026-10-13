@@ -358,11 +358,11 @@ function AppleSheet({ visible, onClose, children }) {
   );
 }
 
-// Material 3's modal bottom sheet, opened at full height. A drag down, a tap
-// outside and the back button all close it.
+// Material 3's modal bottom sheet, opened as tall as it goes. A drag down, a
+// tap outside and the back button all close it.
 function MaterialSheet({ visible, onClose, children }) {
   const { C, mode } = useTheme();
-  const { Host, ModalBottomSheet, RNHostView } = Compose;
+  const { Host, ModalBottomSheet, Column, RNHostView } = Compose;
   const ref = useRef(null);
   // The sheet stays mounted while it slides away after a close the app asked for.
   const [shown, setShown] = useState(visible);
@@ -382,9 +382,12 @@ function MaterialSheet({ visible, onClose, children }) {
         containerColor={C.cream}
         contentColor={C.ink}
       >
-        <RNHostView modifiers={[composeModifiers.fillMaxHeight()]}>
-          <View style={{ flex: 1 }}>{children}</View>
-        </RNHostView>
+        {/* Short of full height, so the screen behind and the rounded corners still show. */}
+        <Column modifiers={[composeModifiers.fillMaxHeight(0.92)]}>
+          <RNHostView>
+            <View style={{ flex: 1 }}>{children}</View>
+          </RNHostView>
+        </Column>
       </ModalBottomSheet>
     </Host>
   );
