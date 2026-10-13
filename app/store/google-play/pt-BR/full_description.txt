@@ -1,0 +1,12 @@
+A forma mais simples de converter receitas entre seu forno e a airfryer - nos dois sentidos.
+Digite a temperatura e o tempo, e o Conversor Airfryer mostra instantaneamente os ajustes equivalentes. Quer fazer uma receita de forno na airfryer? Pronto. Encontrou uma receita de airfryer mas só tem forno? Inverta o sentido com um toque.
+
+Converte nos dois sentidos: forno para airfryer e airfryer para forno
+Funciona em °C e °F: troque quando quiser
+Salve suas conversões favoritas como receitas com nome e emoji
+Timer integrado com alerta na metade do tempo: perfeito para virar ou sacudir os alimentos
+Lindo modo escuro
+Simples, limpo, sem distrações
+
+Pare de adivinhar o tempo de frango, batata frita ou legumes. Digite sua receita e comece a cozinhar.
+Versão Pro: remova os anúncios com uma única compra. Sem assinaturas.
