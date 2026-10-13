@@ -479,7 +479,8 @@ function Root({ themeChoice }) {
 
       {/* Short messages sit at the top, clear of the buttons that raise them
           and of the timers at the bottom: between the two top-bar buttons on
-          iOS (both screens keep it empty), under the app bar on Android. */}
+          iOS, under the app bar on Android. On iOS that gap holds no title a
+          message could hide, only the Converter's small label. */}
       {toast && (
         <View pointerEvents="none" style={[styles.toastWrap, { top: topInset + (M3 ? 68 : 8) }]}>
           <View style={styles.toast}>
