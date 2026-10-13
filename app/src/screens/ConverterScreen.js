@@ -11,20 +11,14 @@ import { BannerAd } from '../ads';
 import {
   Bookmark, Flame, Gear, List, MaterialList, MaterialSettings, Swap, Play, ShareIcon,
 } from '../icons';
-import { convert, fToC, cToF } from '../convert';
+import { convert, fToC, cToF, formatMinutes } from '../convert';
 import { capture } from '../analytics';
+import { t } from '../i18n';
 
 const STORE_URL = Platform.select({
   android: 'https://play.google.com/store/apps/details?id=com.brynneprince.airfryerconverter',
   default: 'https://apps.apple.com/app/id6764600062',
 });
-
-function fmtMinutes(m) {
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60);
-  const rest = m % 60;
-  return rest ? `${h} hr ${rest} min` : `${h} hr`;
-}
 
 export default function ConverterScreen({
   unit, setUnit,
@@ -49,19 +43,23 @@ export default function ConverterScreen({
   const tempMax = unit === 'F' ? 500 : 260;
 
   const isOvenToAir = direction === 'oven-to-air';
-  const sourceLabel = cap(isOvenToAir ? 'Oven recipe' : 'Air fryer recipe');
-  const targetLabel = cap(isOvenToAir ? 'Air fryer' : 'Oven');
+  const sourceLabel = cap(t(isOvenToAir ? 'converter.oven_recipe' : 'converter.air_fryer_recipe'));
+  const targetLabel = cap(t(isOvenToAir ? 'common.air_fryer' : 'common.oven'));
 
   // "425°F oven for 25 min → 400°F air fryer for 20 min"
   const share = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const from = `${ovenTemp}°${unit} ${isOvenToAir ? 'oven' : 'air fryer'} for ${fmtMinutes(ovenTime)}`;
-    const to = `${result.temp}°${targetUnit} ${isOvenToAir ? 'air fryer' : 'oven'} for ${fmtMinutes(result.time)}`;
-    const message = `${from} → ${to}\n\nConverted with Air Fryer Converter\n${STORE_URL}`;
+    const from = t(isOvenToAir ? 'converter.share_oven' : 'converter.share_air', {
+      temp: `${ovenTemp}°${unit}`, time: formatMinutes(ovenTime),
+    });
+    const to = t(isOvenToAir ? 'converter.share_air' : 'converter.share_oven', {
+      temp: `${result.temp}°${targetUnit}`, time: formatMinutes(result.time),
+    });
+    const message = `${from} → ${to}\n\n${t('converter.share_footer')}\n${STORE_URL}`;
     try {
       // Message only: the link is already in the text, and passing it as a
       // separate `url` on iOS makes Messages send it twice.
-      const res = await Share.share({ message }, { subject: 'Air fryer conversion' });
+      const res = await Share.share({ message }, { subject: t('converter.share_subject') });
       if (res.action === Share.sharedAction) {
         capture('result_shared', { direction, source_unit: unit, target_unit: targetUnit });
       }
@@ -98,13 +96,13 @@ export default function ConverterScreen({
     <View style={[styles.root, { paddingTop: topInset }]}>
       {/* Top bar */}
       <View style={styles.topBar}>
-        <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel="Saved recipes">
+        <RoundButton onPress={onOpenSaved} size={44} accessibilityLabel={t('converter.saved_recipes')}>
           {M3 ? <MaterialList s={22} /> : <List s={20} />}
         </RoundButton>
         <View style={styles.topTitleWrap}>
-          <Text style={styles.kicker}>CONVERT</Text>
+          <Text style={styles.kicker}>{t('converter.kicker').toUpperCase()}</Text>
         </View>
-        <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel="Settings">
+        <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel={t('settings.title')}>
           {M3 ? <MaterialSettings s={22} /> : <Gear s={19} />}
         </RoundButton>
       </View>
@@ -113,8 +111,8 @@ export default function ConverterScreen({
       <View style={styles.directionRow}>
         <Segmented
           options={[
-            { value: 'oven-to-air', label: 'Oven → Air fryer' },
-            { value: 'air-to-oven', label: 'Air fryer → Oven' },
+            { value: 'oven-to-air', label: t('converter.oven_to_air') },
+            { value: 'air-to-oven', label: t('converter.air_to_oven') },
           ]}
           value={direction}
           onChange={setDirection}
@@ -165,7 +163,7 @@ export default function ConverterScreen({
 
         {/* Flip arrow */}
         <View style={{ alignItems: 'center', marginVertical: 12 }}>
-          <GlassPressable onPress={flip} hitSlop={10} style={styles.flipBtn} accessibilityLabel="Swap direction">
+          <GlassPressable onPress={flip} hitSlop={10} style={styles.flipBtn} accessibilityLabel={t('converter.swap')}>
             <Animated.View style={{ transform: [{ rotate: spinDeg }] }}>
               <Swap s={M3 ? 20 : 18} c={C.terracotta} />
             </Animated.View>
@@ -186,7 +184,7 @@ export default function ConverterScreen({
               <GlassPressable
                 onPress={share}
                 hitSlop={8}
-                accessibilityLabel="Share conversion"
+                accessibilityLabel={t('converter.share')}
                 clear
                 scheme="light"
                 style={({ pressed }) => [styles.shareBtn, { opacity: pressed ? 0.6 : 1 }]}
@@ -214,7 +212,7 @@ export default function ConverterScreen({
                 {result.temp}
                 <Text style={styles.resultBigSuffix}>°{targetUnit}</Text>
               </Text>
-              <Text style={styles.resultLabel}>{cap('Temperature')}</Text>
+              <Text style={styles.resultLabel}>{cap(t('converter.temperature'))}</Text>
             </View>
             <View style={styles.resultDivider} />
             <View style={styles.resultCol}>
@@ -227,18 +225,18 @@ export default function ConverterScreen({
                 {result.time < 60 ? (
                   <>
                     {result.time}
-                    <Text style={styles.resultBigSuffix}> min</Text>
+                    <Text style={styles.resultBigSuffix}> {t('common.min')}</Text>
                   </>
                 ) : (
                   <>
                     {Math.floor(result.time / 60)}
-                    <Text style={styles.resultBigSuffix}>hr</Text>
+                    <Text style={styles.resultBigSuffix}>{t('common.hr')}</Text>
                     {result.time % 60 > 0 ? ` ${result.time % 60}` : ''}
-                    {result.time % 60 > 0 ? <Text style={styles.resultBigSuffix}>min</Text> : null}
+                    {result.time % 60 > 0 ? <Text style={styles.resultBigSuffix}>{t('common.min')}</Text> : null}
                   </>
                 )}
               </Text>
-              <Text style={styles.resultLabel}>{cap('Time')}</Text>
+              <Text style={styles.resultLabel}>{cap(t('converter.time'))}</Text>
             </View>
           </View>
 
@@ -253,7 +251,14 @@ export default function ConverterScreen({
               style={({ pressed }) => [styles.actionBtn, styles.actionPrimary, { opacity: pressed ? 0.85 : 1 }]}
             >
               <Play s={14} c={C.terracotta} />
-              <Text style={[styles.actionBtnText, { color: C.terracotta }]}>Start timer</Text>
+              <Text
+                style={[styles.actionBtnText, { color: C.terracotta }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
+                {t('converter.start_timer')}
+              </Text>
             </GlassPressable>
             <GlassPressable
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onSave(); }}
@@ -262,7 +267,14 @@ export default function ConverterScreen({
               style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
             >
               <Bookmark s={16} c={C.onTerracotta} />
-              <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>Save</Text>
+              <Text
+                style={[styles.actionBtnText, { color: C.onTerracotta }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
+                {t('common.save')}
+              </Text>
             </GlassPressable>
           </View>
         </LinearGradient>
@@ -427,6 +439,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 8,
+    paddingHorizontal: 12,
   },
   actionPrimary: {
     flex: 2,
@@ -436,7 +449,9 @@ const makeStyles = (C) => StyleSheet.create({
     flex: 1,
     backgroundColor: C.onTerracotta18,
   },
+  // Shrinks a little for a long word, such as the French for Save.
   actionBtnText: {
+    flexShrink: 1,
     fontFamily: FONT.ui,
     fontSize: 15,
     fontWeight: M3 ? '500' : '600',

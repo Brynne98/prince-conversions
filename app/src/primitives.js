@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, useTheme, useStyles } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close, ArrowBack, Check } from './icons';
+import { t } from './i18n';
 
 // Expo's SwiftUI pieces, for the one thing React Native's own sheet cannot do:
 // stop at half height. They exist on iOS only, so they are loaded only there.
@@ -127,7 +128,7 @@ function TimeRich({ minutes, baseStyle, suffixStyle }) {
     return (
       <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
         {minutes}
-        <Text style={suffixStyle}> min</Text>
+        <Text style={suffixStyle}> {t('common.min')}</Text>
       </Text>
     );
   }
@@ -136,9 +137,9 @@ function TimeRich({ minutes, baseStyle, suffixStyle }) {
   return (
     <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
       {h}
-      <Text style={suffixStyle}>hr</Text>
+      <Text style={suffixStyle}>{t('common.hr')}</Text>
       {m > 0 ? ` ${m}` : ''}
-      {m > 0 ? <Text style={suffixStyle}>min</Text> : null}
+      {m > 0 ? <Text style={suffixStyle}>{t('common.min')}</Text> : null}
     </Text>
   );
 }
@@ -230,7 +231,7 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
 export function CloseButton({ onPress, size = 44 }) {
   const { C } = useTheme();
   return (
-    <RoundButton onPress={onPress} size={size} tone="flat" accessibilityLabel="Close">
+    <RoundButton onPress={onPress} size={size} tone="flat" accessibilityLabel={t('common.close')}>
       <Close s={18} c={C.ink70} />
     </RoundButton>
   );
@@ -305,7 +306,7 @@ export function Sheet({ visible, onClose, handle = true, bottom = false, childre
         onRequestClose={onClose}
       >
         <View style={styles.scrim}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" />
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel={t('common.close')} />
           <View style={[styles.bottomSheet, { paddingBottom: insets.bottom + 16 }]}>
             <View style={styles.bottomHandle} />
             {children}
@@ -365,7 +366,7 @@ let scheme = 'light'; // the app's own light or dark, which the system does not 
 // dialog. Same arguments as Alert.alert.
 export function alert(title, message, buttons) {
   if (OWN_DIALOGS && present) {
-    present({ title, message, buttons: buttons?.length ? buttons : [{ text: 'OK' }] });
+    present({ title, message, buttons: buttons?.length ? buttons : [{ text: t('common.ok') }] });
     return;
   }
   Alert.alert(title, message, buttons, { userInterfaceStyle: scheme });
@@ -377,7 +378,7 @@ export function alert(title, message, buttons) {
 export function confirmDestructive({ title, message, confirmLabel, onConfirm, anchor }) {
   if (OWN_DIALOGS) {
     alert(title, message, [
-      { text: 'Cancel', style: 'cancel' },
+      { text: t('common.cancel'), style: 'cancel' },
       { text: confirmLabel, onPress: onConfirm },
     ]);
     return;
@@ -386,7 +387,7 @@ export function confirmDestructive({ title, message, confirmLabel, onConfirm, an
     {
       title,
       message,
-      options: ['Cancel', confirmLabel],
+      options: [t('common.cancel'), confirmLabel],
       cancelButtonIndex: 0,
       destructiveButtonIndex: 1,
       anchor,

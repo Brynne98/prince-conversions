@@ -30,6 +30,8 @@ Only on Brynne's say-so, every time.
 ## Local checks
 
 - `npx expo export --platform all` (run in `app/`) must exit 0.
+- `node scripts/check-locales.js` (run in `app/`) must exit 0: every language
+  file in `app/src/i18n/locales/` holds the same keys as `en.json`.
 - iOS run: `LANG=en_US.UTF-8 npx expo run:ios` (pod install crashes without it).
 - Android run: AVD `AFC_Test_API_36` (`-port 5560 -no-window`), then
   `ANDROID_HOME=$HOME/Library/Android/sdk npx expo run:android --device AFC_Test_API_36`.

@@ -9,6 +9,7 @@ import { RoundButton, Segmented, confirmDestructive } from '../primitives';
 import { GLASS, M3, GlassSurface } from '../glass';
 import { BannerAd } from '../ads';
 import { cToF, fToC, formatMinutesShort } from '../convert';
+import { t } from '../i18n';
 
 export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0, bottomInset = 0 }) {
   const { C, mode } = useTheme();
@@ -21,7 +22,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
     [items, query],
   );
 
-  const count = `${items.length} ${items.length === 1 ? 'recipe' : 'recipes'}`;
+  const count = t('saved.count', { count: items.length });
   const unitToggle = (
     <Segmented
       compact
@@ -33,7 +34,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
   const modeToggle = (
     <Segmented
       compact
-      options={[{ value: 'air', label: M3 ? 'Air' : 'Air fryer' }, { value: 'oven', label: 'Oven' }]}
+      options={[{ value: 'air', label: t(M3 ? 'common.air_short' : 'common.air_fryer') }, { value: 'oven', label: t('common.oven') }]}
       value={displayMode}
       onChange={setDisplayMode}
     />
@@ -44,7 +45,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
       <TextInput
         value={query}
         onChangeText={setQuery}
-        placeholder="Search recipes"
+        placeholder={t('saved.search')}
         placeholderTextColor={M3 ? C.ink70 : C.ink50}
         style={styles.searchInput}
         autoCorrect={false}
@@ -57,10 +58,10 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
       <View style={styles.topBar}>
-        <RoundButton onPress={onClose} size={44} accessibilityLabel="Back">
+        <RoundButton onPress={onClose} size={44} accessibilityLabel={t('common.back')}>
           {M3 ? <ArrowBack s={22} /> : <Back s={20} />}
         </RoundButton>
-        <Text style={styles.topTitle}>My Recipes</Text>
+        <Text style={styles.topTitle}>{t('saved.title')}</Text>
         <View style={{ width: 44 }} />
       </View>
 
@@ -75,7 +76,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         </View>
       ) : (
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-          <Text style={styles.bigTitle}>Saved</Text>
+          <Text style={styles.bigTitle}>{t('saved.big_title')}</Text>
           <Text style={styles.subtitle}>{count}</Text>
           <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
           {searchBar}
@@ -89,10 +90,8 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         {filtered.length === 0 ? (
           <View style={styles.empty}>
             <Text style={{ fontSize: 44, marginBottom: 8 }}>🥘</Text>
-            <Text style={styles.emptyTitle}>Nothing saved yet</Text>
-            <Text style={styles.emptyBody}>
-              Convert a recipe and tap “Save” to keep{'\n'}your perfect time and temperature.
-            </Text>
+            <Text style={styles.emptyTitle}>{t('saved.empty_title')}</Text>
+            <Text style={styles.emptyBody}>{t('saved.empty_body')}</Text>
           </View>
         ) : (
           <View style={{ gap: M3 ? 2 : 10 }}>
@@ -106,9 +105,9 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
                 last={i === filtered.length - 1}
                 onDelete={(e) => {
                   confirmDestructive({
-                    title: `Delete “${it.name}”?`,
-                    message: 'This can’t be undone.',
-                    confirmLabel: 'Delete',
+                    title: t('saved.delete_title', { name: it.name }),
+                    message: t('saved.delete_message'),
+                    confirmLabel: t('common.delete'),
                     // iOS 26 grows the sheet out of the bin button.
                     anchor: findNodeHandle(e?.currentTarget) ?? undefined,
                     onConfirm: () => {
@@ -146,7 +145,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
   const time = isAir ? item.afTime : item.ovenTime;
   const tagBg = isAir ? C.terracottaSoft : C.creamDeep;
   const tagFg = isAir ? C.terracottaDeep : C.ink70;
-  const label = isAir ? 'Air' : 'Oven';
+  const label = t(isAir ? 'common.air_short' : 'common.oven');
 
   const summary = `${label} ${temp}°${unit} · ${formatMinutesShort(time)}`;
 
@@ -171,7 +170,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
           <Text style={styles.rowSupport}>{summary}</Text>
           {!!item.note && <Text style={styles.rowSupport} numberOfLines={1}>{item.note}</Text>}
         </View>
-        <RoundButton onPress={onDelete} tone="plain" accessibilityLabel={`Delete ${item.name}`}>
+        <RoundButton onPress={onDelete} tone="plain" accessibilityLabel={t('saved.delete_a11y', { name: item.name })}>
           <Trash s={22} />
         </RoundButton>
       </Pressable>
@@ -197,7 +196,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
           <Text style={styles.note}>“{item.note}”</Text>
         )}
       </View>
-      <RoundButton onPress={onDelete} size={40} tone="flat" accessibilityLabel={`Delete ${item.name}`}>
+      <RoundButton onPress={onDelete} size={40} tone="flat" accessibilityLabel={t('saved.delete_a11y', { name: item.name })}>
         <Trash s={18} />
       </RoundButton>
     </Pressable>
