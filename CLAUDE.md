@@ -28,22 +28,23 @@ Only on Brynne's say-so, every time.
   account, not in the repo.
 - **App Store listing text:** `app/store.config.json` holds the name,
   subtitle, description, keywords, promo text and What's New for the
-  languages on the App Store: English (U.S.) only, by Brynne's choice
-  (AFC-39). The other eight are written and kept in
-  `app/store/apple-held-languages.json`; move one into `store.config.json`
-  to put it on the store. Before a release, write the new What's New in every
-  language, then run `npx eas-cli metadata:push` in `app/`. It changes text
-  only: the file lists no screenshots and no review contact (the repo is
-  public). A push never removes a language; that is done by hand in App Store
-  Connect.
+  languages on the App Store: the seven the app speaks (English, German,
+  French, Spanish, Italian, Dutch, Portuguese Brazil). It replaces the text
+  once typed into App Store Connect by hand. English (U.K.) and Spanish
+  (Mexico) are kept in `app/store/apple-held-languages.json` and not pushed;
+  move one into `store.config.json` to put it on the store. Before a release,
+  write the new What's New in every language, then run
+  `npx eas-cli metadata:push` in `app/`. It changes text only: the file lists
+  no screenshots and no review contact (the repo is public). A push never
+  removes a language; that is done by hand in App Store Connect.
   Apple refuses the push while a version waits for review. After editing text
   in App Store Connect by hand, copy it back into the file;
   `npx eas-cli metadata:pull` overwrites the file and adds the review contact
   and screenshots, so never commit its output as it comes.
-- **Google Play listing text:** `app/store/google-play/<language>/`, typed
-  into Play Console by hand. The name and full description must match the
-  App Store ones; the short description is Play's own. Only English is on
-  Play; the other six wait, as on the App Store.
+- **Google Play listing text:** `app/store/google-play/<language>/`, the same
+  seven languages, typed into Play Console by hand. The name and full
+  description must match the App Store ones; the short description is Play's
+  own.
 
 ## Local checks
 
