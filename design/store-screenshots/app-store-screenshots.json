@@ -12,7 +12,7 @@
     "nl",
     "pt"
   ],
-  "locale": "en",
+  "locale": "de",
   "device": "iphone",
   "orientation": "portrait",
   "appIcon": "/app-icon.png",
@@ -167,7 +167,7 @@
           "fr": "Vos recettes,\navec un *nom*\n*et un emoji.*",
           "es": "Guarda recetas\ncon *nombre*\n*y emoji.*",
           "it": "Salva le ricette\ncon *nome*\n*ed emoji.*",
-          "nl": "Bewaar recepten\nmet *naam*\n*en emoji.*",
+          "nl": "Jouw recepten\nmet *naam*\n*en emoji.*",
           "pt": "Salve receitas\ncom *nome*\n*e emoji.*"
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/saved.png",
@@ -212,11 +212,11 @@
         },
         "headline": {
           "en": "Set it, *shake it,*\nserve it.",
-          "de": "Starten, *schütteln,*\nservieren.",
+          "de": "*Schütteln*\nnicht vergessen.",
           "fr": "Lancez, *secouez,*\nservez.",
           "es": "Pon, *agita,*\nsirve.",
           "it": "Avvia, *scuoti,*\nservi.",
-          "nl": "Starten, *schudden,*\nserveren.",
+          "nl": "*Schudden*\nniet vergeten.",
           "pt": "Inicie, *sacuda,*\nsirva."
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/timer.png",
@@ -706,7 +706,7 @@
           "fr": "Vos recettes,\navec un *nom*\n*et un emoji.*",
           "es": "Guarda recetas\ncon *nombre*\n*y emoji.*",
           "it": "Salva le ricette\ncon *nome*\n*ed emoji.*",
-          "nl": "Bewaar recepten\nmet *naam*\n*en emoji.*",
+          "nl": "Jouw recepten\nmet *naam*\n*en emoji.*",
           "pt": "Salve receitas\ncom *nome*\n*e emoji.*"
         },
         "screenshot": "/screenshots/android/phone/en/saved.png",
@@ -751,11 +751,11 @@
         },
         "headline": {
           "en": "Set it, *shake it,*\nserve it.",
-          "de": "Starten, *schütteln,*\nservieren.",
+          "de": "*Schütteln*\nnicht vergessen.",
           "fr": "Lancez, *secouez,*\nservez.",
           "es": "Pon, *agita,*\nsirve.",
           "it": "Avvia, *scuoti,*\nservi.",
-          "nl": "Starten, *schudden,*\nserveren.",
+          "nl": "*Schudden*\nniet vergeten.",
           "pt": "Inicie, *sacuda,*\nsirva."
         },
         "screenshot": "/screenshots/android/phone/en/timer.png",
