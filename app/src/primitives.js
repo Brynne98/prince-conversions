@@ -3,17 +3,16 @@ import {
   Pressable, Text, View, Animated, StyleSheet, Modal, Platform, Switch,
   Alert, ActionSheetIOS, TextInput,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, GROW, RADIUS, EDGE, buzz, useTheme, useStyles, useReduceMotion } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close, ArrowBack, Check } from './icons';
 import { t } from './i18n';
 
-// The system's own sheets, through Expo: SwiftUI's on iOS, Jetpack Compose's
-// on Android. Each exists on its own platform only, so it is loaded only there.
+// Expo's SwiftUI pieces, for Apple's own sheet. They exist on iOS only, so
+// they are loaded only there.
 const SwiftUI = Platform.OS === 'ios' ? require('@expo/ui/swift-ui') : null;
 const swiftModifiers = Platform.OS === 'ios' ? require('@expo/ui/swift-ui/modifiers') : null;
-const Compose = Platform.OS === 'android' ? require('@expo/ui/jetpack-compose') : null;
-const composeModifiers = Platform.OS === 'android' ? require('@expo/ui/jetpack-compose/modifiers') : null;
 
 // ─── Hold-to-repeat button ────────────────────────────────────────────
 function HoldButton({ onTrigger, children, style }) {
@@ -310,17 +309,19 @@ export function SheetHeader({ title, onClose, leading, trailing }) {
 }
 
 // ─── Sheet ───────────────────────────────────────────────────────────
-// Every drawer opens in the system's own sheet: Apple's on iOS 26, Material
-// 3's modal bottom sheet on Android. Both draw their own grabber. Older
-// iPhones and the web keep React Native's page sheet, with the app's grabber.
+// iOS 26 opens Apple's own sheet. Older iPhones and the web keep React
+// Native's page sheet, with the app's grabber. Android shows a full-screen
+// page, edge to edge, so the content is padded clear of the status and
+// navigation bars there (AFC-10); a page cannot be dragged away, so it has no
+// grabber.
 export function Sheet({ visible, onClose, children }) {
   const styles = useStyles(makeStyles);
-  if (M3) return <MaterialSheet visible={visible} onClose={onClose}>{children}</MaterialSheet>;
+  const insets = useSafeAreaInsets();
   if (GLASS) return <AppleSheet visible={visible} onClose={onClose}>{children}</AppleSheet>;
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <View style={styles.sheetRoot}>
-        <View style={styles.sheetHandle} />
+      <View style={[styles.sheetRoot, M3 && { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        {!M3 && <View style={styles.sheetHandle} />}
         {children}
       </View>
     </Modal>
@@ -354,41 +355,6 @@ function AppleSheet({ visible, onClose, children }) {
           </RNHostView>
         </Group>
       </BottomSheet>
-    </Host>
-  );
-}
-
-// Material 3's modal bottom sheet, opened as tall as it goes. A drag down, a
-// tap outside and the back button all close it.
-function MaterialSheet({ visible, onClose, children }) {
-  const { C, mode } = useTheme();
-  const { Host, ModalBottomSheet, Column, RNHostView } = Compose;
-  const ref = useRef(null);
-  // The sheet stays mounted while it slides away after a close the app asked for.
-  const [shown, setShown] = useState(visible);
-  useEffect(() => {
-    if (visible) { setShown(true); return undefined; }
-    let live = true;
-    Promise.resolve(ref.current?.hide()).catch(() => {}).then(() => { if (live) setShown(false); });
-    return () => { live = false; };
-  }, [visible]);
-  if (!shown) return null;
-  return (
-    <Host colorScheme={mode} style={{ position: 'absolute', width: 1, height: 1 }}>
-      <ModalBottomSheet
-        ref={ref}
-        onDismissRequest={onClose}
-        skipPartiallyExpanded
-        containerColor={C.cream}
-        contentColor={C.ink}
-      >
-        {/* Short of full height, so the screen behind and the rounded corners still show. */}
-        <Column modifiers={[composeModifiers.fillMaxHeight(0.92)]}>
-          <RNHostView>
-            <View style={{ flex: 1 }}>{children}</View>
-          </RNHostView>
-        </Column>
-      </ModalBottomSheet>
     </Host>
   );
 }

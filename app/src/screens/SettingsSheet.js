@@ -49,7 +49,7 @@ export default function SettingsSheet({
         <SheetHeader title={t('settings.title')} onClose={onClose} />
       )}
 
-      <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Android's rows carry their own side padding, so a press ripples
             from edge to edge. */}
         <View style={{ paddingHorizontal: M3 ? 0 : 20 }}>

@@ -166,7 +166,6 @@ export default function SaveSheet({
           </View>
         </AppBar>
         <ScrollView
-          nestedScrollEnabled
           contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 40, gap: 16 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
