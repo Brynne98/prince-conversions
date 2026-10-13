@@ -3,11 +3,12 @@ import {
   View, Text, Pressable, ScrollView, StyleSheet, Linking,
 } from 'react-native';
 import Constants from 'expo-constants';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, LABEL, useTheme, useStyles } from '../theme';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 const SITE_URL = 'https://brynne98.github.io/prince-conversions';
-import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
+import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
+import { Chevron } from '../icons';
 import { M3, cap } from '../glass';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
@@ -45,10 +46,7 @@ export default function SettingsSheet({
         // An X, as on the other pages that slide up.
         <AppBar title={t('settings.title')} leading="close" onLeading={onClose} />
       ) : (
-        <View style={styles.header}>
-          <Text style={styles.title}>{t('settings.title')}</Text>
-          <CloseButton onPress={onClose} />
-        </View>
+        <SheetHeader title={t('settings.title')} onClose={onClose} />
       )}
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
@@ -157,26 +155,12 @@ function PressableRow({ label, subtitle, onPress }) {
         <Text style={styles.rowLabel}>{label}</Text>
         {!!subtitle && <Text style={styles.rowSubtitle}>{subtitle}</Text>}
       </View>
-      {!M3 && <Text style={styles.chevron}>›</Text>}
+      {!M3 && <Chevron c={C.ink30} />}
     </Pressable>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontFamily: FONT.display,
-    fontSize: 22,
-    fontWeight: '500',
-    color: C.ink,
-    letterSpacing: -0.3,
-  },
   row: M3 ? {
     flexDirection: 'row',
     alignItems: 'center',
@@ -224,23 +208,17 @@ const makeStyles = (C) => StyleSheet.create({
     fontSize: 14,
     color: C.ink70,
   },
-  chevron: {
-    fontFamily: FONT.ui,
-    fontSize: 22,
-    color: C.ink30,
-    fontWeight: '300',
-  },
   proPill: {
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: M3 ? 8 : 999,
     backgroundColor: M3 ? C.terracottaSoft : C.terracotta,
   },
-  proPillText: {
+  proPillText: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 11,
-    fontWeight: M3 ? '500' : '700',
-    color: M3 ? C.terracottaDeep : C.onTerracotta,
-    letterSpacing: M3 ? 0.1 : 0.6,
-  },
+    fontWeight: '500',
+    color: C.terracottaDeep,
+    letterSpacing: 0.1,
+  } : { ...LABEL, color: C.onTerracotta },
 });

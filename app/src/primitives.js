@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FONT, GROW, useTheme, useStyles } from './theme';
+import { FONT, GROW, RADIUS, EDGE, useTheme, useStyles } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close, ArrowBack, Check } from './icons';
 import { t } from './i18n';
@@ -279,6 +279,32 @@ export function AppBar({ title, leading, onLeading, children }) {
         {title}
       </Text>
       {children}
+    </View>
+  );
+}
+
+// ─── Sheet header (iOS) ──────────────────────────────────────────────
+// The one header of every iOS sheet: the title in the centre, close on the
+// right. `leading` and `trailing` replace the two sides, for a sheet that
+// carries its own Cancel and Save.
+export function SheetHeader({ title, onClose, leading, trailing }) {
+  const styles = useStyles(makeStyles);
+  return (
+    <View style={styles.sheetHeader}>
+      <View style={styles.sheetHeaderSide}>{leading}</View>
+      <Text
+        style={styles.sheetHeaderTitle}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        maxFontSizeMultiplier={GROW.bar}
+        accessibilityRole="header"
+      >
+        {title}
+      </Text>
+      <View style={[styles.sheetHeaderSide, { alignItems: 'flex-end' }]}>
+        {trailing ?? <CloseButton onPress={onClose} />}
+      </View>
     </View>
   );
 }
@@ -709,7 +735,7 @@ const makeStyles = (C) => ({
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   roundBtn: {
@@ -721,7 +747,7 @@ const makeStyles = (C) => ({
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   roundFlat: {
@@ -759,6 +785,25 @@ const makeStyles = (C) => ({
     fontFamily: FONT.ui,
     fontSize: 22,
     lineHeight: 28,
+    color: C.ink,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  // Both sides are at least a close button wide, so a title with one button
+  // beside it still sits in the centre.
+  sheetHeaderSide: { minWidth: 44, minHeight: 44, justifyContent: 'center' },
+  // Shrinks before it touches the buttons: Cancel and Save are wider in French.
+  sheetHeaderTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontFamily: FONT.ui,
+    fontSize: 16,
+    fontWeight: '600',
     color: C.ink,
   },
   sheetRoot: { flex: 1, backgroundColor: C.cream },
@@ -866,7 +911,7 @@ const makeStyles = (C) => ({
     padding: 16,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     padding: 18,
     shadowColor: '#000',
     shadowOpacity: C.isDark ? 0.4 : 0.06,

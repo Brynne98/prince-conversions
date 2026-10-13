@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, Pressable, TextInput, StyleSheet, findNodeHandle,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, useTheme, useStyles } from '../theme';
 import { Back, Search, Trash } from '../icons';
 import { RoundButton, Segmented, AppBar, confirmDestructive } from '../primitives';
 import { GLASS, M3, GlassSurface } from '../glass';
@@ -84,7 +84,16 @@ export default function SavedScreen({
         </View>
       ) : (
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-          <Text style={styles.bigTitle} accessibilityRole="header">{t('converter.saved_recipes')}</Text>
+          <Text
+            style={styles.bigTitle}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            maxFontSizeMultiplier={GROW.display}
+            accessibilityRole="header"
+          >
+            {t('converter.saved_recipes')}
+          </Text>
           {hasItems && (
             <>
               <Text style={styles.subtitle}>{count}</Text>
@@ -261,13 +270,13 @@ const makeStyles = (C) => StyleSheet.create({
     marginTop: 12,
     backgroundColor: C.paper,
     // A glass capsule on iOS 26, like Apple's search fields.
-    borderRadius: GLASS ? 22 : 14,
+    borderRadius: GLASS ? 22 : RADIUS.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: GLASS ? 16 : 12,
     height: GLASS ? 44 : 40,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   searchInput: {
@@ -310,7 +319,7 @@ const makeStyles = (C) => StyleSheet.create({
     overflow: 'hidden',
   } : {
     backgroundColor: C.paper,
-    borderRadius: 18,
+    borderRadius: RADIUS.md,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -324,7 +333,7 @@ const makeStyles = (C) => StyleSheet.create({
   rowEmojiBox: {
     width: M3 ? 40 : 48,
     height: M3 ? 40 : 48,
-    borderRadius: M3 ? 20 : 12,
+    borderRadius: M3 ? 20 : RADIUS.sm,
     backgroundColor: C.terracottaSoft,
     alignItems: 'center',
     justifyContent: 'center',
@@ -353,7 +362,7 @@ const makeStyles = (C) => StyleSheet.create({
   tag: {
     paddingHorizontal: 7,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: RADIUS.sm,
   },
   tagText: {
     fontFamily: FONT.ui,

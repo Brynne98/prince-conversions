@@ -4,8 +4,8 @@ import {
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { FONT, GROW, useTheme, useStyles } from '../theme';
-import { Sheet, AppBar, TextButton, Field } from '../primitives';
+import { FONT, GROW, RADIUS, EDGE, LABEL, useTheme, useStyles } from '../theme';
+import { Sheet, SheetHeader, AppBar, TextButton, Field } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { formatMinutes } from '../convert';
 import { Pencil } from '../icons';
@@ -196,27 +196,29 @@ export default function SaveSheet({
 
   return (
     <Sheet visible={visible} onClose={onClose}>
-      <View style={styles.headerRow}>
-        <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
-          <Text style={styles.cancelText} maxFontSizeMultiplier={GROW.bar}>{t('common.cancel')}</Text>
-        </GlassPressable>
-        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar}>
-          {t('save.title')}
-        </Text>
-        <GlassPressable
-          onPress={save}
-          hitSlop={10}
-          disabled={!valid}
-          // Tinted glass once there is something to save, as Apple's Done.
-          tint={valid ? C.terracotta : undefined}
-          style={styles.headerBtn}
-        >
-          <Text maxFontSizeMultiplier={GROW.bar} style={[
-            styles.saveText,
-            { color: !valid ? C.ink30 : GLASS ? C.onTerracotta : C.terracotta },
-          ]}>{t('common.save')}</Text>
-        </GlassPressable>
-      </View>
+      <SheetHeader
+        title={t('save.title')}
+        leading={(
+          <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
+            <Text style={styles.cancelText} maxFontSizeMultiplier={GROW.bar}>{t('common.cancel')}</Text>
+          </GlassPressable>
+        )}
+        trailing={(
+          <GlassPressable
+            onPress={save}
+            hitSlop={10}
+            disabled={!valid}
+            // Tinted glass once there is something to save, as Apple's Done.
+            tint={valid ? C.terracotta : undefined}
+            style={styles.headerBtn}
+          >
+            <Text maxFontSizeMultiplier={GROW.bar} style={[
+              styles.saveText,
+              { color: !valid ? C.ink30 : GLASS ? C.onTerracotta : C.terracotta },
+            ]}>{t('common.save')}</Text>
+          </GlassPressable>
+        )}
+      />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -264,14 +266,6 @@ export default function SaveSheet({
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
   // A glass capsule on iOS 26; a text button with a full-height hit area elsewhere.
   headerBtn: {
     minHeight: 44,
@@ -279,25 +273,20 @@ const makeStyles = (C) => StyleSheet.create({
     ...(GLASS ? { paddingHorizontal: 18, borderRadius: 22 } : null),
   },
   cancelText: { fontFamily: FONT.ui, fontSize: 15, color: C.ink70 },
-  // Shrinks before it touches the buttons: both are wider in French.
-  title: {
-    flexShrink: 1, textAlign: 'center',
-    fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.ink,
-  },
   saveText: { fontFamily: FONT.ui, fontSize: 15, fontWeight: '600' },
   namePill: {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   nameEmojiBox: {
-    width: M3 ? 56 : 40, height: M3 ? 56 : 40, borderRadius: M3 ? 28 : 10,
+    width: M3 ? 56 : 40, height: M3 ? 56 : 40, borderRadius: M3 ? 28 : RADIUS.sm,
     backgroundColor: C.terracottaSoft,
     alignItems: 'center', justifyContent: 'center',
   },
@@ -331,8 +320,8 @@ const makeStyles = (C) => StyleSheet.create({
     flexGrow: 0,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 16,
-    borderWidth: 0.5,
+    borderRadius: RADIUS.md,
+    borderWidth: EDGE,
     borderColor: C.ink10,
     maxHeight: 220,
   },
@@ -348,16 +337,16 @@ const makeStyles = (C) => StyleSheet.create({
     height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: M3 ? 24 : 10,
+    borderRadius: M3 ? 24 : RADIUS.sm,
     overflow: 'hidden',
   },
   gridEmoji: { fontSize: 22 },
   notesBox: {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
     justifyContent: 'center',
   },
@@ -370,19 +359,19 @@ const makeStyles = (C) => StyleSheet.create({
   summary: {
     marginTop: 4,
     backgroundColor: C.terracottaSoft,
-    borderRadius: M3 ? 16 : 14,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
     gap: 6,
   },
-  summaryKicker: {
+  summaryKicker: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 10,
-    fontWeight: M3 ? '500' : '700',
+    fontWeight: '500',
     color: C.terracottaDeep,
-    letterSpacing: M3 ? 0.4 : 1,
+    letterSpacing: 0.4,
     opacity: 0.7,
-  },
+  } : { ...LABEL, color: C.terracottaDeep, opacity: 0.7 },
   // Wraps to a second line when the two halves do not fit, as in Italian.
   summaryRow: {
     flexDirection: 'row',

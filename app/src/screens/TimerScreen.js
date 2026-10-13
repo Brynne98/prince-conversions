@@ -4,9 +4,9 @@ import {
 } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
-import { FONT, GROW, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, BUTTON, useTheme, useStyles } from '../theme';
 import { Restart } from '../icons';
-import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
+import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
 import { formatRemaining } from '../timer';
 import { t } from '../i18n';
@@ -61,14 +61,11 @@ export default function TimerScreen({
   const gapTurn = (gap / circumference) * 360;
 
   return (
-    <Sheet visible={visible} onClose={onClose} handle={false}>
+    <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
         <AppBar title={t('timer.fallback_label')} leading="close" onLeading={onClose} />
       ) : (
-        <View style={styles.header}>
-          <Text style={styles.kicker} maxFontSizeMultiplier={GROW.bar}>{t('timer.fallback_label').toUpperCase()}</Text>
-          <CloseButton onPress={onClose} />
-        </View>
+        <SheetHeader title={t('timer.fallback_label')} onClose={onClose} />
       )}
 
       <View style={styles.center}>
@@ -198,21 +195,6 @@ export default function TimerScreen({
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  kicker: {
-    fontFamily: FONT.ui,
-    fontSize: 12,
-    fontWeight: '700',
-    color: C.terracotta,
-    letterSpacing: 1.6,
-  },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -251,13 +233,13 @@ const makeStyles = (C) => StyleSheet.create({
     gap: 16,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   halfLabel: M3 ? {
@@ -288,8 +270,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
-    height: 56,
-    borderRadius: GLASS || M3 ? 28 : 18,
+    height: M3 ? 56 : BUTTON.height,
+    borderRadius: M3 ? 28 : GLASS ? BUTTON.height / 2 : RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
