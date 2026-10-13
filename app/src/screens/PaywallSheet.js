@@ -52,10 +52,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
       }
     } catch (e) {
       if (!e?.userCancelled && e?.code !== 'PURCHASE_CANCELLED') {
-        alert(
-          t('paywall.purchase_failed_title'),
-          e?.message || t('paywall.purchase_failed_body'),
-        );
+        alert(t('paywall.purchase_failed_title'), t('paywall.purchase_failed_body'));
       }
     } finally {
       setBusy(false);
@@ -78,10 +75,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
       );
       if (owned) onClose?.();
     } catch (e) {
-      alert(
-        t('paywall.restore_failed_title'),
-        e?.message || t('paywall.purchase_failed_body'),
-      );
+      alert(t('paywall.restore_failed_title'), t('paywall.purchase_failed_body'));
     } finally {
       setBusy(false);
     }
@@ -94,7 +88,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
   return (
     <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title="" leading="close" onLeading={onClose} />
+        <AppBar title={t('paywall.title')} leading="close" onLeading={onClose} />
       ) : (
         <SheetHeader onClose={onClose} />
       )}
@@ -104,11 +98,15 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
         bounces={false}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{t('paywall.badge')}</Text>
-        </View>
-
-        <Text style={styles.title}>{t('paywall.title')}</Text>
+        {/* Android names the page in its bar, as every other page does. */}
+        {!M3 && (
+          <>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{t('paywall.badge').toUpperCase()}</Text>
+            </View>
+            <Text style={styles.title}>{t('paywall.title')}</Text>
+          </>
+        )}
         <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
 
         <View style={styles.benefits}>
@@ -172,19 +170,13 @@ const makeStyles = (C) => StyleSheet.create({
   },
   badge: {
     alignSelf: 'center',
-    backgroundColor: M3 ? C.terracottaSoft : C.terracotta,
+    backgroundColor: C.terracotta,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: M3 ? 8 : 999,
+    borderRadius: 999,
     marginBottom: 14,
   },
-  badgeText: M3 ? {
-    fontFamily: FONT.ui,
-    fontSize: 11,
-    fontWeight: '500',
-    color: C.terracottaDeep,
-    letterSpacing: 0.5,
-  } : { ...LABEL, color: C.onTerracotta },
+  badgeText: { ...LABEL, color: C.onTerracotta },
   title: {
     fontFamily: FONT.display,
     fontSize: 28,
@@ -197,7 +189,7 @@ const makeStyles = (C) => StyleSheet.create({
   subtitle: {
     fontFamily: FONT.ui,
     fontSize: 15,
-    color: C.ink50,
+    color: C.ink70,
     textAlign: 'center',
     lineHeight: 21,
     marginBottom: 28,
@@ -243,7 +235,7 @@ const makeStyles = (C) => StyleSheet.create({
   benefitLabel: {
     flex: 1,
     fontFamily: FONT.ui,
-    fontSize: 15,
+    fontSize: M3 ? 16 : 15,
     fontWeight: M3 ? '400' : '500',
     color: C.ink,
   },
@@ -275,7 +267,7 @@ const makeStyles = (C) => StyleSheet.create({
   footer: {
     fontFamily: FONT.ui,
     fontSize: 12,
-    color: C.ink30,
+    color: C.ink70,
     textAlign: 'center',
   },
 });

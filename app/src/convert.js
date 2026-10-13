@@ -37,14 +37,6 @@ export function formatMinutes(min) {
   return m === 0 ? `${h} ${t('common.hr')}` : `${h} ${t('common.hr')} ${m} ${t('common.min')}`;
 }
 
-// Short form for tight chips: "20m" / "1h 20m" / "2h"
-export function formatMinutesShort(min) {
-  if (min < 60) return `${min}m`;
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
-}
-
 export const FOOD_PRESETS = [
   { id: 'fries',   emoji: '🍟', tempF: 425, time: 25 },
   { id: 'chicken', emoji: '🍗', tempF: 400, time: 35 },

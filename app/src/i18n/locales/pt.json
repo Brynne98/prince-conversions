@@ -8,7 +8,6 @@
     "delete": "Excluir",
     "oven": "Forno",
     "air_fryer": "Airfryer",
-    "air_short": "Airfryer",
     "min": "min",
     "hr": "h"
   },
@@ -31,7 +30,6 @@
     "timer_label": "Airfryer %{temp}"
   },
   "saved": {
-    "title": "Minhas receitas",
     "count": {
       "one": "%{count} receita",
       "other": "%{count} receitas"
@@ -39,6 +37,7 @@
     "search": "Buscar receitas",
     "empty_title": "Nada salvo ainda",
     "empty_body": "Converta uma receita e toque em “Salvar” para guardar o tempo e a temperatura perfeitos.",
+    "no_match": "Nenhuma receita corresponde",
     "delete_title": "Excluir “%{name}”?",
     "delete_message": "Essa ação não pode ser desfeita.",
     "delete_a11y": "Excluir %{name}",
@@ -64,7 +63,7 @@
     "pizza": "Pizza"
   },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Pague uma vez. O conversor e os timers continuam grátis.",
     "benefit_no_banners": "Sem banners enquanto você cozinha",
@@ -89,7 +88,6 @@
   "settings": {
     "title": "Ajustes",
     "dark_mode": "Modo escuro",
-    "dark_mode_subtitle": "Paleta grafite quente",
     "analytics": "Compartilhar dados anônimos de uso",
     "analytics_subtitle": "Apenas eventos de uso, nunca o conteúdo das receitas",
     "remove_ads": "Obter Pro",
@@ -128,6 +126,6 @@
     "toast_shake": "Sacudir na metade · %{label}",
     "toast_shake_fallback": "comida",
     "toast_done": "Pronto · %{label}",
-    "toast_started": "Timer · %{name}"
+    "toast_started": "Timer iniciado · %{name}"
   }
 }

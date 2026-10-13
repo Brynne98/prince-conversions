@@ -265,6 +265,9 @@ function Root({ themeChoice }) {
     if (splashGone) initAds();
   }, [splashGone]);
 
+  // Height of Saved recipes' foot: its ad and the room under it.
+  const [savedFootH, setSavedFootH] = useState(0);
+
   const screenW = Dimensions.get('window').width;
   const slide = useRef(new Animated.Value(0)).current;
   const still = useReduceMotion();
@@ -437,6 +440,7 @@ function Root({ themeChoice }) {
           unit={unit}
           topInset={topInset}
           bottomInset={timersInset}
+          onFootLayout={setSavedFootH}
         />
       </Animated.View>
 
@@ -510,12 +514,17 @@ function Root({ themeChoice }) {
 
       {splash}
 
-      {/* Short messages sit at the top, clear of the buttons that raise them
-          and of the timers at the bottom: between the two top-bar buttons on
-          iOS, under the app bar on Android. On iOS that gap holds no title a
-          message could hide, only the Converter's small label. */}
+      {/* Short messages. iOS: at the top, between the two top-bar buttons,
+          a gap that holds no title a message could hide. Android: at the
+          bottom, as Material's snackbar, above the running timers and above
+          Saved recipes' ad, which nothing may cover. */}
       {toast && (
-        <View pointerEvents="none" style={[styles.toastWrap, { top: topInset + (M3 ? 68 : 8) }]}>
+        <View
+          pointerEvents="none"
+          style={[styles.toastWrap, M3
+            ? { bottom: view === 'saved' ? savedFootH + 8 : Math.max(timersInset, bottomInset + 16) }
+            : { top: topInset + 8 }]}
+        >
           <View style={styles.toast}>
             <Text style={styles.toastText} numberOfLines={2} maxFontSizeMultiplier={GROW.bar}>{toast}</Text>
           </View>

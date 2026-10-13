@@ -77,6 +77,8 @@ export default function SaveSheet({
       hitSlop={6}
       accessibilityRole="button"
       accessibilityLabel={t('save.emoji_a11y')}
+      // Unclipped, so the pencil badge on the corner stays whole.
+      android_ripple={{ color: C.ink10, borderless: true, radius: 28 }}
       style={(state) => [styles.nameEmojiBox, typing && styles.nameEmojiTyping, fade(state)]}
     >
       <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
@@ -91,6 +93,7 @@ export default function SaveSheet({
         onBlur={() => setTyping(false)}
         pointerEvents="none"
         caretHidden
+        contextMenuHidden
         autoCorrect={false}
         returnKeyType="done"
         keyboardAppearance={mode}
@@ -125,6 +128,7 @@ export default function SaveSheet({
               setDraft({ ...draft, emoji: e });
               buzz.choice();
             }}
+            android_ripple={{ color: C.ink10, foreground: true }}
             accessibilityRole="button"
             accessibilityLabel={e}
             accessibilityState={{ selected: active }}
@@ -302,7 +306,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   // Out of sight, but still able to hold the keyboard's focus.
   emojiHidden: { position: 'absolute', width: 1, height: 1, opacity: 0, padding: 0 },
-  emojiHint: { fontFamily: FONT.ui, fontSize: 13, color: C.ink50, paddingHorizontal: 4 },
+  emojiHint: { fontFamily: FONT.ui, fontSize: 13, color: C.ink70, paddingHorizontal: 4 },
   nameInput: {
     flex: 1,
     fontFamily: FONT.ui,
@@ -328,12 +332,15 @@ const makeStyles = (C) => StyleSheet.create({
     flexWrap: 'wrap',
     padding: 6,
   },
+  // Seven to a row, 48 high: the size Android asks of anything tapped. A
+  // hair under a seventh, or rounding sends the seventh to the next row.
   gridItem: {
-    width: `${100 / 8}%`,
-    height: 40,
+    width: '14.28%',
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: M3 ? 20 : RADIUS.sm,
+    borderRadius: M3 ? 24 : RADIUS.sm,
+    overflow: 'hidden',
   },
   gridEmoji: { fontSize: 22 },
   notesBox: {

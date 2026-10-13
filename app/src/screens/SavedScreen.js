@@ -3,14 +3,16 @@ import {
   View, Text, ScrollView, Pressable, TextInput, StyleSheet, findNodeHandle,
 } from 'react-native';
 import { FONT, GROW, RADIUS, EDGE, buzz, useTheme, useStyles } from '../theme';
-import { ArrowBack, Back, Search, Trash } from '../icons';
-import { RoundButton, Segmented, confirmDestructive } from '../primitives';
+import { Back, Search, Trash } from '../icons';
+import { RoundButton, Segmented, AppBar, confirmDestructive } from '../primitives';
 import { GLASS, M3, GlassSurface, fade } from '../glass';
 import { BannerAd } from '../ads';
-import { cToF, fToC, formatMinutesShort } from '../convert';
+import { cToF, fToC, formatMinutes } from '../convert';
 import { t } from '../i18n';
 
-export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0, bottomInset = 0 }) {
+export default function SavedScreen({
+  items, onClose, onDelete, onStart, unit, topInset = 0, bottomInset = 0, onFootLayout,
+}) {
   const { C, mode } = useTheme();
   const styles = useStyles(makeStyles);
   const [query, setQuery] = useState('');
@@ -21,6 +23,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
     [items, query],
   );
 
+  const hasItems = items.length > 0;
   const count = t('saved.count', { count: items.length });
   const unitToggle = (
     <Segmented
@@ -33,7 +36,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
   const modeToggle = (
     <Segmented
       compact
-      options={[{ value: 'air', label: t(M3 ? 'common.air_short' : 'common.air_fryer') }, { value: 'oven', label: t('common.oven') }]}
+      options={[{ value: 'air', label: t('common.air_fryer') }, { value: 'oven', label: t('common.oven') }]}
       value={displayMode}
       onChange={setDisplayMode}
     />
@@ -56,19 +59,22 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
 
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
-      <View style={styles.topBar}>
-        <RoundButton onPress={onClose} size={44} accessibilityLabel={t('common.back')}>
-          {M3 ? <ArrowBack s={22} /> : <Back s={20} />}
-        </RoundButton>
-        {/* iOS keeps this gap free for the short messages; the large title
-            below names the screen. */}
-        {M3 && <Text style={styles.topTitle}>{t('saved.title')}</Text>}
-        <View style={{ width: 44 }} />
-      </View>
-
       {M3 ? (
+        <AppBar title={t('converter.saved_recipes')} leading="back" onLeading={onClose} />
+      ) : (
+        // The gap beside the button is kept free for the short messages; the
+        // large title below names the screen.
+        <View style={styles.topBar}>
+          <RoundButton onPress={onClose} size={44} accessibilityLabel={t('common.back')}>
+            <Back s={20} />
+          </RoundButton>
+        </View>
+      )}
+
+      {/* Search and the filters have nothing to work on until a recipe is saved. */}
+      {M3 ? hasItems && (
         // Material order: the search bar leads, the filters sit under it.
-        <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
           {searchBar}
           <View style={styles.toggleRow}>
             <Text style={styles.subtitle}>{count}</Text>
@@ -87,9 +93,13 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
           >
             {t('converter.saved_recipes')}
           </Text>
-          <Text style={styles.subtitle}>{count}</Text>
-          <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
-          {searchBar}
+          {hasItems && (
+            <>
+              <Text style={styles.subtitle}>{count}</Text>
+              <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
+              {searchBar}
+            </>
+          )}
         </View>
       )}
 
@@ -100,8 +110,8 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         {filtered.length === 0 ? (
           <View style={styles.empty}>
             <Text style={{ fontSize: 44, marginBottom: 8 }}>🥘</Text>
-            <Text style={styles.emptyTitle}>{t('saved.empty_title')}</Text>
-            <Text style={styles.emptyBody}>{t('saved.empty_body')}</Text>
+            <Text style={styles.emptyTitle}>{t(hasItems ? 'saved.no_match' : 'saved.empty_title')}</Text>
+            {!hasItems && <Text style={styles.emptyBody}>{t('saved.empty_body')}</Text>}
           </View>
         ) : (
           <View style={{ gap: M3 ? 2 : 10 }}>
@@ -139,7 +149,10 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
       {/* The page runs under the system's bar (Android's buttons, the iPhone's
           home line), so the ad is lifted clear of it: a covered ad breaks the
           ad network's rules. */}
-      <View style={[styles.stickyBanner, { paddingBottom: Math.max(24, bottomInset + 8) }]}>
+      <View
+        style={[styles.stickyBanner, { paddingBottom: Math.max(24, bottomInset + 8) }]}
+        onLayout={(e) => onFootLayout?.(e.nativeEvent.layout.height)}
+      >
         <BannerAd placement="saved_sticky" />
       </View>
     </View>
@@ -155,9 +168,9 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
   const time = isAir ? item.afTime : item.ovenTime;
   const tagBg = isAir ? C.terracottaSoft : C.creamDeep;
   const tagFg = isAir ? C.terracottaDeep : C.ink70;
-  const label = t(isAir ? 'common.air_short' : 'common.oven');
+  const label = t(isAir ? 'common.air_fryer' : 'common.oven');
 
-  const summary = `${label} ${temp}°${unit} · ${formatMinutesShort(time)}`;
+  const summary = `${label} ${temp}°${unit} · ${formatMinutes(time)}`;
 
   // Android: a Material list item. The rows join into one group, rounded at
   // its two ends, with the detail as plain supporting text.
@@ -221,13 +234,6 @@ const makeStyles = (C) => StyleSheet.create({
     paddingTop: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  topTitle: {
-    fontFamily: FONT.ui,
-    fontSize: 16,
-    fontWeight: '600',
-    color: C.ink,
   },
   bigTitle: {
     fontFamily: FONT.display,
@@ -236,19 +242,17 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.ink,
     letterSpacing: -0.5,
   },
-  subtitle: M3 ? {
+  subtitle: {
     fontFamily: FONT.ui,
     fontSize: 14,
     color: C.ink70,
-  } : {
-    fontFamily: FONT.ui,
-    fontSize: 14,
-    color: C.ink50,
-    marginTop: 2,
+    marginTop: M3 ? 0 : 2,
   },
+  // Wraps when the labels are long, as in Italian.
   toggleRow: {
     marginTop: M3 ? 12 : 16,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
@@ -297,7 +301,7 @@ const makeStyles = (C) => StyleSheet.create({
   emptyBody: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: M3 ? C.ink70 : C.ink50,
+    color: C.ink70,
     marginTop: 6,
     lineHeight: 20,
     textAlign: 'center',
