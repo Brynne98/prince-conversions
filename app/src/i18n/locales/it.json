@@ -32,7 +32,6 @@
   },
   "saved": {
     "title": "Le mie ricette",
-    "big_title": "Salvate",
     "count": {
       "one": "%{count} ricetta",
       "other": "%{count} ricette"

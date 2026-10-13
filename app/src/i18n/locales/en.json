@@ -32,7 +32,6 @@
   },
   "saved": {
     "title": "My Recipes",
-    "big_title": "Saved",
     "count": {
       "one": "%{count} recipe",
       "other": "%{count} recipes"
@@ -51,7 +50,7 @@
     "title": "Save recipe",
     "name": "Recipe name",
     "notes": "Notes",
-    "notes_placeholder": "Notes — e.g. shake at 10 min, single layer",
+    "notes_placeholder": "Notes, e.g. shake at 10 min, single layer",
     "emoji_a11y": "Type your own emoji",
     "emoji_hint": "Switch to the emoji keyboard and pick one.",
     "saving_both": "Saving both"

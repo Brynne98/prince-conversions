@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { FONT, GROW, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, BUTTON, LABEL, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
@@ -309,13 +309,7 @@ const makeStyles = (C) => StyleSheet.create({
   directionRow: M3
     ? { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, alignItems: 'center' }
     : { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 18, alignItems: 'center' },
-  kicker: {
-    fontFamily: FONT.ui,
-    fontSize: 11,
-    fontWeight: '700',
-    color: C.terracotta,
-    letterSpacing: 1.6,
-  },
+  kicker: { ...LABEL, color: C.terracotta },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -325,19 +319,20 @@ const makeStyles = (C) => StyleSheet.create({
   flameDot: {
     width: M3 ? 28 : 22,
     height: M3 ? 28 : 22,
-    borderRadius: M3 ? 14 : 6,
+    // A circle on both.
+    borderRadius: M3 ? 14 : 11,
     backgroundColor: C.terracottaSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cardLabel: {
+  cardLabel: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 12,
-    fontWeight: M3 ? '500' : '700',
+    fontWeight: '500',
     color: C.ink70,
-    letterSpacing: M3 ? 0.1 : 0.5,
+    letterSpacing: 0.1,
     flexShrink: 1,
-  },
+  } : { ...LABEL, color: C.ink70, flexShrink: 1 },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: C.divider,
@@ -359,7 +354,7 @@ const makeStyles = (C) => StyleSheet.create({
     backgroundColor: C.cream,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   resultCard: M3 ? {
@@ -367,7 +362,7 @@ const makeStyles = (C) => StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
   } : {
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     paddingHorizontal: 20,
     paddingTop: 22,
     paddingBottom: 22,
@@ -394,14 +389,14 @@ const makeStyles = (C) => StyleSheet.create({
     backgroundColor: C.onTerracotta18,
     alignItems: 'center', justifyContent: 'center',
   },
-  resultKicker: {
+  resultKicker: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 12,
-    fontWeight: M3 ? '500' : '700',
+    fontWeight: '500',
     color: C.onTerracotta85,
-    letterSpacing: M3 ? 0.1 : 1.6,
+    letterSpacing: 0.1,
     flexShrink: 1,
-  },
+  } : { ...LABEL, color: C.onTerracotta85, flexShrink: 1 },
   resultRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -423,14 +418,14 @@ const makeStyles = (C) => StyleSheet.create({
     fontSize: 26,
     color: C.onTerracotta85,
   },
-  resultLabel: {
+  resultLabel: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 11,
     color: C.onTerracotta70,
     marginTop: 6,
-    letterSpacing: M3 ? 0.4 : 0.8,
-    fontWeight: M3 ? '500' : '600',
-  },
+    letterSpacing: 0.4,
+    fontWeight: '500',
+  } : { ...LABEL, color: C.onTerracotta70, marginTop: 6 },
   resultDivider: {
     width: StyleSheet.hairlineWidth,
     backgroundColor: C.onTerracotta20,
@@ -444,8 +439,8 @@ const makeStyles = (C) => StyleSheet.create({
   // On iOS 26 the buttons are glass capsules, as Apple's are. Android's are
   // Material's medium buttons: 56dp and fully round.
   actionBtn: {
-    height: M3 ? 56 : 48,
-    borderRadius: M3 ? 28 : GLASS ? 24 : 14,
+    height: M3 ? 56 : BUTTON.height,
+    borderRadius: M3 ? 28 : GLASS ? BUTTON.height / 2 : RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
