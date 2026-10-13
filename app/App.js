@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Appearance, Dimensions, StyleSheet, Platform, useColorScheme,
+  View, Text, Animated, Appearance, BackHandler, Dimensions, StyleSheet, Platform, useColorScheme,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -275,6 +275,17 @@ function Root({ themeChoice }) {
     }).start();
   }, [view, slide]);
 
+  // Android's back button leaves Saved recipes for the main screen, not the
+  // app. The pages that open over a screen close themselves.
+  useEffect(() => {
+    if (view !== 'saved') return undefined;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      setView('converter');
+      return true;
+    });
+    return () => sub.remove();
+  }, [view]);
+
   const result = convert(ovenTemp, unit, ovenTime, direction);
   const isOvenToAir = direction === 'oven-to-air';
   const ovenValues = isOvenToAir
@@ -401,7 +412,7 @@ function Root({ themeChoice }) {
           }}
           unit={unit}
           topInset={topInset}
-          bottomInset={bottomInset}
+          bottomInset={timersInset}
         />
       </Animated.View>
 
