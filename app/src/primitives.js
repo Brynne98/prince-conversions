@@ -3,10 +3,10 @@ import {
   Pressable, Text, View, Animated, StyleSheet, Modal, Platform, Switch,
   Alert, ActionSheetIOS, TextInput,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from './theme';
+import { FONT, GROW, RADIUS, EDGE, buzz, useTheme, useStyles, useReduceMotion } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
-import { Plus, Minus, Close, Check } from './icons';
+import { Plus, Minus, Close, ArrowBack, Check } from './icons';
+import { t } from './i18n';
 
 // The system's own sheets, through Expo: SwiftUI's on iOS, Jetpack Compose's
 // on Android. Each exists on its own platform only, so it is loaded only there.
@@ -30,12 +30,12 @@ function HoldButton({ onTrigger, children, style }) {
 
   const start = () => {
     stop();
-    Haptics.selectionAsync();
+    buzz.choice();
     triggerRef.current?.();
     let delay = 320;
     const tick = () => {
       triggerRef.current?.();
-      Haptics.selectionAsync();
+      buzz.choice();
       delay = Math.max(35, delay * 0.8);
       timerRef.current = setTimeout(tick, delay);
     };
@@ -63,7 +63,7 @@ export function Toggle({ value, onValueChange, onColor }) {
   const { C } = useTheme();
   const change = (v) => {
     onValueChange?.(v);
-    Haptics.selectionAsync();
+    buzz.choice();
   };
   if (M3) return <M3Switch value={!!value} onChange={change} />;
   return (
@@ -126,20 +126,20 @@ function M3Switch({ value, onChange }) {
 function TimeRich({ minutes, baseStyle, suffixStyle }) {
   if (minutes < 60) {
     return (
-      <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+      <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>
         {minutes}
-        <Text style={suffixStyle}> min</Text>
+        <Text style={suffixStyle}> {t('common.min')}</Text>
       </Text>
     );
   }
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return (
-    <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+    <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>
       {h}
-      <Text style={suffixStyle}>hr</Text>
+      <Text style={suffixStyle}> {t('common.hr')}</Text>
       {m > 0 ? ` ${m}` : ''}
-      {m > 0 ? <Text style={suffixStyle}>min</Text> : null}
+      {m > 0 ? <Text style={suffixStyle}> {t('common.min')}</Text> : null}
     </Text>
   );
 }
@@ -175,7 +175,7 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
 
   return (
     <View style={styles.stepperRow}>
-      <HoldButton onTrigger={dec} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
+      <HoldButton onTrigger={dec} style={styles.stepBtn}>
         <Minus s={iconSize} c={iconColor} />
       </HoldButton>
       <View style={styles.stepperValueWrap}>
@@ -189,6 +189,9 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
           <Text
             style={[styles.stepperValue, { fontSize: valueSize, lineHeight: valueSize }]}
             numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+            maxFontSizeMultiplier={GROW.display}
           >
             {value}
             {suffix ? (
@@ -197,7 +200,7 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
           </Text>
         )}
       </View>
-      <HoldButton onTrigger={inc} style={({ pressed }) => [styles.stepBtn, { opacity: pressed ? 0.7 : 1 }]}>
+      <HoldButton onTrigger={inc} style={styles.stepBtn}>
         <Plus s={iconSize} c={iconColor} />
       </HoldButton>
     </View>
@@ -218,9 +221,9 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
       hitSlop={8}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [
+      style={[
         plain ? styles.roundM3 : tone === 'flat' ? styles.roundFlat : styles.roundBtn,
-        { width: s, height: s, borderRadius: s / 2, opacity: pressed ? 0.6 : 1 },
+        { width: s, height: s, borderRadius: s / 2 },
       ]}
     >
       {children}
@@ -231,7 +234,7 @@ export function RoundButton({ onPress, children, size = 44, tone = 'raised', acc
 export function CloseButton({ onPress, size = 44 }) {
   const { C } = useTheme();
   return (
-    <RoundButton onPress={onPress} size={size} tone="flat" accessibilityLabel="Close">
+    <RoundButton onPress={onPress} size={size} tone="flat" accessibilityLabel={t('common.close')}>
       <Close s={18} c={C.ink70} />
     </RoundButton>
   );
@@ -257,16 +260,15 @@ export function TextButton({ label, onPress, disabled = false }) {
 }
 
 // ─── Top app bar (Android) ───────────────────────────────────────────
-// Material's small top app bar, heading Android's sheets: close leads, the
-// title follows and actions trail. The main screens and iOS have their own
-// headers.
+// Material's small top app bar, on every Android screen and page: the title
+// leads from the left and actions trail. iOS has its own headers.
 export function AppBar({ title, leading, onLeading, children }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.appBar}>
       {leading && (
-        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel="Close">
-          <Close s={24} />
+        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel={t(leading === 'back' ? 'common.back' : 'common.close')}>
+          {leading === 'back' ? <ArrowBack /> : <Close s={24} />}
         </RoundButton>
       )}
       <Text
@@ -281,19 +283,44 @@ export function AppBar({ title, leading, onLeading, children }) {
   );
 }
 
+// ─── Sheet header (iOS) ──────────────────────────────────────────────
+// The one header of every iOS sheet: the title in the centre, close on the
+// right. `leading` and `trailing` replace the two sides, for a sheet that
+// carries its own Cancel and Save.
+export function SheetHeader({ title, onClose, leading, trailing }) {
+  const styles = useStyles(makeStyles);
+  return (
+    <View style={styles.sheetHeader}>
+      <View style={styles.sheetHeaderSide}>{leading}</View>
+      <Text
+        style={styles.sheetHeaderTitle}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        maxFontSizeMultiplier={GROW.bar}
+        accessibilityRole="header"
+      >
+        {title}
+      </Text>
+      <View style={[styles.sheetHeaderSide, { alignItems: 'flex-end' }]}>
+        {trailing ?? <CloseButton onPress={onClose} />}
+      </View>
+    </View>
+  );
+}
+
 // ─── Sheet ───────────────────────────────────────────────────────────
 // Every drawer opens in the system's own sheet: Apple's on iOS 26, Material
-// 3's modal bottom sheet on Android. Both draw their own grabber, so `handle`
-// only says whether it shows. Older iPhones and the web keep React Native's
-// page sheet, with the app's grabber.
-export function Sheet({ visible, onClose, handle = true, children }) {
+// 3's modal bottom sheet on Android. Both draw their own grabber. Older
+// iPhones and the web keep React Native's page sheet, with the app's grabber.
+export function Sheet({ visible, onClose, children }) {
   const styles = useStyles(makeStyles);
-  if (M3) return <MaterialSheet visible={visible} onClose={onClose} handle={handle}>{children}</MaterialSheet>;
-  if (GLASS) return <AppleSheet visible={visible} onClose={onClose} handle={handle}>{children}</AppleSheet>;
+  if (M3) return <MaterialSheet visible={visible} onClose={onClose}>{children}</MaterialSheet>;
+  if (GLASS) return <AppleSheet visible={visible} onClose={onClose}>{children}</AppleSheet>;
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <View style={styles.sheetRoot}>
-        {handle && <View style={styles.sheetHandle} />}
+        <View style={styles.sheetHandle} />
         {children}
       </View>
     </Modal>
@@ -303,7 +330,7 @@ export function Sheet({ visible, onClose, handle = true, children }) {
 // Apple's sheet, with the app's content inside it. It is painted in the page
 // colour: the sheet's own glass follows the system's light or dark, not the
 // app's, and would turn dark mode's text unreadable.
-function AppleSheet({ visible, onClose, handle, children }) {
+function AppleSheet({ visible, onClose, children }) {
   const { C, mode } = useTheme();
   const { Host, BottomSheet, Group, RNHostView } = SwiftUI;
   const { presentationDetents, presentationDragIndicator, presentationBackground } = swiftModifiers;
@@ -317,13 +344,13 @@ function AppleSheet({ visible, onClose, handle, children }) {
         <Group
           modifiers={[
             presentationDetents(['large']),
-            presentationDragIndicator(handle ? 'visible' : 'hidden'),
+            presentationDragIndicator('visible'),
             presentationBackground(C.cream),
           ]}
         >
           <RNHostView>
             {/* The grabber floats over the content; this keeps the header clear of it. */}
-            <View style={{ flex: 1, paddingTop: handle ? 16 : 0 }}>{children}</View>
+            <View style={{ flex: 1, paddingTop: 16 }}>{children}</View>
           </RNHostView>
         </Group>
       </BottomSheet>
@@ -333,7 +360,7 @@ function AppleSheet({ visible, onClose, handle, children }) {
 
 // Material 3's modal bottom sheet, opened at full height. A drag down, a tap
 // outside and the back button all close it.
-function MaterialSheet({ visible, onClose, handle, children }) {
+function MaterialSheet({ visible, onClose, children }) {
   const { C, mode } = useTheme();
   const { Host, ModalBottomSheet, RNHostView } = Compose;
   const ref = useRef(null);
@@ -352,7 +379,6 @@ function MaterialSheet({ visible, onClose, handle, children }) {
         ref={ref}
         onDismissRequest={onClose}
         skipPartiallyExpanded
-        showDragHandle={handle}
         containerColor={C.cream}
         contentColor={C.ink}
       >
@@ -375,7 +401,7 @@ let scheme = 'light'; // the app's own light or dark, which the system does not 
 // dialog. Same arguments as Alert.alert.
 export function alert(title, message, buttons) {
   if (OWN_DIALOGS && present) {
-    present({ title, message, buttons: buttons?.length ? buttons : [{ text: 'OK' }] });
+    present({ title, message, buttons: buttons?.length ? buttons : [{ text: t('common.ok') }] });
     return;
   }
   Alert.alert(title, message, buttons, { userInterfaceStyle: scheme });
@@ -387,7 +413,7 @@ export function alert(title, message, buttons) {
 export function confirmDestructive({ title, message, confirmLabel, onConfirm, anchor }) {
   if (OWN_DIALOGS) {
     alert(title, message, [
-      { text: 'Cancel', style: 'cancel' },
+      { text: t('common.cancel'), style: 'cancel' },
       { text: confirmLabel, onPress: onConfirm },
     ]);
     return;
@@ -396,7 +422,7 @@ export function confirmDestructive({ title, message, confirmLabel, onConfirm, an
     {
       title,
       message,
-      options: ['Cancel', confirmLabel],
+      options: [t('common.cancel'), confirmLabel],
       cancelButtonIndex: 0,
       destructiveButtonIndex: 1,
       anchor,
@@ -500,7 +526,7 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
             onPress={() => {
               if (!active) {
                 onChange(o.value);
-                Haptics.selectionAsync();
+                buzz.choice();
               }
             }}
             hitSlop={{ top: 4, bottom: 4 }}
@@ -521,7 +547,7 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
               borderBottomRightRadius: trail,
             }}
           >
-            <Text style={{
+            <Text maxFontSizeMultiplier={GROW.bar} style={{
               fontFamily: FONT.ui,
               fontSize: 14,
               fontWeight: '500',
@@ -542,13 +568,14 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
   const onTerracotta = tone === 'onTerracotta';
   const idx = Math.max(0, options.findIndex(o => o.value === value));
   const slide = useRef(new Animated.Value(idx)).current;
+  const still = useReduceMotion();
   useEffect(() => {
     Animated.timing(slide, {
       toValue: idx,
-      duration: 180,
+      duration: still ? 0 : 180,
       useNativeDriver: false,
     }).start();
-  }, [idx, slide]);
+  }, [idx, slide, still]);
 
   // Where each label sits, so the thumb can match it: labels differ in width
   // ("Air fryer", "Oven"), and a thumb cut to an equal share sits off-centre.
@@ -563,8 +590,6 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
     });
   };
 
-  // Tall enough to hit: about 38pt compact, 44pt full.
-  const padV = compact ? 8 : 10;
   const padH = compact ? 14 : 18;
   const fontSize = compact ? 14 : 15;
 
@@ -584,13 +609,17 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
             onPress={() => {
               if (!active) {
                 onChange(o.value);
-                Haptics.selectionAsync();
+                buzz.choice();
               }
             }}
             onLayout={measure(i)}
-            style={{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1 }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            // With the track's 3pt edge above and below, a 44pt target.
+            hitSlop={{ top: 3, bottom: 3 }}
+            style={{ minHeight: 38, justifyContent: 'center', paddingHorizontal: padH, zIndex: 1, flexShrink: 1 }}
           >
-            <Text style={{
+            <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar} style={{
               fontFamily: FONT.ui,
               fontSize,
               fontWeight: '600',
@@ -716,7 +745,7 @@ const makeStyles = (C) => ({
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   roundBtn: {
@@ -728,7 +757,7 @@ const makeStyles = (C) => ({
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   roundFlat: {
@@ -766,6 +795,25 @@ const makeStyles = (C) => ({
     fontFamily: FONT.ui,
     fontSize: 22,
     lineHeight: 28,
+    color: C.ink,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  // Both sides are at least a close button wide, so a title with one button
+  // beside it still sits in the centre.
+  sheetHeaderSide: { minWidth: 44, minHeight: 44, justifyContent: 'center' },
+  // Shrinks before it touches the buttons: Cancel and Save are wider in French.
+  sheetHeaderTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontFamily: FONT.ui,
+    fontSize: 16,
+    fontWeight: '600',
     color: C.ink,
   },
   sheetRoot: { flex: 1, backgroundColor: C.cream },
@@ -849,6 +897,7 @@ const makeStyles = (C) => ({
     position: 'relative',
     flexDirection: 'row',
     alignSelf: 'center',
+    maxWidth: '100%',
     backgroundColor: C.ink06,
     borderRadius: 999,
     padding: 3,
@@ -860,7 +909,7 @@ const makeStyles = (C) => ({
     padding: 16,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     padding: 18,
     shadowColor: '#000',
     shadowOpacity: C.isDark ? 0.4 : 0.06,

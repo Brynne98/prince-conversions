@@ -5,12 +5,15 @@ import { useTheme } from './theme';
 // Each icon defaults its stroke / fill color to the active theme so it
 // works in both light and dark mode without callers having to pass `c`.
 
+// The one line weight of every drawn icon.
+const W = 2;
+
 export const Plus = ({ s = 18, c }) => {
   const { C } = useTheme();
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M12 5v14M5 12h14" stroke={stroke} strokeWidth={2.2} strokeLinecap="round" />
+      <Path d="M12 5v14M5 12h14" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -20,7 +23,7 @@ export const Minus = ({ s = 18, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M5 12h14" stroke={stroke} strokeWidth={2.2} strokeLinecap="round" />
+      <Path d="M5 12h14" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -30,7 +33,7 @@ export const Bookmark = ({ s = 18, c, fill = 'none' }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill={fill}>
-      <Path d="M6 4h12v17l-6-4-6 4V4z" stroke={stroke} strokeWidth={2} strokeLinejoin="round" />
+      <Path d="M6 4h12v17l-6-4-6 4V4z" stroke={stroke} strokeWidth={W} strokeLinejoin="round" />
     </Svg>
   );
 };
@@ -40,7 +43,7 @@ export const List = ({ s = 22, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M4 6h16M4 12h16M4 18h10" stroke={stroke} strokeWidth={2} strokeLinecap="round" />
+      <Path d="M4 6h16M4 12h16M4 18h10" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -50,9 +53,9 @@ export const Gear = ({ s = 22, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={3} stroke={stroke} strokeWidth={1.8} />
+      <Circle cx={12} cy={12} r={3} stroke={stroke} strokeWidth={W} />
       <Path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"
-        stroke={stroke} strokeWidth={1.6}
+        stroke={stroke} strokeWidth={W}
       />
     </Svg>
   );
@@ -63,7 +66,42 @@ export const Back = ({ s = 22, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M14 6l-6 6 6 6" stroke={stroke} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M14 6l-6 6 6 6" stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+// The arrow at the end of a row that opens something.
+export const Chevron = ({ s = 16, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.ink;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path d="M9 5l7 7-7 7" stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+// What Pro offers: no ads, and a purchase that can be brought back.
+export const NoAds = ({ s = 22, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.terracotta;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path d="M4 7h12a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2z" stroke={stroke} strokeWidth={W} />
+      <Path d="M18 9l4-2v10l-4-2" stroke={stroke} strokeWidth={W} strokeLinejoin="round" />
+      <Path d="M3 21L21 3" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
+    </Svg>
+  );
+};
+
+export const RestorePurchase = ({ s = 22, c }) => {
+  const { C } = useTheme();
+  const stroke = c || C.terracotta;
+  return (
+    <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+      <Path d="M4 12a8 8 0 0114.2-5M20 12a8 8 0 01-14.2 5" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
+      <Path d="M18 3v4h-4M6 21v-4h4" stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };
@@ -73,7 +111,7 @@ export const Close = ({ s = 22, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M6 6l12 12M18 6L6 18" stroke={stroke} strokeWidth={2.2} strokeLinecap="round" />
+      <Path d="M6 6l12 12M18 6L6 18" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -83,8 +121,8 @@ export const Search = ({ s = 18, c }) => {
   const stroke = c || C.ink50;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Circle cx={11} cy={11} r={6} stroke={stroke} strokeWidth={2} />
-      <Path d="M20 20l-4-4" stroke={stroke} strokeWidth={2} strokeLinecap="round" />
+      <Circle cx={11} cy={11} r={6} stroke={stroke} strokeWidth={W} />
+      <Path d="M20 20l-4-4" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -94,12 +132,12 @@ export const Trash = ({ s = 18, c }) => {
   const stroke = c || C.ink70;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M4 7 H20" stroke={stroke} strokeWidth={1.8} strokeLinecap="round" />
+      <Path d="M4 7 H20" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
       <Path d="M9.5 7 V5.5 a1.2 1.2 0 0 1 1.2 -1.2 h2.6 a1.2 1.2 0 0 1 1.2 1.2 V7"
-        stroke={stroke} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+        stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M6.4 7 l1 12.6 a2 2 0 0 0 2 1.9 h5.2 a2 2 0 0 0 2 -1.9 l1 -12.6"
-        stroke={stroke} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M10.4 11 V17.6 M13.6 11 V17.6" stroke={stroke} strokeWidth={1.6} strokeLinecap="round" />
+        stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M10.4 11 V17.6 M13.6 11 V17.6" stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -110,7 +148,7 @@ export const Flame = ({ s = 18, c }) => {
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
       <Path d="M12 3c1 4 5 5 5 10a5 5 0 11-10 0c0-2 1-3 2-4 0 2 1 3 2 3-1-3 0-6 1-9z"
-        stroke={stroke} strokeWidth={1.8} strokeLinejoin="round" />
+        stroke={stroke} strokeWidth={W} strokeLinejoin="round" />
     </Svg>
   );
 };
@@ -121,9 +159,9 @@ export const Restart = ({ s = 18, c }) => {
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
       <Path d="M21 12 a9 9 0 1 1 -3 -7"
-        stroke={stroke} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+        stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M21 4 V11 H14"
-        stroke={stroke} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+        stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };
@@ -134,9 +172,9 @@ export const Bell = ({ s = 14, c }) => {
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
       <Path d="M6 16 V11 a6 6 0 0 1 12 0 V16 l1.5 2 H4.5 Z"
-        stroke={stroke} strokeWidth={1.7} strokeLinejoin="round" strokeLinecap="round" />
+        stroke={stroke} strokeWidth={W} strokeLinejoin="round" strokeLinecap="round" />
       <Path d="M10 19 a2 2 0 0 0 4 0"
-        stroke={stroke} strokeWidth={1.7} strokeLinecap="round" />
+        stroke={stroke} strokeWidth={W} strokeLinecap="round" />
     </Svg>
   );
 };
@@ -160,7 +198,7 @@ export const Swap = ({ s = 14, c }) => {
       <Path
         d="M7 20 L7 4 M3 8 L7 4 L11 8 M17 4 L17 20 M13 16 L17 20 L21 16"
         stroke={stroke}
-        strokeWidth={2.2}
+        strokeWidth={W}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -176,7 +214,7 @@ export const ShareIcon = ({ s = 18, c }) => {
       <Path
         d="M12 15V4M8 8l4-4 4 4M5 13v6a1 1 0 001 1h12a1 1 0 001-1v-6"
         stroke={stroke}
-        strokeWidth={2.1}
+        strokeWidth={W}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -190,7 +228,7 @@ export const ArrowBack = ({ s = 24, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M20 12H5M11 6l-6 6 6 6" stroke={stroke} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M20 12H5M11 6l-6 6 6 6" stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };
@@ -200,7 +238,7 @@ export const Check = ({ s = 14, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M5 12.5l4.5 4.5L19 7.5" stroke={stroke} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M5 12.5l4.5 4.5L19 7.5" stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };
@@ -210,7 +248,7 @@ export const Pencil = ({ s = 12, c }) => {
   const stroke = c || C.ink;
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" fill="none">
-      <Path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" stroke={stroke} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" stroke={stroke} strokeWidth={W} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };

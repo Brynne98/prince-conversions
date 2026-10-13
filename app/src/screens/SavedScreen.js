@@ -2,15 +2,17 @@ import React, { useMemo, useState } from 'react';
 import {
   View, Text, ScrollView, Pressable, TextInput, StyleSheet, findNodeHandle,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
-import { ArrowBack, Back, Search, Trash } from '../icons';
-import { RoundButton, Segmented, confirmDestructive } from '../primitives';
-import { GLASS, M3, GlassSurface } from '../glass';
+import { FONT, GROW, RADIUS, EDGE, buzz, useTheme, useStyles } from '../theme';
+import { Back, Search, Trash } from '../icons';
+import { RoundButton, Segmented, AppBar, confirmDestructive } from '../primitives';
+import { GLASS, M3, GlassSurface, fade } from '../glass';
 import { BannerAd } from '../ads';
-import { cToF, fToC, formatMinutesShort } from '../convert';
+import { cToF, fToC, formatMinutes } from '../convert';
+import { t } from '../i18n';
 
-export default function SavedScreen({ items, onClose, onDelete, onStart, unit, topInset = 0, bottomInset = 0 }) {
+export default function SavedScreen({
+  items, onClose, onDelete, onStart, unit, topInset = 0, bottomInset = 0, onFootLayout,
+}) {
   const { C, mode } = useTheme();
   const styles = useStyles(makeStyles);
   const [query, setQuery] = useState('');
@@ -21,7 +23,8 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
     [items, query],
   );
 
-  const count = `${items.length} ${items.length === 1 ? 'recipe' : 'recipes'}`;
+  const hasItems = items.length > 0;
+  const count = t('saved.count', { count: items.length });
   const unitToggle = (
     <Segmented
       compact
@@ -33,7 +36,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
   const modeToggle = (
     <Segmented
       compact
-      options={[{ value: 'air', label: M3 ? 'Air' : 'Air fryer' }, { value: 'oven', label: 'Oven' }]}
+      options={[{ value: 'air', label: t('common.air_fryer') }, { value: 'oven', label: t('common.oven') }]}
       value={displayMode}
       onChange={setDisplayMode}
     />
@@ -44,7 +47,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
       <TextInput
         value={query}
         onChangeText={setQuery}
-        placeholder="Search recipes"
+        placeholder={t('saved.search')}
         placeholderTextColor={M3 ? C.ink70 : C.ink50}
         style={styles.searchInput}
         autoCorrect={false}
@@ -56,17 +59,22 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
 
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
-      <View style={styles.topBar}>
-        <RoundButton onPress={onClose} size={44} accessibilityLabel="Back">
-          {M3 ? <ArrowBack s={22} /> : <Back s={20} />}
-        </RoundButton>
-        <Text style={styles.topTitle}>My Recipes</Text>
-        <View style={{ width: 44 }} />
-      </View>
-
       {M3 ? (
+        <AppBar title={t('converter.saved_recipes')} leading="back" onLeading={onClose} />
+      ) : (
+        // The gap beside the button is kept free for the short messages; the
+        // large title below names the screen.
+        <View style={styles.topBar}>
+          <RoundButton onPress={onClose} size={44} accessibilityLabel={t('common.back')}>
+            <Back s={20} />
+          </RoundButton>
+        </View>
+      )}
+
+      {/* Search and the filters have nothing to work on until a recipe is saved. */}
+      {M3 ? hasItems && (
         // Material order: the search bar leads, the filters sit under it.
-        <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
           {searchBar}
           <View style={styles.toggleRow}>
             <Text style={styles.subtitle}>{count}</Text>
@@ -75,10 +83,23 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         </View>
       ) : (
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-          <Text style={styles.bigTitle}>Saved</Text>
-          <Text style={styles.subtitle}>{count}</Text>
-          <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
-          {searchBar}
+          <Text
+            style={styles.bigTitle}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            maxFontSizeMultiplier={GROW.display}
+            accessibilityRole="header"
+          >
+            {t('converter.saved_recipes')}
+          </Text>
+          {hasItems && (
+            <>
+              <Text style={styles.subtitle}>{count}</Text>
+              <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
+              {searchBar}
+            </>
+          )}
         </View>
       )}
 
@@ -89,10 +110,8 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         {filtered.length === 0 ? (
           <View style={styles.empty}>
             <Text style={{ fontSize: 44, marginBottom: 8 }}>🥘</Text>
-            <Text style={styles.emptyTitle}>Nothing saved yet</Text>
-            <Text style={styles.emptyBody}>
-              Convert a recipe and tap “Save” to keep{'\n'}your perfect time and temperature.
-            </Text>
+            <Text style={styles.emptyTitle}>{t(hasItems ? 'saved.no_match' : 'saved.empty_title')}</Text>
+            {!hasItems && <Text style={styles.emptyBody}>{t('saved.empty_body')}</Text>}
           </View>
         ) : (
           <View style={{ gap: M3 ? 2 : 10 }}>
@@ -106,19 +125,19 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
                 last={i === filtered.length - 1}
                 onDelete={(e) => {
                   confirmDestructive({
-                    title: `Delete “${it.name}”?`,
-                    message: 'This can’t be undone.',
-                    confirmLabel: 'Delete',
+                    title: t('saved.delete_title', { name: it.name }),
+                    message: t('saved.delete_message'),
+                    confirmLabel: t('common.delete'),
                     // iOS 26 grows the sheet out of the bin button.
                     anchor: findNodeHandle(e?.currentTarget) ?? undefined,
                     onConfirm: () => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      buzz.action();
                       onDelete(it.id);
                     },
                   });
                 }}
                 onStart={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  buzz.action();
                   onStart?.(it, displayMode);
                 }}
               />
@@ -130,7 +149,10 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
       {/* The page runs under the system's bar (Android's buttons, the iPhone's
           home line), so the ad is lifted clear of it: a covered ad breaks the
           ad network's rules. */}
-      <View style={[styles.stickyBanner, { paddingBottom: Math.max(24, bottomInset + 8) }]}>
+      <View
+        style={[styles.stickyBanner, { paddingBottom: Math.max(24, bottomInset + 8) }]}
+        onLayout={(e) => onFootLayout?.(e.nativeEvent.layout.height)}
+      >
         <BannerAd placement="saved_sticky" />
       </View>
     </View>
@@ -146,9 +168,9 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
   const time = isAir ? item.afTime : item.ovenTime;
   const tagBg = isAir ? C.terracottaSoft : C.creamDeep;
   const tagFg = isAir ? C.terracottaDeep : C.ink70;
-  const label = isAir ? 'Air' : 'Oven';
+  const label = t(isAir ? 'common.air_fryer' : 'common.oven');
 
-  const summary = `${label} ${temp}°${unit} · ${formatMinutesShort(time)}`;
+  const summary = `${label} ${temp}°${unit} · ${formatMinutes(time)}`;
 
   // Android: a Material list item. The rows join into one group, rounded at
   // its two ends, with the detail as plain supporting text.
@@ -171,7 +193,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
           <Text style={styles.rowSupport}>{summary}</Text>
           {!!item.note && <Text style={styles.rowSupport} numberOfLines={1}>{item.note}</Text>}
         </View>
-        <RoundButton onPress={onDelete} tone="plain" accessibilityLabel={`Delete ${item.name}`}>
+        <RoundButton onPress={onDelete} tone="plain" accessibilityLabel={t('saved.delete_a11y', { name: item.name })}>
           <Trash s={22} />
         </RoundButton>
       </Pressable>
@@ -181,13 +203,14 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
   return (
     <Pressable
       onPress={onStart}
-      style={({ pressed }) => [styles.row, { opacity: pressed ? 0.85 : 1 }]}
+      accessibilityRole="button"
+      style={(state) => [styles.row, fade(state)]}
     >
       <View style={[styles.rowEmojiBox, { backgroundColor: tagBg }]}>
         <Text style={styles.rowEmoji}>{item.emoji}</Text>
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={styles.rowName} numberOfLines={1}>{item.name}</Text>
+        <Text style={styles.rowName} numberOfLines={2}>{item.name}</Text>
         <View style={styles.tagRow}>
           <View style={[styles.tag, { backgroundColor: tagBg }]}>
             <Text style={[styles.tagText, { color: tagFg }]}>{summary}</Text>
@@ -197,7 +220,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
           <Text style={styles.note}>“{item.note}”</Text>
         )}
       </View>
-      <RoundButton onPress={onDelete} size={40} tone="flat" accessibilityLabel={`Delete ${item.name}`}>
+      <RoundButton onPress={onDelete} size={40} tone="flat" accessibilityLabel={t('saved.delete_a11y', { name: item.name })}>
         <Trash s={18} />
       </RoundButton>
     </Pressable>
@@ -211,13 +234,6 @@ const makeStyles = (C) => StyleSheet.create({
     paddingTop: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  topTitle: {
-    fontFamily: FONT.ui,
-    fontSize: 16,
-    fontWeight: '600',
-    color: C.ink,
   },
   bigTitle: {
     fontFamily: FONT.display,
@@ -226,19 +242,17 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.ink,
     letterSpacing: -0.5,
   },
-  subtitle: M3 ? {
+  subtitle: {
     fontFamily: FONT.ui,
     fontSize: 14,
     color: C.ink70,
-  } : {
-    fontFamily: FONT.ui,
-    fontSize: 14,
-    color: C.ink50,
-    marginTop: 2,
+    marginTop: M3 ? 0 : 2,
   },
+  // Wraps when the labels are long, as in Italian.
   toggleRow: {
     marginTop: M3 ? 12 : 16,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
@@ -256,13 +270,13 @@ const makeStyles = (C) => StyleSheet.create({
     marginTop: 12,
     backgroundColor: C.paper,
     // A glass capsule on iOS 26, like Apple's search fields.
-    borderRadius: GLASS ? 22 : 14,
+    borderRadius: GLASS ? 22 : RADIUS.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: GLASS ? 16 : 12,
     height: GLASS ? 44 : 40,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   searchInput: {
@@ -287,7 +301,7 @@ const makeStyles = (C) => StyleSheet.create({
   emptyBody: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: M3 ? C.ink70 : C.ink50,
+    color: C.ink70,
     marginTop: 6,
     lineHeight: 20,
     textAlign: 'center',
@@ -305,7 +319,7 @@ const makeStyles = (C) => StyleSheet.create({
     overflow: 'hidden',
   } : {
     backgroundColor: C.paper,
-    borderRadius: 18,
+    borderRadius: RADIUS.md,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -319,7 +333,7 @@ const makeStyles = (C) => StyleSheet.create({
   rowEmojiBox: {
     width: M3 ? 40 : 48,
     height: M3 ? 40 : 48,
-    borderRadius: M3 ? 20 : 12,
+    borderRadius: M3 ? 20 : RADIUS.sm,
     backgroundColor: C.terracottaSoft,
     alignItems: 'center',
     justifyContent: 'center',
@@ -348,7 +362,7 @@ const makeStyles = (C) => StyleSheet.create({
   tag: {
     paddingHorizontal: 7,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: RADIUS.sm,
   },
   tagText: {
     fontFamily: FONT.ui,

@@ -3,12 +3,13 @@ import {
   View, Text, Pressable, ScrollView, StyleSheet, Linking,
 } from 'react-native';
 import Constants from 'expo-constants';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, LABEL, useTheme, useStyles } from '../theme';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 const SITE_URL = 'https://brynne98.github.io/prince-conversions';
-import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
-import { M3 } from '../glass';
+import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
+import { Chevron } from '../icons';
+import { M3, cap, fade } from '../glass';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
 import { capture, isAnalyticsConfigured } from '../analytics';
@@ -42,17 +43,17 @@ export default function SettingsSheet({
   return (
     <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title="Settings" leading="close" onLeading={onClose} />
+        // An X, as on the other pages that slide up.
+        <AppBar title={t('settings.title')} leading="close" onLeading={onClose} />
       ) : (
-        <View style={styles.header}>
-          <Text style={styles.title}>Settings</Text>
-          <CloseButton onPress={onClose} />
-        </View>
+        <SheetHeader title={t('settings.title')} onClose={onClose} />
       )}
 
       <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 32 }}>
-        <View style={{ paddingHorizontal: M3 ? 16 : 20 }}>
-          <Row label="Dark mode" subtitle="Warm-charcoal palette">
+        {/* Android's rows carry their own side padding, so a press ripples
+            from edge to edge. */}
+        <View style={{ paddingHorizontal: M3 ? 0 : 20 }}>
+          <Row label={t('settings.dark_mode')}>
             <Toggle
               value={mode === 'dark'}
               onValueChange={(v) => setMode?.(v ? 'dark' : 'light')}
@@ -61,8 +62,8 @@ export default function SettingsSheet({
 
           {isAnalyticsConfigured() && (
             <Row
-              label="Share anonymous analytics"
-              subtitle="Usage events only — never recipe content"
+              label={t('settings.analytics')}
+              subtitle={t('settings.analytics_subtitle')}
             >
               <Toggle
                 value={analyticsEnabled}
@@ -77,7 +78,7 @@ export default function SettingsSheet({
               subtitle={t('settings.pro_active_subtitle')}
             >
               <View style={styles.proPill}>
-                <Text style={styles.proPillText}>{M3 ? 'Active' : t('settings.pro_active_pill')}</Text>
+                <Text style={styles.proPillText}>{cap(t('settings.pro_active_pill'))}</Text>
               </View>
             </Row>
           ) : (
@@ -90,8 +91,8 @@ export default function SettingsSheet({
 
           {adPrivacyOptions && !isPro && (
             <PressableRow
-              label="Ad privacy options"
-              subtitle="Review or change your consent choices"
+              label={t('settings.ad_privacy')}
+              subtitle={t('settings.ad_privacy_subtitle')}
               onPress={() => {
                 capture('ad_privacy_options_opened');
                 showAdPrivacyOptions();
@@ -100,15 +101,15 @@ export default function SettingsSheet({
           )}
 
           <PressableRow
-            label="Privacy policy"
+            label={t('settings.privacy_policy')}
             onPress={() => Linking.openURL(`${SITE_URL}/privacy`)}
           />
           <PressableRow
-            label="Terms of use"
+            label={t('settings.terms')}
             onPress={() => Linking.openURL(`${SITE_URL}/terms`)}
           />
 
-          <Row label="About" detail={`v${APP_VERSION}`} isLast />
+          <Row label={t('settings.about')} detail={`v${APP_VERSION}`} isLast />
         </View>
 
         <View style={{ paddingHorizontal: M3 ? 16 : 20, marginTop: 20 }}>
@@ -144,42 +145,26 @@ function PressableRow({ label, subtitle, onPress }) {
     <Pressable
       onPress={onPress}
       android_ripple={{ color: C.ink10, foreground: true }}
-      style={({ pressed }) => [
-        styles.row,
-        styles.rowDivider,
-        { opacity: pressed && !M3 ? 0.55 : 1 },
-      ]}
+      accessibilityRole="button"
+      style={(state) => [styles.row, styles.rowDivider, fade(state)]}
     >
       <View style={{ flex: 1, paddingRight: 12 }}>
         <Text style={styles.rowLabel}>{label}</Text>
         {!!subtitle && <Text style={styles.rowSubtitle}>{subtitle}</Text>}
       </View>
-      {!M3 && <Text style={styles.chevron}>›</Text>}
+      {!M3 && <Chevron c={C.ink30} />}
     </Pressable>
   );
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontFamily: FONT.display,
-    fontSize: 22,
-    fontWeight: '500',
-    color: C.ink,
-    letterSpacing: -0.3,
-  },
   row: M3 ? {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     minHeight: 72,
     paddingVertical: 8,
+    paddingHorizontal: 16,
     gap: 16,
   } : {
     flexDirection: 'row',
@@ -195,8 +180,8 @@ const makeStyles = (C) => StyleSheet.create({
   },
   rowLabel: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
     color: C.ink,
   } : {
     fontFamily: FONT.ui,
@@ -212,19 +197,13 @@ const makeStyles = (C) => StyleSheet.create({
   } : {
     fontFamily: FONT.ui,
     fontSize: 12,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 2,
   },
   rowDetail: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: C.ink50,
-  },
-  chevron: {
-    fontFamily: FONT.ui,
-    fontSize: 22,
-    color: C.ink30,
-    fontWeight: '300',
+    color: C.ink70,
   },
   proPill: {
     paddingVertical: 4,
@@ -232,11 +211,11 @@ const makeStyles = (C) => StyleSheet.create({
     borderRadius: M3 ? 8 : 999,
     backgroundColor: M3 ? C.terracottaSoft : C.terracotta,
   },
-  proPillText: {
+  proPillText: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 11,
-    fontWeight: M3 ? '500' : '700',
-    color: M3 ? C.terracottaDeep : C.onTerracotta,
-    letterSpacing: M3 ? 0.1 : 0.6,
-  },
+    fontWeight: '500',
+    color: C.terracottaDeep,
+    letterSpacing: 0.1,
+  } : { ...LABEL, color: C.onTerracotta },
 });

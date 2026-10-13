@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Animated, Appearance, Dimensions, StyleSheet, Platform, useColorScheme,
+  View, Text, Animated, Appearance, BackHandler, Dimensions, PanResponder, StyleSheet, Platform, useColorScheme,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ import PaywallSheet from './src/screens/PaywallSheet';
 import TimerStack, { stackHeight } from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
-import { ThemeProvider, useTheme, useStyles } from './src/theme';
+import { ThemeProvider, useTheme, useStyles, useReduceMotion, GROW } from './src/theme';
 import { M3 } from './src/glass';
 import { DialogHost } from './src/primitives';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
@@ -28,6 +28,7 @@ import { initAds } from './src/ads';
 import { capture, setAnalyticsEnabled } from './src/analytics';
 import { recordTimerCompletion } from './src/review';
 import { recordCompletionForSoftPaywall } from './src/softPaywall';
+import { t } from './src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 // Expo Go has its own splash screen and only warns when asked to change it.
@@ -90,8 +91,10 @@ function Root({ themeChoice }) {
   const onTimerDoneRef = useRef(() => {});
 
   const cookTimers = useCookTimers({
-    onShake: (t) => showToast(`Shake halfway · ${t.label || 'cooking'}`),
-    onDone: (t) => onTimerDoneRef.current?.(t),
+    onShake: (timer) => showToast(
+      t('timer.toast_shake', { label: timer.label || t('timer.toast_shake_fallback') }),
+    ),
+    onDone: (timer) => onTimerDoneRef.current?.(timer),
   });
 
   softPaywallGate.current = {
@@ -103,15 +106,15 @@ function Root({ themeChoice }) {
     timers: cookTimers.list,
   };
 
-  onTimerDoneRef.current = (t) => {
+  onTimerDoneRef.current = (timer) => {
     capture('timer_completed', {
-      duration_bucket: durationBucket(t.totalSec),
+      duration_bucket: durationBucket(timer.totalSec),
     });
-    showToast(`Done · ${t.label || 'cook timer'}`);
+    showToast(t('timer.toast_done', { label: timer.label || t('timer.fallback_label') }));
 
     const g = softPaywallGate.current;
     const hasRunning = (g.timers || []).some(
-      (x) => x.id !== t.id && !x.completed,
+      (x) => x.id !== timer.id && !x.completed,
     );
     const canShowSoftPaywall = !g.openTimerId && !hasRunning;
 
@@ -141,7 +144,7 @@ function Root({ themeChoice }) {
   }, [activitySig]);
 
   const openTimer = openTimerId
-    ? cookTimers.list.find((t) => t.id === openTimerId)
+    ? cookTimers.list.find((x) => x.id === openTimerId)
     : null;
   useEffect(() => {
     if (openTimerId && !openTimer) setOpenTimerId(null);
@@ -262,15 +265,48 @@ function Root({ themeChoice }) {
     if (splashGone) initAds();
   }, [splashGone]);
 
+  // Height of Saved recipes' foot: its ad and the room under it.
+  const [savedFootH, setSavedFootH] = useState(0);
+
   const screenW = Dimensions.get('window').width;
   const slide = useRef(new Animated.Value(0)).current;
+  const still = useReduceMotion();
+  const slideTo = (toValue) => Animated.timing(slide, {
+    toValue,
+    duration: still ? 0 : 320,
+    useNativeDriver: true,
+  }).start();
   useEffect(() => {
-    Animated.timing(slide, {
-      toValue: view === 'saved' ? 1 : 0,
-      duration: 320,
-      useNativeDriver: true,
-    }).start();
-  }, [view, slide]);
+    slideTo(view === 'saved' ? 1 : 0);
+  }, [view, slide]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // iPhone: a drag from the left edge pulls Saved recipes back off, as the
+  // system's own back swipe does. Past a third of the way, or flicked, it
+  // goes; otherwise it settles back.
+  const slideToRef = useRef(slideTo);
+  slideToRef.current = slideTo;
+  const edgeSwipe = useRef(PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (_, g) => g.x0 < 24 && g.dx > 8 && g.dx > Math.abs(g.dy) * 2,
+    // A drag that starts while the screen is still sliding in takes over from it.
+    onPanResponderGrant: () => slide.stopAnimation(),
+    onPanResponderMove: (_, g) => slide.setValue(1 - Math.min(1, Math.max(0, g.dx / screenW))),
+    onPanResponderRelease: (_, g) => {
+      if (g.dx > screenW / 3 || g.vx > 0.5) setView('converter');
+      else slideToRef.current(1);
+    },
+    onPanResponderTerminate: () => slideToRef.current(1),
+  })).current;
+
+  // Android's back button leaves Saved recipes for the main screen, not the
+  // app. The pages that open over a screen close themselves.
+  useEffect(() => {
+    if (view !== 'saved') return undefined;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      setView('converter');
+      return true;
+    });
+    return () => sub.remove();
+  }, [view]);
 
   const result = convert(ovenTemp, unit, ovenTime, direction);
   const isOvenToAir = direction === 'oven-to-air';
@@ -281,8 +317,10 @@ function Root({ themeChoice }) {
     ? { temp: result.temp, time: result.time }
     : { temp: ovenTemp, time: ovenTime };
 
-  const startTimer = (minutes, label, source) => {
+  // Every start says so, wherever it came from.
+  const startTimer = (minutes, label, source, message) => {
     const id = cookTimers.start(minutes, label);
+    showToast(message ?? t('timer.toast_started', { name: label }));
     capture('timer_started', {
       source,
       duration_bucket: durationBucket(Math.round(minutes * 60)),
@@ -302,7 +340,7 @@ function Root({ themeChoice }) {
         && Math.abs(p.time - ovenValues.time) < 5,
     );
     setDraft({
-      name: guess ? guess.name : '',
+      name: guess ? t(`presets.${guess.id}`) : '',
       emoji: guess ? guess.emoji : '🍟',
       note: '',
     });
@@ -325,10 +363,10 @@ function Root({ themeChoice }) {
     capture('recipe_saved', { saved_recipe_count: items.length + 1 });
     startTimer(
       airValues.time,
-      `${newItem.emoji} ${newItem.name || 'Recipe'}`,
+      `${newItem.emoji} ${newItem.name || t('saved.recipe_fallback')}`,
       'recipe_save',
+      t('saved.toast_saved'),
     );
-    showToast('Saved to recipes');
   };
   const doDelete = (id) => {
     setItems(items.filter(i => i.id !== id));
@@ -377,14 +415,17 @@ function Root({ themeChoice }) {
           onOpenSettings={() => setShowSettings(true)}
           onSave={openSave}
           onStartTimer={(min) => {
-            startTimer(min, `Air fryer ${airValues.temp}°${unit}`, 'converter');
+            startTimer(min, t('converter.timer_label', { temp: `${airValues.temp}°${unit}` }), 'converter');
           }}
           topInset={topInset}
           bottomInset={timersInset}
         />
       </Animated.View>
 
-      <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ translateX: savedTx }] }]}>
+      <Animated.View
+        style={[StyleSheet.absoluteFill, { transform: [{ translateX: savedTx }] }]}
+        {...(Platform.OS === 'ios' ? edgeSwipe.panHandlers : null)}
+      >
         <SavedScreen
           items={items}
           onClose={() => setView('converter')}
@@ -392,13 +433,14 @@ function Root({ themeChoice }) {
           onStart={(item, mode) => {
             const isAir = mode !== 'oven';
             const minutes = isAir ? item.afTime : item.ovenTime;
-            const label = `${item.emoji} ${item.name || 'Recipe'}${isAir ? '' : ' · oven'}`;
-            startTimer(minutes, label, 'saved_recipe');
-            showToast(`Timer · ${item.name || 'recipe'}`);
+            const label = `${item.emoji} ${item.name || t('saved.recipe_fallback')}${isAir ? '' : ` · ${t('saved.oven_suffix')}`}`;
+            startTimer(minutes, label, 'saved_recipe',
+              t('timer.toast_started', { name: item.name || t('saved.recipe_fallback') }));
           }}
           unit={unit}
           topInset={topInset}
-          bottomInset={bottomInset}
+          bottomInset={timersInset}
+          onFootLayout={setSavedFootH}
         />
       </Animated.View>
 
@@ -472,13 +514,19 @@ function Root({ themeChoice }) {
 
       {splash}
 
-      {/* Short messages sit at the top, clear of the buttons that raise them
-          and of the timers at the bottom: between the two top-bar buttons on
-          iOS, under the app bar on Android. */}
+      {/* Short messages. iOS: at the top, between the two top-bar buttons,
+          a gap that holds no title a message could hide. Android: at the
+          bottom, as Material's snackbar, above the running timers and above
+          Saved recipes' ad, which nothing may cover. */}
       {toast && (
-        <View pointerEvents="none" style={[styles.toastWrap, { top: topInset + (M3 ? 68 : 8) }]}>
+        <View
+          pointerEvents="none"
+          style={[styles.toastWrap, M3
+            ? { bottom: view === 'saved' ? savedFootH + 8 : Math.max(timersInset, bottomInset + 16) }
+            : { top: topInset + 8 }]}
+        >
           <View style={styles.toast}>
-            <Text style={styles.toastText} numberOfLines={2}>{toast}</Text>
+            <Text style={styles.toastText} numberOfLines={2} maxFontSizeMultiplier={GROW.bar}>{toast}</Text>
           </View>
         </View>
       )}

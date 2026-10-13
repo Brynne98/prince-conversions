@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, Pressable, StyleSheet, ScrollView,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import Svg, { Path, Line } from 'react-native-svg';
-import { FONT, useTheme, useStyles } from '../theme';
-import { Sheet, CloseButton, AppBar, TextButton, alert } from '../primitives';
-import { GLASS, M3, GlassPressable } from '../glass';
+import { FONT, RADIUS, EDGE, BUTTON, LABEL, PRESSED, buzz, useTheme, useStyles } from '../theme';
+import { Sheet, SheetHeader, AppBar, TextButton, alert } from '../primitives';
+import { NoAds, RestorePurchase } from '../icons';
+import { GLASS, M3, GlassPressable, fade } from '../glass';
 import { useIap } from '../iap';
 import { capture } from '../analytics';
 import { t } from '../i18n';
@@ -43,20 +42,17 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
     }
     if (busy) return;
     setBusy(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    buzz.action();
     try {
       const owned = await buyPro();
       if (owned) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        buzz.success();
         alert(t('paywall.thanks_title'), t('paywall.thanks_body'));
         onClose?.();
       }
     } catch (e) {
       if (!e?.userCancelled && e?.code !== 'PURCHASE_CANCELLED') {
-        alert(
-          t('paywall.purchase_failed_title'),
-          e?.message || t('paywall.purchase_failed_body'),
-        );
+        alert(t('paywall.purchase_failed_title'), t('paywall.purchase_failed_body'));
       }
     } finally {
       setBusy(false);
@@ -70,7 +66,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
     }
     if (busy) return;
     setBusy(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    buzz.tap();
     try {
       const owned = await restorePurchases();
       alert(
@@ -79,10 +75,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
       );
       if (owned) onClose?.();
     } catch (e) {
-      alert(
-        t('paywall.restore_failed_title'),
-        e?.message || t('paywall.purchase_failed_body'),
-      );
+      alert(t('paywall.restore_failed_title'), t('paywall.purchase_failed_body'));
     } finally {
       setBusy(false);
     }
@@ -95,12 +88,9 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
   return (
     <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title="" leading="close" onLeading={onClose} />
+        <AppBar title={t('paywall.title')} leading="close" onLeading={onClose} />
       ) : (
-        <View style={styles.header}>
-          <View style={{ width: 44 }} />
-          <CloseButton onPress={onClose} />
-        </View>
+        <SheetHeader onClose={onClose} />
       )}
 
       <ScrollView
@@ -109,20 +99,24 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
         bounces={false}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{t('paywall.badge')}</Text>
-        </View>
-
-        <Text style={styles.title}>{t('paywall.title')}</Text>
+        {/* Android names the page in its bar, as every other page does. */}
+        {!M3 && (
+          <>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{t('paywall.badge').toUpperCase()}</Text>
+            </View>
+            <Text style={styles.title}>{t('paywall.title')}</Text>
+          </>
+        )}
         <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
 
         <View style={styles.benefits}>
           <Benefit
-            icon={<NoAdsIcon c={C.terracotta} />}
+            icon={<NoAds />}
             label={t('paywall.benefit_no_banners')}
           />
           <Benefit
-            icon={<RestoreIcon c={C.terracotta} />}
+            icon={<RestorePurchase />}
             label={t(M3 ? 'paywall.benefit_restore_android' : 'paywall.benefit_restore')}
             divider
           />
@@ -132,10 +126,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
           onPress={onBuy}
           disabled={busy}
           tint={C.terracotta}
-          style={({ pressed }) => [
-            styles.cta,
-            { opacity: pressed || busy ? 0.7 : 1 },
-          ]}
+          style={[styles.cta, busy && { opacity: PRESSED }]}
         >
           <Text style={styles.ctaText}>{ctaLabel}</Text>
         </GlassPressable>
@@ -149,7 +140,8 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
             onPress={onRestore}
             disabled={busy}
             hitSlop={8}
-            style={({ pressed }) => ({ opacity: pressed || busy ? 0.55 : 1 })}
+            accessibilityRole="button"
+            style={(state) => fade({ pressed: state.pressed || busy })}
           >
             <Text style={styles.restore}>{t('paywall.restore')}</Text>
           </Pressable>
@@ -171,42 +163,7 @@ function Benefit({ icon, label, divider }) {
   );
 }
 
-function NoAdsIcon({ c }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M4 7h12a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2z"
-        stroke={c}
-        strokeWidth={1.8}
-      />
-      <Path d="M18 9l4-2v10l-4-2" stroke={c} strokeWidth={1.8} strokeLinejoin="round" />
-      <Line x1={3} y1={21} x2={21} y2={3} stroke={c} strokeWidth={1.8} strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-function RestoreIcon({ c }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M4 12a8 8 0 0114.2-5M20 12a8 8 0 01-14.2 5"
-        stroke={c}
-        strokeWidth={1.8}
-        strokeLinecap="round"
-      />
-      <Path d="M18 3v4h-4M6 21v-4h4" stroke={c} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
-
 const makeStyles = (C) => StyleSheet.create({
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   body: {
     paddingHorizontal: 24,
     paddingBottom: 40,
@@ -214,19 +171,13 @@ const makeStyles = (C) => StyleSheet.create({
   },
   badge: {
     alignSelf: 'center',
-    backgroundColor: M3 ? C.terracottaSoft : C.terracotta,
+    backgroundColor: C.terracotta,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: M3 ? 8 : 999,
+    borderRadius: 999,
     marginBottom: 14,
   },
-  badgeText: {
-    fontFamily: FONT.ui,
-    fontSize: 11,
-    fontWeight: M3 ? '500' : '700',
-    color: M3 ? C.terracottaDeep : C.onTerracotta,
-    letterSpacing: M3 ? 0.5 : 0.8,
-  },
+  badgeText: { ...LABEL, color: C.onTerracotta },
   title: {
     fontFamily: FONT.display,
     fontSize: 28,
@@ -239,7 +190,7 @@ const makeStyles = (C) => StyleSheet.create({
   subtitle: {
     fontFamily: FONT.ui,
     fontSize: 15,
-    color: C.ink50,
+    color: C.ink70,
     textAlign: 'center',
     lineHeight: 21,
     marginBottom: 28,
@@ -253,10 +204,10 @@ const makeStyles = (C) => StyleSheet.create({
     marginBottom: 28,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingHorizontal: 16,
     marginBottom: 28,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: EDGE,
     borderColor: C.divider,
   },
   benefitRow: M3 ? {
@@ -285,15 +236,18 @@ const makeStyles = (C) => StyleSheet.create({
   benefitLabel: {
     flex: 1,
     fontFamily: FONT.ui,
-    fontSize: 15,
+    fontSize: M3 ? 16 : 15,
     fontWeight: M3 ? '400' : '500',
     color: C.ink,
   },
   cta: {
     backgroundColor: C.terracotta,
-    borderRadius: M3 ? 28 : GLASS ? 26 : 16,
-    ...(M3 ? { height: 56, justifyContent: 'center' } : null),
-    paddingVertical: 16,
+    borderRadius: M3 ? 28 : GLASS ? BUTTON.height / 2 : RADIUS.md,
+    // A floor, not a fixed height: the label may grow with the text size.
+    minHeight: M3 ? 56 : BUTTON.height,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: M3 ? 8 : 16,
   },
@@ -314,7 +268,7 @@ const makeStyles = (C) => StyleSheet.create({
   footer: {
     fontFamily: FONT.ui,
     fontSize: 12,
-    color: C.ink30,
+    color: C.ink70,
     textAlign: 'center',
   },
 });

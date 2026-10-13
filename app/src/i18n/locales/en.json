@@ -1,6 +1,69 @@
 {
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "save": "Save",
+    "delete": "Delete",
+    "oven": "Oven",
+    "air_fryer": "Air fryer",
+    "min": "min",
+    "hr": "hr"
+  },
+  "converter": {
+    "kicker": "Convert",
+    "saved_recipes": "Saved recipes",
+    "oven_to_air": "Oven → Air fryer",
+    "air_to_oven": "Air fryer → Oven",
+    "oven_recipe": "Oven recipe",
+    "air_fryer_recipe": "Air fryer recipe",
+    "swap": "Swap direction",
+    "share": "Share conversion",
+    "temperature": "Temperature",
+    "time": "Time",
+    "start_timer": "Start timer",
+    "share_oven": "%{temp} oven for %{time}",
+    "share_air": "%{temp} air fryer for %{time}",
+    "share_footer": "Converted with Air Fryer Converter",
+    "share_subject": "Air fryer conversion",
+    "timer_label": "Air fryer %{temp}"
+  },
+  "saved": {
+    "count": {
+      "one": "%{count} recipe",
+      "other": "%{count} recipes"
+    },
+    "search": "Search recipes",
+    "empty_title": "Nothing saved yet",
+    "empty_body": "Convert a recipe and tap “Save” to keep\nyour perfect time and temperature.",
+    "no_match": "No recipes match",
+    "delete_title": "Delete “%{name}”?",
+    "delete_message": "This can’t be undone.",
+    "delete_a11y": "Delete %{name}",
+    "recipe_fallback": "Recipe",
+    "oven_suffix": "oven",
+    "toast_saved": "Saved · timer started"
+  },
+  "save": {
+    "title": "Save recipe",
+    "name": "Recipe name",
+    "notes": "Notes",
+    "notes_placeholder": "Notes, e.g. shake at 10 min, single layer",
+    "emoji_a11y": "Type your own emoji",
+    "emoji_hint": "Switch to the emoji keyboard and pick one.",
+    "saving_both": "Saving both"
+  },
+  "presets": {
+    "fries": "Fries",
+    "chicken": "Chicken wings",
+    "salmon": "Salmon",
+    "veg": "Roast veg",
+    "bacon": "Bacon",
+    "pizza": "Pizza"
+  },
   "paywall": {
-    "badge": "PRO",
+    "badge": "Pro",
     "title": "Air Fryer Pro",
     "subtitle": "Pay once. Converter and timers stay free.",
     "benefit_no_banners": "No banners while you cook",
@@ -15,6 +78,7 @@
     "purchase_failed_title": "Purchase failed",
     "purchase_failed_body": "Try again later.",
     "not_configured": "In-app purchases not configured yet.",
+    "no_products": "No products available.",
     "restored_title": "Restored",
     "restored_body": "Pro is active on this device.",
     "nothing_title": "Nothing to restore",
@@ -22,11 +86,20 @@
     "restore_failed_title": "Restore failed"
   },
   "settings": {
+    "title": "Settings",
+    "dark_mode": "Dark mode",
+    "analytics": "Share anonymous analytics",
+    "analytics_subtitle": "Usage events only, never recipe content",
     "remove_ads": "Get Pro",
     "remove_ads_subtitle": "One-time purchase%{price}",
     "pro_active": "Pro",
     "pro_active_subtitle": "Ads removed. Thanks!",
-    "pro_active_pill": "ACTIVE"
+    "pro_active_pill": "Active",
+    "ad_privacy": "Ad privacy options",
+    "ad_privacy_subtitle": "Review or change your consent choices",
+    "privacy_policy": "Privacy policy",
+    "terms": "Terms of use",
+    "about": "About"
   },
   "ads": {
     "att_title": "Keep the app free",
@@ -36,9 +109,23 @@
   "timer": {
     "done": "Done!",
     "done_short": "Done",
+    "done_hint": "Tap Restart or Stop timer",
     "ready_at": "Ready at %{time}",
     "shake_at": "Shake at %{time}",
     "fallback_label": "Cook timer",
-    "channel_running": "Cook timer running"
+    "channel_running": "Cook timer running",
+    "channel_done": "Cook timer done",
+    "half_label": "Shake halfway reminder",
+    "half_sub": "Chime at the midpoint of this cook",
+    "restart": "Restart",
+    "restart_a11y": "Restart timer",
+    "stop": "Stop timer",
+    "notif_ready": "%{label} is ready.",
+    "notif_shake_title": "Shake halfway",
+    "notif_shake_body": "Give %{label} a shake.",
+    "toast_shake": "Shake halfway · %{label}",
+    "toast_shake_fallback": "cooking",
+    "toast_done": "Done · %{label}",
+    "toast_started": "Timer started · %{name}"
   }
 }

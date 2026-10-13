@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const LIGHT = {
   cream: '#FAF5EC',
@@ -20,6 +21,8 @@ const LIGHT = {
   sage: '#7A8F6E',
   sageSoft: '#DDE5D4',
   butter: '#E9B85B',
+  // A label that removes something.
+  danger: '#B3261E',
   divider: 'rgba(42,31,24,0.08)',
   cream0: 'rgba(255,247,238,0)',
   onTerracotta: '#FFF7EE',
@@ -52,6 +55,7 @@ const DARK = {
   sage:       '#B0BFA1',          // lighter sage so notes read on paper
   sageSoft:   '#2E382A',
   butter:     '#E9B85B',
+  danger:     '#F2877B',
   divider:    'rgba(242,232,216,0.13)',
   cream0:     'rgba(255,247,238,0)',
   // The terracotta result-card stays terracotta in dark mode, so its
@@ -78,6 +82,55 @@ export const FONT = {
   display: 'Fraunces_500Medium',
   displayBold: 'Fraunces_600SemiBold',
 };
+
+// How far text may grow with the phone's text-size setting
+// (maxFontSizeMultiplier). The big numbers and the one-line bars stop early,
+// so they stay on screen; everything else grows freely and wraps.
+export const GROW = { display: 1.2, bar: 1.3 };
+
+// The shared shapes of the iOS looks. Android keeps Material's own.
+// Corners: small for tiles and tags, medium for fields, rows and panels,
+// large for cards. Buttons and pills are fully round.
+export const RADIUS = { sm: 10, md: 16, lg: 24 };
+// The one line drawn round a box.
+export const EDGE = StyleSheet.hairlineWidth;
+// Main buttons: a capsule on iOS 26, RADIUS.md corners on older iPhones.
+export const BUTTON = { height: 52 };
+// The small capital label. The caller sets the colour.
+export const LABEL = {
+  fontFamily: FONT.ui,
+  fontSize: 12,
+  fontWeight: '700',
+  letterSpacing: 1,
+};
+
+// How far a pressed control fades on the iOS looks. Android ripples instead,
+// and glass on iOS 26 answers the finger itself.
+export const PRESSED = 0.6;
+
+// One buzz per tap, chosen by what the tap does, not by where it is.
+export const buzz = {
+  // Picking between values: a switch, a segment, a step, an emoji.
+  choice: () => Haptics.selectionAsync(),
+  // A small action beside the main ones: share, swap, restore.
+  tap: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+  // A main button: start, stop, restart, save, delete, buy.
+  action: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
+  // Something was kept: a recipe saved, a purchase made.
+  success: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
+};
+
+// True while the phone's Reduce Motion setting is on: slides, spins and
+// pulses then jump to where they end.
+export function useReduceMotion() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setOn);
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setOn);
+    return () => sub.remove();
+  }, []);
+  return on;
+}
 
 const ThemeContext = createContext({
   mode: 'light',

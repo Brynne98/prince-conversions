@@ -3,12 +3,12 @@ import {
   View, Text, Pressable, StyleSheet, Animated, Dimensions,
 } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, GROW, RADIUS, EDGE, BUTTON, buzz, useTheme, useStyles } from '../theme';
 import { Restart } from '../icons';
-import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
+import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
 import { formatRemaining } from '../timer';
+import { t } from '../i18n';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -60,14 +60,11 @@ export default function TimerScreen({
   const gapTurn = (gap / circumference) * 360;
 
   return (
-    <Sheet visible={visible} onClose={onClose} handle={false}>
+    <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title="Cook timer" leading="close" onLeading={onClose} />
+        <AppBar title={t('timer.fallback_label')} leading="close" onLeading={onClose} />
       ) : (
-        <View style={styles.header}>
-          <Text style={styles.kicker}>COOK TIMER</Text>
-          <CloseButton onPress={onClose} />
-        </View>
+        <SheetHeader title={t('timer.fallback_label')} onClose={onClose} />
       )}
 
       <View style={styles.center}>
@@ -113,12 +110,18 @@ export default function TimerScreen({
           <View style={styles.centerText} pointerEvents="none">
             {completed ? (
               <>
-                <Text style={styles.doneText}>Done!</Text>
-                <Text style={styles.doneSub}>Tap restart or cancel</Text>
+                <Text style={styles.doneText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>{t('timer.done')}</Text>
+                <Text style={styles.doneSub}>{t('timer.done_hint')}</Text>
               </>
             ) : (
               <>
-                <Text style={styles.timeText} numberOfLines={1}>
+                <Text
+                  style={styles.timeText}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.6}
+                  maxFontSizeMultiplier={GROW.display}
+                >
                   {formatRemaining(remainingSec)}
                 </Text>
                 {!!label && <Text style={styles.labelText}>{label}</Text>}
@@ -132,8 +135,8 @@ export default function TimerScreen({
         {!completed && (
           <View style={styles.halfRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.halfLabel}>Shake halfway reminder</Text>
-              <Text style={styles.halfSub}>Chime at the midpoint of this cook</Text>
+              <Text style={styles.halfLabel}>{t('timer.half_label')}</Text>
+              <Text style={styles.halfSub}>{t('timer.half_sub')}</Text>
             </View>
             <Toggle
               value={!!remindHalfway}
@@ -146,33 +149,35 @@ export default function TimerScreen({
           {completed && (
             <GlassPressable
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                buzz.action();
                 onRestart?.();
               }}
               tint={C.terracotta}
-              style={({ pressed }) => [
-                styles.actionBtn,
-                styles.restartBtn,
-                { opacity: pressed ? 0.85 : 1 },
-              ]}
+              style={[styles.actionBtn, styles.restartBtn]}
             >
               <Restart s={18} c={C.onTerracotta} />
-              <Text style={styles.restartText}>Restart</Text>
+              <Text style={styles.restartText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar}>{t('timer.restart')}</Text>
             </GlassPressable>
           )}
           <GlassPressable
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              buzz.action();
               onCancel?.();
               onClose?.();
             }}
-            style={({ pressed }) => [
-              styles.actionBtn,
-              styles.cancelBtn,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
+            style={[styles.actionBtn, styles.stopBtn]}
           >
-            <Text style={styles.cancelText}>Cancel</Text>
+            {/* Stopping a running timer throws its time away, so it reads as
+                a delete; a finished one has nothing left to lose. */}
+            <Text
+              style={[styles.stopText, !completed && { color: C.danger }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+              maxFontSizeMultiplier={GROW.bar}
+            >
+              {t('timer.stop')}
+            </Text>
           </GlassPressable>
         </View>
       </View>
@@ -181,21 +186,6 @@ export default function TimerScreen({
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  kicker: {
-    fontFamily: FONT.ui,
-    fontSize: 12,
-    fontWeight: '700',
-    color: C.terracotta,
-    letterSpacing: 1.6,
-  },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -216,7 +206,7 @@ const makeStyles = (C) => StyleSheet.create({
   labelText: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 8,
     fontWeight: '500',
   },
@@ -234,19 +224,19 @@ const makeStyles = (C) => StyleSheet.create({
     gap: 16,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   halfLabel: M3 ? {
     fontFamily: FONT.ui,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
     color: C.ink,
   } : {
     fontFamily: FONT.ui,
@@ -262,7 +252,7 @@ const makeStyles = (C) => StyleSheet.create({
   } : {
     fontFamily: FONT.ui,
     fontSize: 12,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 2,
   },
   actionRow: {
@@ -271,23 +261,24 @@ const makeStyles = (C) => StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
-    height: 56,
-    borderRadius: GLASS || M3 ? 28 : 18,
+    height: M3 ? 56 : BUTTON.height,
+    borderRadius: M3 ? 28 : GLASS ? BUTTON.height / 2 : RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 8,
   },
-  cancelBtn: {
-    backgroundColor: M3 ? C.terracottaSoft : C.ink,
+  // Plain glass on iOS 26; a tonal button on Android; a faint wash on older
+  // iPhones.
+  stopBtn: {
+    backgroundColor: M3 ? C.terracottaSoft : C.ink06,
   },
-  cancelText: {
+  stopText: {
+    flexShrink: 1,
     fontFamily: FONT.ui,
     fontSize: 16,
     fontWeight: M3 ? '500' : '600',
-    // Plain glass on iOS 26, so the label is ink; a tonal button on Android;
-    // a solid ink button on older iPhones.
-    color: M3 ? C.terracottaDeep : GLASS ? C.ink : C.cream,
+    color: M3 ? C.terracottaDeep : C.ink,
     letterSpacing: M3 ? 0 : -0.2,
   },
   restartBtn: {
@@ -299,6 +290,7 @@ const makeStyles = (C) => StyleSheet.create({
     fontWeight: M3 ? '500' : '600',
     color: C.onTerracotta,
     letterSpacing: M3 ? 0 : -0.2,
+    flexShrink: 1,
   },
   doneText: {
     fontFamily: FONT.display,
@@ -310,7 +302,7 @@ const makeStyles = (C) => StyleSheet.create({
   doneSub: {
     fontFamily: FONT.ui,
     fontSize: 14,
-    color: C.ink50,
+    color: C.ink70,
     marginTop: 8,
     fontWeight: '500',
   },

@@ -3,12 +3,12 @@ import {
   View, Text, ScrollView, TextInput, Pressable,
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
-import { Sheet, AppBar, TextButton, Field } from '../primitives';
-import { GLASS, M3, cap, GlassPressable } from '../glass';
+import { FONT, GROW, RADIUS, EDGE, LABEL, buzz, useTheme, useStyles } from '../theme';
+import { Sheet, SheetHeader, AppBar, TextButton, Field } from '../primitives';
+import { GLASS, M3, cap, GlassPressable, fade } from '../glass';
 import { formatMinutes } from '../convert';
 import { Pencil } from '../icons';
+import { t } from '../i18n';
 
 // One emoji can be several characters joined together: a family, a flag, a
 // skin tone. These helpers find where one ends and the next begins.
@@ -68,7 +68,7 @@ export default function SaveSheet({
     const next = lastEmoji(text);
     if (next && next !== draft.emoji) {
       setDraft({ ...draft, emoji: next });
-      Haptics.selectionAsync();
+      buzz.choice();
     }
   };
   const emojiButton = (
@@ -76,8 +76,10 @@ export default function SaveSheet({
       onPress={() => emojiField.current?.focus()}
       hitSlop={6}
       accessibilityRole="button"
-      accessibilityLabel="Type your own emoji"
-      style={[styles.nameEmojiBox, typing && styles.nameEmojiTyping]}
+      accessibilityLabel={t('save.emoji_a11y')}
+      // Unclipped, so the pencil badge on the corner stays whole.
+      android_ripple={{ color: C.ink10, borderless: true, radius: 28 }}
+      style={(state) => [styles.nameEmojiBox, typing && styles.nameEmojiTyping, fade(state)]}
     >
       <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
       <View style={styles.emojiBadge}>
@@ -91,6 +93,7 @@ export default function SaveSheet({
         onBlur={() => setTyping(false)}
         pointerEvents="none"
         caretHidden
+        contextMenuHidden
         autoCorrect={false}
         returnKeyType="done"
         keyboardAppearance={mode}
@@ -99,12 +102,12 @@ export default function SaveSheet({
     </Pressable>
   );
   const emojiHint = typing && (
-    <Text style={styles.emojiHint}>Switch to the emoji keyboard and pick one.</Text>
+    <Text style={styles.emojiHint}>{t('save.emoji_hint')}</Text>
   );
 
   const save = () => {
     if (valid) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      buzz.success();
       onSave();
     }
   };
@@ -123,9 +126,13 @@ export default function SaveSheet({
             key={e}
             onPress={() => {
               setDraft({ ...draft, emoji: e });
-              Haptics.selectionAsync();
+              buzz.choice();
             }}
-            style={[styles.gridItem, active && { backgroundColor: C.terracottaSoft }]}
+            android_ripple={{ color: C.ink10, foreground: true }}
+            accessibilityRole="button"
+            accessibilityLabel={e}
+            accessibilityState={{ selected: active }}
+            style={(state) => [styles.gridItem, active && { backgroundColor: C.terracottaSoft }, fade(state)]}
           >
             <Text style={styles.gridEmoji}>{e}</Text>
           </Pressable>
@@ -135,14 +142,14 @@ export default function SaveSheet({
   );
   const summary = (
     <View style={styles.summary}>
-      <Text style={styles.summaryKicker}>{cap('Saving both')}</Text>
+      <Text style={styles.summaryKicker}>{cap(t('save.saving_both'))}</Text>
       <View style={styles.summaryRow}>
         <Text style={styles.summaryText}>
-          <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
+          <Text style={{ fontWeight: '700' }}>{t('common.oven')}</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
         </Text>
         <Text style={[styles.summaryText, { opacity: 0.5 }]}>↔</Text>
         <Text style={styles.summaryText}>
-          <Text style={{ fontWeight: '700' }}>Air fryer</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
+          <Text style={{ fontWeight: '700' }}>{t('common.air_fryer')}</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
         </Text>
       </View>
     </View>
@@ -153,9 +160,9 @@ export default function SaveSheet({
   if (M3) {
     return (
       <Sheet visible={visible} onClose={onClose}>
-        <AppBar title="Save recipe" leading="close" onLeading={onClose}>
+        <AppBar title={t('save.title')} leading="close" onLeading={onClose}>
           <View style={{ marginRight: 8 }}>
-            <TextButton label="Save" onPress={save} disabled={!valid} />
+            <TextButton label={t('common.save')} onPress={save} disabled={!valid} />
           </View>
         </AppBar>
         <ScrollView
@@ -167,9 +174,9 @@ export default function SaveSheet({
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             {emojiButton}
             <Field
-              label="Recipe name"
+              label={t('save.name')}
               value={draft.name}
-              onChangeText={(t) => setDraft({ ...draft, name: t })}
+              onChangeText={(v) => setDraft({ ...draft, name: v })}
               returnKeyType="done"
               keyboardAppearance={mode}
               style={{ flex: 1 }}
@@ -178,9 +185,9 @@ export default function SaveSheet({
           {emojiHint}
           {emojiGrid}
           <Field
-            label="Notes"
+            label={t('save.notes')}
             value={draft.note}
-            onChangeText={(t) => setDraft({ ...draft, note: t })}
+            onChangeText={(v) => setDraft({ ...draft, note: v })}
             returnKeyType="done"
             keyboardAppearance={mode}
           />
@@ -192,25 +199,29 @@ export default function SaveSheet({
 
   return (
     <Sheet visible={visible} onClose={onClose}>
-      <View style={styles.headerRow}>
-        <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </GlassPressable>
-        <Text style={styles.title}>Save recipe</Text>
-        <GlassPressable
-          onPress={save}
-          hitSlop={10}
-          disabled={!valid}
-          // Tinted glass once there is something to save, as Apple's Done.
-          tint={valid ? C.terracotta : undefined}
-          style={styles.headerBtn}
-        >
-          <Text style={[
-            styles.saveText,
-            { color: !valid ? C.ink30 : GLASS ? C.onTerracotta : C.terracotta },
-          ]}>Save</Text>
-        </GlassPressable>
-      </View>
+      <SheetHeader
+        title={t('save.title')}
+        leading={(
+          <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
+            <Text style={styles.cancelText} maxFontSizeMultiplier={GROW.bar}>{t('common.cancel')}</Text>
+          </GlassPressable>
+        )}
+        trailing={(
+          <GlassPressable
+            onPress={save}
+            hitSlop={10}
+            disabled={!valid}
+            // Tinted glass once there is something to save, as Apple's Done.
+            tint={valid ? C.terracotta : undefined}
+            style={styles.headerBtn}
+          >
+            <Text maxFontSizeMultiplier={GROW.bar} style={[
+              styles.saveText,
+              { color: !valid ? C.ink30 : GLASS ? C.onTerracotta : C.terracotta },
+            ]}>{t('common.save')}</Text>
+          </GlassPressable>
+        )}
+      />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -225,8 +236,8 @@ export default function SaveSheet({
             {emojiButton}
             <TextInput
               value={draft.name}
-              onChangeText={(t) => setDraft({ ...draft, name: t })}
-              placeholder="Recipe name"
+              onChangeText={(v) => setDraft({ ...draft, name: v })}
+              placeholder={t('save.name')}
               placeholderTextColor={C.ink50}
               style={styles.nameInput}
               returnKeyType="done"
@@ -241,8 +252,8 @@ export default function SaveSheet({
           <View style={styles.notesBox}>
             <TextInput
               value={draft.note}
-              onChangeText={(t) => setDraft({ ...draft, note: t })}
-              placeholder="Notes — e.g. shake at 10 min, single layer"
+              onChangeText={(v) => setDraft({ ...draft, note: v })}
+              placeholder={t('save.notes_placeholder')}
               placeholderTextColor={C.ink50}
               style={styles.notesInput}
               returnKeyType="done"
@@ -258,13 +269,6 @@ export default function SaveSheet({
 }
 
 const makeStyles = (C) => StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
   // A glass capsule on iOS 26; a text button with a full-height hit area elsewhere.
   headerBtn: {
     minHeight: 44,
@@ -272,21 +276,20 @@ const makeStyles = (C) => StyleSheet.create({
     ...(GLASS ? { paddingHorizontal: 18, borderRadius: 22 } : null),
   },
   cancelText: { fontFamily: FONT.ui, fontSize: 15, color: C.ink70 },
-  title: { fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.ink },
   saveText: { fontFamily: FONT.ui, fontSize: 15, fontWeight: '600' },
   namePill: {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
   },
   nameEmojiBox: {
-    width: M3 ? 56 : 40, height: M3 ? 56 : 40, borderRadius: M3 ? 28 : 10,
+    width: M3 ? 56 : 40, height: M3 ? 56 : 40, borderRadius: M3 ? 28 : RADIUS.sm,
     backgroundColor: C.terracottaSoft,
     alignItems: 'center', justifyContent: 'center',
   },
@@ -304,7 +307,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   // Out of sight, but still able to hold the keyboard's focus.
   emojiHidden: { position: 'absolute', width: 1, height: 1, opacity: 0, padding: 0 },
-  emojiHint: { fontFamily: FONT.ui, fontSize: 13, color: C.ink50, paddingHorizontal: 4 },
+  emojiHint: { fontFamily: FONT.ui, fontSize: 13, color: C.ink70, paddingHorizontal: 4 },
   nameInput: {
     flex: 1,
     fontFamily: FONT.ui,
@@ -320,8 +323,8 @@ const makeStyles = (C) => StyleSheet.create({
     flexGrow: 0,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 16,
-    borderWidth: 0.5,
+    borderRadius: RADIUS.md,
+    borderWidth: EDGE,
     borderColor: C.ink10,
     maxHeight: 220,
   },
@@ -330,20 +333,23 @@ const makeStyles = (C) => StyleSheet.create({
     flexWrap: 'wrap',
     padding: 6,
   },
+  // Seven to a row, 48 high: the size Android asks of anything tapped. A
+  // hair under a seventh, or rounding sends the seventh to the next row.
   gridItem: {
-    width: `${100 / 8}%`,
-    height: 40,
+    width: '14.28%',
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: M3 ? 20 : 10,
+    borderRadius: M3 ? 24 : RADIUS.sm,
+    overflow: 'hidden',
   },
   gridEmoji: { fontSize: 22 },
   notesBox: {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
-    borderWidth: 0.5,
+    borderWidth: EDGE,
     borderColor: C.ink10,
     justifyContent: 'center',
   },
@@ -356,21 +362,23 @@ const makeStyles = (C) => StyleSheet.create({
   summary: {
     marginTop: 4,
     backgroundColor: C.terracottaSoft,
-    borderRadius: M3 ? 16 : 14,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 14,
     gap: 6,
   },
-  summaryKicker: {
+  summaryKicker: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 10,
-    fontWeight: M3 ? '500' : '700',
+    fontWeight: '500',
     color: C.terracottaDeep,
-    letterSpacing: M3 ? 0.4 : 1,
+    letterSpacing: 0.4,
     opacity: 0.7,
-  },
+  } : { ...LABEL, color: C.terracottaDeep, opacity: 0.7 },
+  // Wraps to a second line when the two halves do not fit, as in Italian.
   summaryRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 6,
