@@ -1,0 +1,337 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "version": "1.5.0",
+    "copyright": "2026 Brynne Prince",
+    "release": {
+      "automaticRelease": true
+    },
+    "info": {
+      "nl-NL": {
+        "description": "De eenvoudigste manier om recepten tussen je oven en airfryer om te rekenen - in beide richtingen.\nVoer temperatuur en tijd in, en Airfryer Omrekener toont direct de juiste instellingen. Een ovenrecept in de airfryer maken? Geregeld. Een airfryer-recept gevonden, maar alleen een oven? Wissel de richting met één tik.\n\nWerkt beide kanten op: oven naar airfryer, en andersom\nIn °C en °F: schakel wanneer je wilt\nBewaar je favoriete omrekeningen als recepten met naam en emoji\nIngebouwde timer met halverwege-melding: ideaal om te keren of te schudden\nMooie donkere modus\nEenvoudig en zonder afleiding\n\nStop met gokken hoe lang kip, frites of groenten moeten. Voer je recept in en begin te koken.\nPro-versie: verwijder advertenties met een eenmalige aankoop. Geen abonnementen.",
+        "keywords": [
+          "koken",
+          "oven",
+          "recept",
+          "bakken",
+          "braden",
+          "opwarmen",
+          "celsius",
+          "fahrenheit",
+          "timer",
+          "frituren",
+          "heteluchtfriteuse",
+          "keuken"
+        ],
+        "releaseNotes": "• Timers waarschuwen je nu ook als je iPhone vergrendeld is\n• Lopende timers staan op het toegangsscherm en in het Dynamic Island\n• Deel een omrekening met één tik\n• Een frisse look, plus donkere en getinte appsymbolen",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Airfryer Omrekener",
+        "subtitle": "Recept tijd & temperatuur",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/nl-NL/APP_IPHONE_67/screenshot_1_nl.png",
+            "store/apple/screenshot/nl-NL/APP_IPHONE_67/screenshot_2_nl.png",
+            "store/apple/screenshot/nl-NL/APP_IPHONE_67/screenshot_4_nl.png",
+            "store/apple/screenshot/nl-NL/APP_IPHONE_67/screenshot_3_nl.png",
+            "store/apple/screenshot/nl-NL/APP_IPHONE_67/screenshot_5_nl.png",
+            "store/apple/screenshot/nl-NL/APP_IPHONE_67/screenshot_6_nl.png"
+          ]
+        }
+      },
+      "en-GB": {
+        "description": "The simplest way to convert recipes between your oven and air fryer - in either direction.\nType in the temperature and time, and Air Fryer Converter instantly shows you the equivalent settings. Cooking an oven recipe in your air fryer? Done. Found an air fryer recipe, but only have an oven? Just flip the direction with one tap.\n\nConvert both ways - oven to air fryer, air fryer to oven\nWorks in °C and °F - switch anytime\nSave your favorite conversions as named recipes with emojis\nBuilt-in cooking timer with a smart halfway-point alert - perfect for flipping or shaking food\nBeautiful dark mode\nClean, simple, distraction-free\n\nStop guessing how long to cook chicken, fries, or vegetables. Stop overcooking dinner. Just enter your recipe and start cooking - Air Fryer Converter does the math.\nPro version - Remove ads with a single one-time purchase. No subscriptions, ever.",
+        "keywords": [
+          "cooking",
+          "bake",
+          "roast",
+          "reheat",
+          "celsius",
+          "fahrenheit",
+          "kitchen",
+          "convection",
+          "timer",
+          "fry",
+          "chart",
+          "guide",
+          "chef",
+          "food"
+        ],
+        "releaseNotes": "• Timers now alert you even when your phone is locked\n• Running timers show on the lock screen and Dynamic Island\n• Share a conversion with one tap\n• A fresh look, plus dark and tinted app icons",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Oven to Air Fryer Converter",
+        "subtitle": "Recipe Timer & Temp Calculator",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy"
+      },
+      "es-ES": {
+        "description": "La forma más simple de convertir recetas entre tu horno y tu freidora de aire - en ambas direcciones.\nIngresa la temperatura y el tiempo, y Convertidor Freidora de Aire te muestra al instante los ajustes equivalentes. ¿Quieres cocinar una receta de horno en tu freidora de aire? Listo. ¿Encontraste una receta para freidora de aire pero solo tienes horno? Cambia la dirección con un toque.\n\nConvierte en ambos sentidos: horno a freidora de aire, freidora de aire a horno\nFunciona en °C y °F: cambia cuando quieras\nGuarda tus conversiones favoritas como recetas con nombre y emoji\nTemporizador integrado con alerta a la mitad: ideal para voltear o sacudir la comida\nHermoso modo oscuro\nLimpio, simple, sin distracciones\n\nDeja de adivinar cuánto tiempo cocinar pollo, papas o verduras. Solo ingresa tu receta y comienza a cocinar.\nVersión Pro: elimina los anuncios con una sola compra única. Sin suscripciones.",
+        "keywords": [
+          "cocina",
+          "horno",
+          "receta",
+          "hornear",
+          "asar",
+          "recalentar",
+          "celsius",
+          "fahrenheit",
+          "temporizador",
+          "freidora",
+          "airfryer"
+        ],
+        "releaseNotes": "• Los temporizadores ahora te avisan aunque el iPhone esté bloqueado\n• Los temporizadores en curso aparecen en la pantalla de bloqueo y en la Dynamic Island\n• Comparte una conversión con un toque\n• Un aspecto renovado, con iconos de la app oscuros y tintados",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Convertidor Freidora de Aire",
+        "subtitle": "Calculadora de tiempo y temp",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/es-ES/APP_IPHONE_67/screenshot_1_es.png",
+            "store/apple/screenshot/es-ES/APP_IPHONE_67/screenshot_2_es.png",
+            "store/apple/screenshot/es-ES/APP_IPHONE_67/screenshot_4_es.png",
+            "store/apple/screenshot/es-ES/APP_IPHONE_67/screenshot_3_es.png",
+            "store/apple/screenshot/es-ES/APP_IPHONE_67/screenshot_5_es.png",
+            "store/apple/screenshot/es-ES/APP_IPHONE_67/screenshot_6_es.png"
+          ]
+        }
+      },
+      "it": {
+        "description": "Il modo più semplice per convertire ricette tra il tuo forno e la friggitrice ad aria - in entrambe le direzioni.\nInserisci temperatura e tempo, e Convertitore Friggitrice Aria ti mostra subito le impostazioni equivalenti. Vuoi cucinare una ricetta da forno nella friggitrice ad aria? Fatto. Hai trovato una ricetta per friggitrice ad aria ma hai solo il forno? Inverti la direzione con un tap.\n\nConverte in entrambi i sensi: forno verso friggitrice ad aria, e viceversa\nFunziona in °C e °F: cambia quando vuoi\nSalva le tue conversioni preferite come ricette con nome ed emoji\nTimer integrato con avviso a metà cottura: perfetto per girare o scuotere\nBellissima modalità scura\nPulito, semplice, senza distrazioni\n\nBasta indovinare i tempi di cottura di pollo, patatine o verdure. Inserisci la ricetta e inizia a cucinare.\nVersione Pro: rimuovi gli annunci con un unico acquisto. Nessun abbonamento.",
+        "keywords": [
+          "cucina",
+          "forno",
+          "ricetta",
+          "cuocere",
+          "arrostire",
+          "riscaldare",
+          "celsius",
+          "fahrenheit",
+          "timer",
+          "friggere",
+          "airfryer"
+        ],
+        "releaseNotes": "• I timer ora ti avvisano anche con l’iPhone bloccato\n• I timer attivi compaiono nella schermata di blocco e nella Dynamic Island\n• Condividi una conversione con un tocco\n• Un look rinnovato, con icone dell’app scure e colorate",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Convertitore Friggitrice Aria",
+        "subtitle": "Calcolatore tempo e temp",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/it/APP_IPHONE_67/screenshot_1_it.png",
+            "store/apple/screenshot/it/APP_IPHONE_67/screenshot_2_it.png",
+            "store/apple/screenshot/it/APP_IPHONE_67/screenshot_4_it.png",
+            "store/apple/screenshot/it/APP_IPHONE_67/screenshot_3_it.png",
+            "store/apple/screenshot/it/APP_IPHONE_67/screenshot_5_it.png",
+            "store/apple/screenshot/it/APP_IPHONE_67/screenshot_6_it.png"
+          ]
+        }
+      },
+      "en-US": {
+        "description": "The simplest way to convert recipes between your oven and air fryer - in either direction.\nType in the temperature and time, and Air Fryer Converter instantly shows you the equivalent settings. Cooking an oven recipe in your air fryer? Done. Found an air fryer recipe, but only have an oven? Just flip the direction with one tap.\n\nConvert both ways - oven to air fryer, air fryer to oven\nWorks in °C and °F - switch anytime\nSave your favorite conversions as named recipes with emojis\nBuilt-in cooking timer with a smart halfway-point alert - perfect for flipping or shaking food\nBeautiful dark mode\nClean, simple, distraction-free\n\nStop guessing how long to cook chicken, fries, or vegetables. Stop overcooking dinner. Just enter your recipe and start cooking - Air Fryer Converter does the math.\nPro version - Remove ads with a single one-time purchase. No subscriptions, ever.",
+        "keywords": [
+          "airfryer",
+          "convertor",
+          "conversion",
+          "chart",
+          "recipes",
+          "temperature",
+          "cooking",
+          "convection",
+          "celsius",
+          "fahrenheit",
+          "calc"
+        ],
+        "releaseNotes": "• Timers now alert you even when your phone is locked\n• Running timers show on the lock screen and Dynamic Island\n• Share a conversion with one tap\n• A fresh look, plus dark and tinted app icons",
+        "marketingUrl": "https://brynne98.github.io/prince-conversions/",
+        "promoText": "Convert any oven recipe to air fryer time and temperature in one tap. Works both ways, in °F or °C, with a built-in cook timer and a halfway shake reminder.",
+        "supportUrl": "https://brynne98.github.io/prince-conversions/",
+        "title": "Oven to Air Fryer Converter",
+        "subtitle": "Cook Time Calculator & Timer",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/en-US/APP_IPHONE_67/01-hero.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_67/02-device-bottom.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_67/03-two-devices.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_67/04-device-bottom.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_67/05-no-device.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_67/06-two-devices.png"
+          ],
+          "APP_IPHONE_61": [
+            "store/apple/screenshot/en-US/APP_IPHONE_61/01-hero.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_61/02-device-bottom.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_61/03-two-devices.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_61/04-device-bottom.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_61/05-no-device.png",
+            "store/apple/screenshot/en-US/APP_IPHONE_61/06-two-devices.png"
+          ]
+        }
+      },
+      "de-DE": {
+        "description": "Der einfachste Weg, Rezepte zwischen Backofen und Heißluftfritteuse umzurechnen - in beide Richtungen.\nGib Temperatur und Zeit ein, und Heißluftfritteuse Umrechner zeigt dir sofort die passenden Einstellungen. Du willst ein Backofen-Rezept in der Heißluftfritteuse zubereiten? Erledigt. Du hast ein Airfryer-Rezept gefunden, aber nur einen Backofen? Tippe einmal, um die Richtung zu wechseln.\n\nUmrechnung in beide Richtungen: Backofen zu Heißluftfritteuse, und umgekehrt\nFunktioniert in °C und °F: jederzeit umschaltbar\nSpeichere deine Lieblings-Umrechnungen als Rezepte mit Name und Emoji\nIntegrierter Timer mit Halbzeit-Erinnerung: perfekt zum Wenden oder Schütteln\nSchöner Dunkelmodus\nKlar, einfach, ohne Ablenkung\n\nSchluss mit dem Raten, wie lange Hähnchen, Pommes oder Gemüse brauchen. Rezept eingeben und loslegen.\nPro-Version: Entferne Werbung mit einem einmaligen Kauf. Keine Abos.",
+        "keywords": [
+          "kochen",
+          "backofen",
+          "rezept",
+          "backen",
+          "braten",
+          "aufwärmen",
+          "celsius",
+          "fahrenheit",
+          "timer",
+          "frittieren",
+          "airfryer"
+        ],
+        "releaseNotes": "• Timer melden sich jetzt auch bei gesperrtem iPhone\n• Laufende Timer erscheinen auf dem Sperrbildschirm und in der Dynamic Island\n• Umrechnung mit einem Tipp teilen\n• Frischer Look, dazu dunkle und getönte App-Symbole",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Heißluftfritteuse Umrechner",
+        "subtitle": "Rezept Zeit & Temperatur",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/de-DE/APP_IPHONE_67/screenshot_1_de.png",
+            "store/apple/screenshot/de-DE/APP_IPHONE_67/screenshot_2_de.png",
+            "store/apple/screenshot/de-DE/APP_IPHONE_67/screenshot_4_de.png",
+            "store/apple/screenshot/de-DE/APP_IPHONE_67/screenshot_3_de.png",
+            "store/apple/screenshot/de-DE/APP_IPHONE_67/screenshot_5_de.png",
+            "store/apple/screenshot/de-DE/APP_IPHONE_67/screenshot_6_de.png"
+          ]
+        }
+      },
+      "pt-BR": {
+        "description": "A forma mais simples de converter receitas entre seu forno e airfryer - nos dois sentidos.\nDigite a temperatura e o tempo, e o Conversor Airfryer mostra instantaneamente os ajustes equivalentes. Quer fazer uma receita de forno na airfryer? Pronto. Encontrou uma receita de airfryer mas só tem forno? Inverta a direção com um toque.\n\nConverte nos dois sentidos: forno para airfryer e airfryer para forno\nFunciona em °C e °F: troque quando quiser\nSalve suas conversões favoritas como receitas com nome e emoji\nTimer integrado com alerta na metade do tempo: perfeito para virar ou sacudir os alimentos\nLindo modo escuro\nSimples, limpo, sem distrações\n\nPare de adivinhar o tempo de cocção de frango, batatas ou legumes. Apenas digite sua receita e comece a cozinhar.\nVersão Pro: remova os anúncios com uma única compra. Sem assinaturas.",
+        "keywords": [
+          "cozinha",
+          "forno",
+          "receita",
+          "assar",
+          "esquentar",
+          "celsius",
+          "fahrenheit",
+          "temporizador",
+          "fritar",
+          "fritadeira",
+          "ar"
+        ],
+        "releaseNotes": "• Os timers agora avisam você mesmo com o iPhone bloqueado\n• Timers em andamento aparecem na Tela Bloqueada e na Dynamic Island\n• Compartilhe uma conversão com um toque\n• Visual renovado, com ícones do app escuros e tonalizados",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Conversor Airfryer e Forno",
+        "subtitle": "Calculadora de tempo e temp",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/pt-BR/APP_IPHONE_67/screenshot_1_pt.png",
+            "store/apple/screenshot/pt-BR/APP_IPHONE_67/screenshot_2_pt.png",
+            "store/apple/screenshot/pt-BR/APP_IPHONE_67/screenshot_4_pt.png",
+            "store/apple/screenshot/pt-BR/APP_IPHONE_67/screenshot_3_pt.png",
+            "store/apple/screenshot/pt-BR/APP_IPHONE_67/screenshot_5_pt.png",
+            "store/apple/screenshot/pt-BR/APP_IPHONE_67/screenshot_6_pt.png"
+          ]
+        }
+      },
+      "fr-FR": {
+        "description": "La façon la plus simple de convertir des recettes entre votre four et votre friteuse à air - dans les deux sens.\nEntrez la température et le temps, et Convertisseur Friteuse à Air vous montre instantanément les réglages équivalents. Vous voulez préparer une recette de four dans votre friteuse à air ? C'est fait. Vous avez trouvé une recette de friteuse à air mais vous n'avez qu'un four ? Inversez le sens en un seul tap.\n\nConversion dans les deux sens : four vers friteuse à air, et inversement\nFonctionne en °C et °F : changez quand vous voulez\nSauvegardez vos conversions favorites comme recettes avec nom et emoji\nMinuteur intégré avec alerte à mi-cuisson : parfait pour retourner ou secouer\nBeau mode sombre\nSimple, épuré, sans distraction\n\nFini les approximations sur le temps de cuisson du poulet, des frites ou des légumes. Entrez votre recette et lancez-vous.\nVersion Pro : supprimez les publicités avec un achat unique. Pas d'abonnements.",
+        "keywords": [
+          "cuisine",
+          "four",
+          "recette",
+          "cuisson",
+          "rôtir",
+          "réchauffer",
+          "celsius",
+          "fahrenheit",
+          "minuteur",
+          "frire",
+          "airfryer",
+          "chaleur"
+        ],
+        "releaseNotes": "• Les minuteurs vous alertent désormais même quand l’iPhone est verrouillé\n• Les minuteurs en cours s’affichent sur l’écran verrouillé et dans Dynamic Island\n• Partagez une conversion d’un seul geste\n• Un nouveau look, avec des icônes d’app sombres et teintées",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Convertisseur Friteuse à Air",
+        "subtitle": "Calculateur temps & temp",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/fr-FR/APP_IPHONE_67/screenshot_1_fr.png",
+            "store/apple/screenshot/fr-FR/APP_IPHONE_67/screenshot_2_fr.png",
+            "store/apple/screenshot/fr-FR/APP_IPHONE_67/screenshot_4_fr.png",
+            "store/apple/screenshot/fr-FR/APP_IPHONE_67/screenshot_3_fr.png",
+            "store/apple/screenshot/fr-FR/APP_IPHONE_67/screenshot_5_fr.png",
+            "store/apple/screenshot/fr-FR/APP_IPHONE_67/screenshot_6_fr.png"
+          ]
+        }
+      },
+      "es-MX": {
+        "description": "La forma más simple de convertir recetas entre tu horno y tu freidora de aire - en ambas direcciones.\nIngresa la temperatura y el tiempo, y Convertidor Freidora de Aire te muestra al instante los ajustes equivalentes. ¿Quieres cocinar una receta de horno en tu freidora de aire? Listo. ¿Encontraste una receta para freidora de aire pero solo tienes horno? Cambia la dirección con un toque.\n\nConvierte en ambos sentidos: horno a freidora de aire, freidora de aire a horno\nFunciona en °C y °F: cambia cuando quieras\nGuarda tus conversiones favoritas como recetas con nombre y emoji\nTemporizador integrado con alerta a la mitad: ideal para voltear o sacudir la comida\nHermoso modo oscuro\nLimpio, simple, sin distracciones\n\nDeja de adivinar cuánto tiempo cocinar pollo, papas o verduras. Solo ingresa tu receta y comienza a cocinar.\nVersión Pro: elimina los anuncios con una sola compra única. Sin suscripciones.",
+        "keywords": [
+          "cocina",
+          "horno",
+          "receta",
+          "hornear",
+          "asar",
+          "recalentar",
+          "celsius",
+          "fahrenheit",
+          "temporizador",
+          "freir",
+          "airfryer"
+        ],
+        "releaseNotes": "• Los temporizadores ahora te avisan aunque el iPhone esté bloqueado\n• Los temporizadores en curso aparecen en la pantalla de bloqueo y en la Dynamic Island\n• Comparte una conversión con un toque\n• Un aspecto renovado, con íconos de la app oscuros y tintados",
+        "marketingUrl": "https://brynne98.github.io/",
+        "supportUrl": "https://github.com/Brynne98/prince-conversions",
+        "title": "Convertidor Freidora de Aire",
+        "subtitle": "Calculadora de tiempo y temp",
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "store/apple/screenshot/es-MX/APP_IPHONE_67/screenshot_1_es.png",
+            "store/apple/screenshot/es-MX/APP_IPHONE_67/screenshot_2_es.png",
+            "store/apple/screenshot/es-MX/APP_IPHONE_67/screenshot_4_es.png",
+            "store/apple/screenshot/es-MX/APP_IPHONE_67/screenshot_3_es.png",
+            "store/apple/screenshot/es-MX/APP_IPHONE_67/screenshot_5_es.png",
+            "store/apple/screenshot/es-MX/APP_IPHONE_67/screenshot_6_es.png"
+          ]
+        }
+      }
+    },
+    "categories": [
+      "FOOD_AND_DRINK",
+      "UTILITIES"
+    ],
+    "advisory": {
+      "ageRatingOverride": "NONE",
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gambling": false,
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "kidsAgeBand": null,
+      "koreaAgeRatingOverride": "NONE",
+      "lootBox": false,
+      "matureOrSuggestiveThemes": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "unrestrictedWebAccess": false,
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "advertising": true,
+      "ageAssurance": false,
+      "ageRatingOverrideV2": "NONE",
+      "developerAgeRatingInfoUrl": null,
+      "gunsOrOtherWeapons": "NONE",
+      "healthOrWellnessTopics": false,
+      "messagingAndChat": false,
+      "parentalControls": false,
+      "userGeneratedContent": false
+    }
+  }
+}
