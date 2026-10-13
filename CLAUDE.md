@@ -27,18 +27,23 @@ Only on Brynne's say-so, every time.
   Console to hand it to testers. The Google upload key is kept on the Expo
   account, not in the repo.
 - **App Store listing text:** `app/store.config.json` holds the name,
-  subtitle, description, keywords, promo text and What's New for all nine
-  App Store languages. Before a release, write the new What's New in every
+  subtitle, description, keywords, promo text and What's New for the
+  languages on the App Store: English (U.S.) only, by Brynne's choice
+  (AFC-39). The other eight are written and kept in
+  `app/store/apple-held-languages.json`; move one into `store.config.json`
+  to put it on the store. Before a release, write the new What's New in every
   language, then run `npx eas-cli metadata:push` in `app/`. It changes text
   only: the file lists no screenshots and no review contact (the repo is
-  public), and a language missing from the file is left as it is, not removed.
+  public). A push never removes a language; that is done by hand in App Store
+  Connect.
   Apple refuses the push while a version waits for review. After editing text
   in App Store Connect by hand, copy it back into the file;
   `npx eas-cli metadata:pull` overwrites the file and adds the review contact
   and screenshots, so never commit its output as it comes.
 - **Google Play listing text:** `app/store/google-play/<language>/`, typed
   into Play Console by hand. The name and full description must match the
-  App Store ones; the short description is Play's own.
+  App Store ones; the short description is Play's own. Only English is on
+  Play; the other six wait, as on the App Store.
 
 ## Local checks
 

@@ -4,6 +4,10 @@
 const fs = require('fs');
 
 const apple = require('../store.config.json').apple;
+// Written and kept, but not on the App Store: a push only sends the languages
+// in store.config.json. Move one back there to put it on the store again.
+const held = require('../store/apple-held-languages.json').info;
+const info = { ...held, ...apple.info };
 const playDir = `${__dirname}/../store/google-play`;
 
 // English (U.K.) and Spanish (Mexico) reuse the English and Spanish text.
@@ -25,24 +29,25 @@ for (const key of Object.keys(apple)) {
 }
 
 for (const lang of APPLE) {
-  const info = apple.info[lang];
-  if (!info) { fail(`apple ${lang}: missing`); continue; }
-  if (info.screenshots) fail(`apple ${lang}: screenshots must not be listed`);
+  const text = info[lang];
+  if (!text) { fail(`apple ${lang}: missing`); continue; }
+  if (apple.info[lang] && held[lang]) fail(`apple ${lang}: in both files`);
+  if (text.screenshots) fail(`apple ${lang}: screenshots must not be listed`);
   for (const [field, max] of Object.entries(APPLE_MAX)) {
-    const text = info[field] ?? '';
-    if (!text.trim()) fail(`apple ${lang}: empty ${field}`);
-    if (size(text) > max) fail(`apple ${lang}: ${field} is ${size(text)}, limit ${max}`);
+    const value = text[field] ?? '';
+    if (!value.trim()) fail(`apple ${lang}: empty ${field}`);
+    if (size(value) > max) fail(`apple ${lang}: ${field} is ${size(value)}, limit ${max}`);
   }
-  const keywords = (info.keywords ?? []).join(',');
+  const keywords = (text.keywords ?? []).join(',');
   if (!keywords) fail(`apple ${lang}: empty keywords`);
   if (size(keywords) > 100) fail(`apple ${lang}: keywords are ${size(keywords)}, limit 100`);
-  for (const url of APPLE_URLS) if (!info[url]) fail(`apple ${lang}: empty ${url}`);
+  for (const url of APPLE_URLS) if (!text[url]) fail(`apple ${lang}: empty ${url}`);
   const from = COPIES[lang];
-  if (from && JSON.stringify(info) !== JSON.stringify(apple.info[from])) {
+  if (from && JSON.stringify(text) !== JSON.stringify(info[from])) {
     fail(`apple ${lang}: differs from ${from}`);
   }
 }
-for (const lang of Object.keys(apple.info)) {
+for (const lang of Object.keys(info)) {
   if (!APPLE.includes(lang)) fail(`apple ${lang}: not one of the nine languages`);
 }
 
@@ -56,10 +61,10 @@ for (const [lang, from] of Object.entries(PLAY)) {
     if (!text.trim()) fail(`play ${lang}: empty ${field}`);
     if (size(text) > max) fail(`play ${lang}: ${field} is ${size(text)}, limit ${max}`);
   }
-  const info = apple.info[from] ?? {};
-  if (read('title') !== info.title) fail(`play ${lang}: title differs from the App Store one`);
-  if (read('full_description') !== info.description) fail(`play ${lang}: full_description differs from the App Store one`);
+  const text = info[from] ?? {};
+  if (read('title') !== text.title) fail(`play ${lang}: title differs from the App Store one`);
+  if (read('full_description') !== text.description) fail(`play ${lang}: full_description differs from the App Store one`);
 }
 
-console.log(bad ? `${bad} problem(s)` : `ok: ${APPLE.length} App Store languages, ${Object.keys(PLAY).length} Google Play languages`);
+console.log(bad ? `${bad} problem(s)` : `ok: ${APPLE.length} App Store languages (${Object.keys(apple.info).join(', ')} pushed), ${Object.keys(PLAY).length} Google Play languages`);
 process.exit(bad ? 1 : 0);
