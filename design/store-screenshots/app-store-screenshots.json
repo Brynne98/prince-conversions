@@ -579,7 +579,7 @@
           "nl": "Twee getallen.\n*Eén tik.*",
           "pt": "Dois números.\n*Um toque.*"
         },
-        "screenshot": "/screenshots/android/phone/en/convert.png",
+        "screenshot": "/screenshots/android/phone/{locale}/convert.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -644,7 +644,7 @@
           "nl": "*Precies goed,*\nelke keer.",
           "pt": "*No ponto,*\nsempre."
         },
-        "screenshot": "/screenshots/android/phone/en/convert-reverse.png",
+        "screenshot": "/screenshots/android/phone/{locale}/convert-reverse.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -709,8 +709,8 @@
           "nl": "Jouw recepten\nmet *naam*\n*en emoji.*",
           "pt": "Salve receitas\ncom *nome*\n*e emoji.*"
         },
-        "screenshot": "/screenshots/android/phone/en/saved.png",
-        "screenshotSecondary": "/screenshots/android/phone/en/saved-dark.png",
+        "screenshot": "/screenshots/android/phone/{locale}/saved.png",
+        "screenshotSecondary": "/screenshots/android/phone/{locale}/saved-dark.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -758,7 +758,7 @@
           "nl": "*Schudden*\nniet vergeten.",
           "pt": "Inicie, *sacuda,*\nsirva."
         },
-        "screenshot": "/screenshots/android/phone/en/timer.png",
+        "screenshot": "/screenshots/android/phone/{locale}/timer.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -1042,8 +1042,8 @@
           "nl": "Mooi bij\n*elk licht.*",
           "pt": "Bonito em\n*qualquer luz.*"
         },
-        "screenshot": "/screenshots/android/phone/en/convert-dark.png",
-        "screenshotSecondary": "/screenshots/android/phone/en/convert.png",
+        "screenshot": "/screenshots/android/phone/{locale}/convert-dark.png",
+        "screenshotSecondary": "/screenshots/android/phone/{locale}/convert.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -1194,7 +1194,7 @@
           "nl": "Ovenrecept erin.\n*Airfryertijd eruit.*",
           "pt": "Receita de forno.\n*Tempo de airfryer.*"
         },
-        "screenshot": "/screenshots/android/phone/en/convert.png"
+        "screenshot": "/screenshots/android/phone/{locale}/convert.png"
       }
     ],
     "apple-header": [

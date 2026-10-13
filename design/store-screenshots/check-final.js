@@ -11,6 +11,7 @@ const SETS = [
   ['apple/phone-1284x2778', 1284, 2778, ['']],
   ['apple/phone-1206x2622', 1206, 2622, ['']],
   ['apple/phone-1125x2436', 1125, 2436, ['']],
+  ['google-play/phone-1080x1920', 1080, 1920, LANGS],
 ];
 
 let bad = 0, seen = 0;
