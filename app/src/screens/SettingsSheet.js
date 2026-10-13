@@ -42,7 +42,7 @@ export default function SettingsSheet({
   return (
     <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title="Settings" leading="back" onLeading={onClose} />
+        <AppBar title="Settings" leading="close" onLeading={onClose} />
       ) : (
         <View style={styles.header}>
           <Text style={styles.title}>Settings</Text>
@@ -50,7 +50,7 @@ export default function SettingsSheet({
         </View>
       )}
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={{ paddingHorizontal: M3 ? 16 : 20 }}>
           <Row label="Dark mode" subtitle="Warm-charcoal palette">
             <Toggle

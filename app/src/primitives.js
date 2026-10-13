@@ -4,15 +4,16 @@ import {
   Alert, ActionSheetIOS, TextInput,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, useTheme, useStyles } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
-import { Plus, Minus, Close, ArrowBack, Check } from './icons';
+import { Plus, Minus, Close, Check } from './icons';
 
-// Expo's SwiftUI pieces, for the one thing React Native's own sheet cannot do:
-// stop at half height. They exist on iOS only, so they are loaded only there.
+// The system's own sheets, through Expo: SwiftUI's on iOS, Jetpack Compose's
+// on Android. Each exists on its own platform only, so it is loaded only there.
 const SwiftUI = Platform.OS === 'ios' ? require('@expo/ui/swift-ui') : null;
 const swiftModifiers = Platform.OS === 'ios' ? require('@expo/ui/swift-ui/modifiers') : null;
+const Compose = Platform.OS === 'android' ? require('@expo/ui/jetpack-compose') : null;
+const composeModifiers = Platform.OS === 'android' ? require('@expo/ui/jetpack-compose/modifiers') : null;
 
 // ─── Hold-to-repeat button ────────────────────────────────────────────
 function HoldButton({ onTrigger, children, style }) {
@@ -256,16 +257,16 @@ export function TextButton({ label, onPress, disabled = false }) {
 }
 
 // ─── Top app bar (Android) ───────────────────────────────────────────
-// Material's small top app bar, for the full-screen pages: the title leads
-// from the left and actions trail. The main screens and iOS have their own
+// Material's small top app bar, heading Android's sheets: close leads, the
+// title follows and actions trail. The main screens and iOS have their own
 // headers.
 export function AppBar({ title, leading, onLeading, children }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.appBar}>
       {leading && (
-        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel={leading === 'back' ? 'Back' : 'Close'}>
-          {leading === 'back' ? <ArrowBack /> : <Close s={24} />}
+        <RoundButton onPress={onLeading} tone="plain" accessibilityLabel="Close">
+          <Close s={24} />
         </RoundButton>
       )}
       <Text
@@ -281,53 +282,28 @@ export function AppBar({ title, leading, onLeading, children }) {
 }
 
 // ─── Sheet ───────────────────────────────────────────────────────────
-// Apple's page sheet, which iOS 26 draws in its own glass style. Android
-// shows it as a full-screen page, edge to edge, so the content is padded
-// clear of the status and navigation bars there (AFC-10). `bottom` is for a
-// short list and one action: a half-height sheet on iOS that drags taller,
-// Material's bottom sheet on Android. The grabber is drawn on iOS only: an
-// Android page cannot be dragged away.
-export function Sheet({ visible, onClose, handle = true, bottom = false, children }) {
+// Every drawer opens in the system's own sheet: Apple's on iOS 26, Material
+// 3's modal bottom sheet on Android. Both draw their own grabber, so `handle`
+// only says whether it shows. Older iPhones and the web keep React Native's
+// page sheet, with the app's grabber.
+export function Sheet({ visible, onClose, handle = true, children }) {
   const styles = useStyles(makeStyles);
-  const insets = useSafeAreaInsets();
-  const android = Platform.OS === 'android';
-  if (bottom && SwiftUI) {
-    return <HalfSheet visible={visible} onClose={onClose}>{children}</HalfSheet>;
-  }
-  if (android && bottom) {
-    return (
-      <Modal
-        visible={visible}
-        transparent
-        statusBarTranslucent
-        navigationBarTranslucent
-        animationType="fade"
-        onRequestClose={onClose}
-      >
-        <View style={styles.scrim}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" />
-          <View style={[styles.bottomSheet, { paddingBottom: insets.bottom + 16 }]}>
-            <View style={styles.bottomHandle} />
-            {children}
-          </View>
-        </View>
-      </Modal>
-    );
-  }
+  if (M3) return <MaterialSheet visible={visible} onClose={onClose} handle={handle}>{children}</MaterialSheet>;
+  if (GLASS) return <AppleSheet visible={visible} onClose={onClose} handle={handle}>{children}</AppleSheet>;
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <View style={[styles.sheetRoot, android && { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        {handle && !android && <View style={styles.sheetHandle} />}
+      <View style={styles.sheetRoot}>
+        {handle && <View style={styles.sheetHandle} />}
         {children}
       </View>
     </Modal>
   );
 }
 
-// Apple's sheet at half height, with the app's content inside it. It is
-// painted in the page colour: the sheet's own glass follows the system's
-// light or dark, not the app's, and would turn dark mode's text unreadable.
-function HalfSheet({ visible, onClose, children }) {
+// Apple's sheet, with the app's content inside it. It is painted in the page
+// colour: the sheet's own glass follows the system's light or dark, not the
+// app's, and would turn dark mode's text unreadable.
+function AppleSheet({ visible, onClose, handle, children }) {
   const { C, mode } = useTheme();
   const { Host, BottomSheet, Group, RNHostView } = SwiftUI;
   const { presentationDetents, presentationDragIndicator, presentationBackground } = swiftModifiers;
@@ -340,16 +316,50 @@ function HalfSheet({ visible, onClose, children }) {
       >
         <Group
           modifiers={[
-            presentationDetents(['medium', 'large']),
-            presentationDragIndicator('visible'),
+            presentationDetents(['large']),
+            presentationDragIndicator(handle ? 'visible' : 'hidden'),
             presentationBackground(C.cream),
           ]}
         >
           <RNHostView>
-            <View style={{ flex: 1 }}>{children}</View>
+            {/* The grabber floats over the content; this keeps the header clear of it. */}
+            <View style={{ flex: 1, paddingTop: handle ? 16 : 0 }}>{children}</View>
           </RNHostView>
         </Group>
       </BottomSheet>
+    </Host>
+  );
+}
+
+// Material 3's modal bottom sheet, opened at full height. A drag down, a tap
+// outside and the back button all close it.
+function MaterialSheet({ visible, onClose, handle, children }) {
+  const { C, mode } = useTheme();
+  const { Host, ModalBottomSheet, RNHostView } = Compose;
+  const ref = useRef(null);
+  // The sheet stays mounted while it slides away after a close the app asked for.
+  const [shown, setShown] = useState(visible);
+  useEffect(() => {
+    if (visible) { setShown(true); return undefined; }
+    let live = true;
+    Promise.resolve(ref.current?.hide()).catch(() => {}).then(() => { if (live) setShown(false); });
+    return () => { live = false; };
+  }, [visible]);
+  if (!shown) return null;
+  return (
+    <Host colorScheme={mode} style={{ position: 'absolute', width: 1, height: 1 }}>
+      <ModalBottomSheet
+        ref={ref}
+        onDismissRequest={onClose}
+        skipPartiallyExpanded
+        showDragHandle={handle}
+        containerColor={C.cream}
+        contentColor={C.ink}
+      >
+        <RNHostView modifiers={[composeModifiers.fillMaxHeight()]}>
+          <View style={{ flex: 1 }}>{children}</View>
+        </RNHostView>
+      </ModalBottomSheet>
     </Host>
   );
 }
@@ -769,18 +779,6 @@ const makeStyles = (C) => ({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.32)',
     justifyContent: 'flex-end',
-  },
-  bottomSheet: {
-    maxHeight: '90%',
-    backgroundColor: C.surfaceLow,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-  },
-  bottomHandle: {
-    width: 32, height: 4, borderRadius: 2,
-    backgroundColor: C.ink30,
-    alignSelf: 'center',
-    marginTop: 16, marginBottom: 14,
   },
   dialogScrim: {
     justifyContent: 'center',

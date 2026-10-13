@@ -104,6 +104,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
       )}
 
       <ScrollView
+        nestedScrollEnabled
         contentContainerStyle={styles.body}
         bounces={false}
         showsVerticalScrollIndicator={false}
