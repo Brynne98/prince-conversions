@@ -87,6 +87,22 @@ export const FONT = {
 // so they stay on screen; everything else grows freely and wraps.
 export const GROW = { display: 1.2, bar: 1.3 };
 
+// The shared shapes of the iOS looks. Android keeps Material's own.
+// Corners: small for tiles and tags, medium for fields, rows and panels,
+// large for cards. Buttons and pills are fully round.
+export const RADIUS = { sm: 10, md: 16, lg: 24 };
+// The one line drawn round a box.
+export const EDGE = StyleSheet.hairlineWidth;
+// Main buttons: a capsule on iOS 26, RADIUS.md corners on older iPhones.
+export const BUTTON = { height: 52 };
+// The small capital label. The caller sets the colour.
+export const LABEL = {
+  fontFamily: FONT.ui,
+  fontSize: 12,
+  fontWeight: '700',
+  letterSpacing: 1,
+};
+
 const ThemeContext = createContext({
   mode: 'light',
   C: LIGHT,

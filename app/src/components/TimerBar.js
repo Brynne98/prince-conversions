@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
-import { FONT, GROW, PALETTES, useTheme } from '../theme';
+import { FONT, GROW, RADIUS, PALETTES, useTheme } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
 import { GLASS, M3, GlassFill, GlassPressable } from '../glass';
@@ -223,7 +223,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
     >
       <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
         <View style={[styles.card, styles.cardRow, GLASS && styles.cardGlass, isDone && styles.cardDone]}>
-          <GlassFill tint={isDone ? C.terracotta : C.paper} scheme={scheme} radius={26} />
+          <GlassFill tint={isDone ? C.terracotta : C.paper} scheme={scheme} radius={RADIUS.lg} />
           <Ring frac={timer.elapsedFrac} C={C} done={isDone} />
           <View style={styles.left}>
             <View style={styles.kickerRow}>
@@ -254,9 +254,11 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
 const makeStyles = (C) => StyleSheet.create({
   card: {
     flex: 1,
-    backgroundColor: GLASS ? 'transparent' : C.paper,
+    // Solid under the glass: on its own the pale card of dark mode lets the
+    // page show through.
+    backgroundColor: C.paper,
     paddingHorizontal: 14,
-    borderRadius: 20,
+    borderRadius: M3 ? 20 : RADIUS.lg,
     shadowColor: '#000',
     shadowOpacity: 0.28,
     shadowRadius: 16,
@@ -265,8 +267,8 @@ const makeStyles = (C) => StyleSheet.create({
     overflow: 'hidden',
   },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  cardGlass: { borderRadius: 26, shadowOpacity: 0, elevation: 0 },
-  cardDone: { backgroundColor: GLASS ? 'transparent' : C.terracotta },
+  cardGlass: { shadowOpacity: 0, elevation: 0 },
+  cardDone: { backgroundColor: C.terracotta },
   left: { flex: 1, minWidth: 0 },
   kickerRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   kicker: {

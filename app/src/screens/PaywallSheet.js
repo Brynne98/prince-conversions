@@ -3,9 +3,9 @@ import {
   View, Text, Pressable, StyleSheet, ScrollView,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import Svg, { Path, Line } from 'react-native-svg';
-import { FONT, useTheme, useStyles } from '../theme';
-import { Sheet, CloseButton, AppBar, TextButton, alert } from '../primitives';
+import { FONT, RADIUS, EDGE, BUTTON, LABEL, useTheme, useStyles } from '../theme';
+import { Sheet, SheetHeader, AppBar, TextButton, alert } from '../primitives';
+import { NoAds, RestorePurchase } from '../icons';
 import { GLASS, M3, GlassPressable } from '../glass';
 import { useIap } from '../iap';
 import { capture } from '../analytics';
@@ -97,10 +97,7 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
       {M3 ? (
         <AppBar title="" leading="close" onLeading={onClose} />
       ) : (
-        <View style={styles.header}>
-          <View style={{ width: 44 }} />
-          <CloseButton onPress={onClose} />
-        </View>
+        <SheetHeader onClose={onClose} />
       )}
 
       <ScrollView
@@ -117,11 +114,11 @@ export default function PaywallSheet({ visible, onClose, surface = 'paywall' }) 
 
         <View style={styles.benefits}>
           <Benefit
-            icon={<NoAdsIcon c={C.terracotta} />}
+            icon={<NoAds />}
             label={t('paywall.benefit_no_banners')}
           />
           <Benefit
-            icon={<RestoreIcon c={C.terracotta} />}
+            icon={<RestorePurchase />}
             label={t(M3 ? 'paywall.benefit_restore_android' : 'paywall.benefit_restore')}
             divider
           />
@@ -170,42 +167,7 @@ function Benefit({ icon, label, divider }) {
   );
 }
 
-function NoAdsIcon({ c }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M4 7h12a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2z"
-        stroke={c}
-        strokeWidth={1.8}
-      />
-      <Path d="M18 9l4-2v10l-4-2" stroke={c} strokeWidth={1.8} strokeLinejoin="round" />
-      <Line x1={3} y1={21} x2={21} y2={3} stroke={c} strokeWidth={1.8} strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-function RestoreIcon({ c }) {
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M4 12a8 8 0 0114.2-5M20 12a8 8 0 01-14.2 5"
-        stroke={c}
-        strokeWidth={1.8}
-        strokeLinecap="round"
-      />
-      <Path d="M18 3v4h-4M6 21v-4h4" stroke={c} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
-
 const makeStyles = (C) => StyleSheet.create({
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   body: {
     paddingHorizontal: 24,
     paddingBottom: 40,
@@ -219,13 +181,13 @@ const makeStyles = (C) => StyleSheet.create({
     borderRadius: M3 ? 8 : 999,
     marginBottom: 14,
   },
-  badgeText: {
+  badgeText: M3 ? {
     fontFamily: FONT.ui,
     fontSize: 11,
-    fontWeight: M3 ? '500' : '700',
-    color: M3 ? C.terracottaDeep : C.onTerracotta,
-    letterSpacing: M3 ? 0.5 : 0.8,
-  },
+    fontWeight: '500',
+    color: C.terracottaDeep,
+    letterSpacing: 0.5,
+  } : { ...LABEL, color: C.onTerracotta },
   title: {
     fontFamily: FONT.display,
     fontSize: 28,
@@ -252,10 +214,10 @@ const makeStyles = (C) => StyleSheet.create({
     marginBottom: 28,
   } : {
     backgroundColor: C.paper,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     paddingHorizontal: 16,
     marginBottom: 28,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: EDGE,
     borderColor: C.divider,
   },
   benefitRow: M3 ? {
@@ -290,9 +252,12 @@ const makeStyles = (C) => StyleSheet.create({
   },
   cta: {
     backgroundColor: C.terracotta,
-    borderRadius: M3 ? 28 : GLASS ? 26 : 16,
-    ...(M3 ? { height: 56, justifyContent: 'center' } : null),
-    paddingVertical: 16,
+    borderRadius: M3 ? 28 : GLASS ? BUTTON.height / 2 : RADIUS.md,
+    // A floor, not a fixed height: the label may grow with the text size.
+    minHeight: M3 ? 56 : BUTTON.height,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: M3 ? 8 : 16,
   },

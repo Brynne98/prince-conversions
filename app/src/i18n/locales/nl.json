@@ -32,7 +32,6 @@
   },
   "saved": {
     "title": "Mijn recepten",
-    "big_title": "Bewaard",
     "count": {
       "one": "%{count} recept",
       "other": "%{count} recepten"
