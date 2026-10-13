@@ -228,7 +228,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
           <View style={styles.left}>
             <View style={styles.kickerRow}>
               <Text style={[styles.kicker, isDone && { color: C.onTerracotta85 }]} numberOfLines={1}>
-                {timer.label || 'Cook timer'}
+                {timer.label || t('timer.fallback_label')}
               </Text>
               {!isDone && timer.remindHalfway && <Bell s={11} c={C.ink50} />}
             </View>
@@ -238,11 +238,11 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
           </View>
 
           {isDone && (
-            <IconButton onPress={onRestart} label="Restart timer" done>
+            <IconButton onPress={onRestart} label={t('timer.restart_a11y')} done>
               <Restart s={18} c={fg} />
             </IconButton>
           )}
-          <IconButton onPress={onCancel} label="Cancel timer" done={isDone}>
+          <IconButton onPress={onCancel} label={t('timer.cancel_a11y')} done={isDone}>
             <Close s={18} c={fg} />
           </IconButton>
         </View>

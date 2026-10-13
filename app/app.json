@@ -39,6 +39,14 @@
         "android.permission.RECORD_AUDIO"
       ]
     },
+    "locales": {
+      "de": { "ios": { "NSUserTrackingUsageDescription": "Erlaube dieser App, deine Daten für personalisierte Werbung zu verwenden." } },
+      "fr": { "ios": { "NSUserTrackingUsageDescription": "Autorisez cette app à utiliser vos données pour afficher des publicités personnalisées." } },
+      "es": { "ios": { "NSUserTrackingUsageDescription": "Permite que esta app use tus datos para mostrarte anuncios personalizados." } },
+      "it": { "ios": { "NSUserTrackingUsageDescription": "Consenti a questa app di usare i tuoi dati per mostrarti annunci personalizzati." } },
+      "nl": { "ios": { "NSUserTrackingUsageDescription": "Sta toe dat deze app je gegevens gebruikt om gepersonaliseerde advertenties te tonen." } },
+      "pt-BR": { "ios": { "NSUserTrackingUsageDescription": "Permita que este app use seus dados para exibir anúncios personalizados." } }
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -77,7 +85,12 @@
           "userTrackingPermission": "Allow this app to use your data to deliver personalized ads."
         }
       ],
-      "expo-localization",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": ["en", "de", "fr", "es", "it", "nl", "pt-BR"]
+        }
+      ],
       "expo-asset",
       [
         "expo-notifications",

@@ -9,6 +9,7 @@ import { Sheet, AppBar, TextButton, Field } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { formatMinutes } from '../convert';
 import { Pencil } from '../icons';
+import { t } from '../i18n';
 
 // One emoji can be several characters joined together: a family, a flag, a
 // skin tone. These helpers find where one ends and the next begins.
@@ -76,7 +77,7 @@ export default function SaveSheet({
       onPress={() => emojiField.current?.focus()}
       hitSlop={6}
       accessibilityRole="button"
-      accessibilityLabel="Type your own emoji"
+      accessibilityLabel={t('save.emoji_a11y')}
       style={[styles.nameEmojiBox, typing && styles.nameEmojiTyping]}
     >
       <Text style={styles.nameEmoji}>{draft.emoji || '🍽️'}</Text>
@@ -99,7 +100,7 @@ export default function SaveSheet({
     </Pressable>
   );
   const emojiHint = typing && (
-    <Text style={styles.emojiHint}>Switch to the emoji keyboard and pick one.</Text>
+    <Text style={styles.emojiHint}>{t('save.emoji_hint')}</Text>
   );
 
   const save = () => {
@@ -135,14 +136,14 @@ export default function SaveSheet({
   );
   const summary = (
     <View style={styles.summary}>
-      <Text style={styles.summaryKicker}>{cap('Saving both')}</Text>
+      <Text style={styles.summaryKicker}>{cap(t('save.saving_both'))}</Text>
       <View style={styles.summaryRow}>
         <Text style={styles.summaryText}>
-          <Text style={{ fontWeight: '700' }}>Oven</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
+          <Text style={{ fontWeight: '700' }}>{t('common.oven')}</Text> {ovenValues.temp}°{unit} · {formatMinutes(ovenValues.time)}
         </Text>
         <Text style={[styles.summaryText, { opacity: 0.5 }]}>↔</Text>
         <Text style={styles.summaryText}>
-          <Text style={{ fontWeight: '700' }}>Air fryer</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
+          <Text style={{ fontWeight: '700' }}>{t('common.air_fryer')}</Text> {airValues.temp}°{unit} · {formatMinutes(airValues.time)}
         </Text>
       </View>
     </View>
@@ -153,9 +154,9 @@ export default function SaveSheet({
   if (M3) {
     return (
       <Sheet visible={visible} onClose={onClose}>
-        <AppBar title="Save recipe" leading="close" onLeading={onClose}>
+        <AppBar title={t('save.title')} leading="close" onLeading={onClose}>
           <View style={{ marginRight: 8 }}>
-            <TextButton label="Save" onPress={save} disabled={!valid} />
+            <TextButton label={t('common.save')} onPress={save} disabled={!valid} />
           </View>
         </AppBar>
         <ScrollView
@@ -166,9 +167,9 @@ export default function SaveSheet({
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             {emojiButton}
             <Field
-              label="Recipe name"
+              label={t('save.name')}
               value={draft.name}
-              onChangeText={(t) => setDraft({ ...draft, name: t })}
+              onChangeText={(v) => setDraft({ ...draft, name: v })}
               returnKeyType="done"
               keyboardAppearance={mode}
               style={{ flex: 1 }}
@@ -177,9 +178,9 @@ export default function SaveSheet({
           {emojiHint}
           {emojiGrid}
           <Field
-            label="Notes"
+            label={t('save.notes')}
             value={draft.note}
-            onChangeText={(t) => setDraft({ ...draft, note: t })}
+            onChangeText={(v) => setDraft({ ...draft, note: v })}
             returnKeyType="done"
             keyboardAppearance={mode}
           />
@@ -193,9 +194,9 @@ export default function SaveSheet({
     <Sheet visible={visible} onClose={onClose}>
       <View style={styles.headerRow}>
         <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('common.cancel')}</Text>
         </GlassPressable>
-        <Text style={styles.title}>Save recipe</Text>
+        <Text style={styles.title}>{t('save.title')}</Text>
         <GlassPressable
           onPress={save}
           hitSlop={10}
@@ -207,7 +208,7 @@ export default function SaveSheet({
           <Text style={[
             styles.saveText,
             { color: !valid ? C.ink30 : GLASS ? C.onTerracotta : C.terracotta },
-          ]}>Save</Text>
+          ]}>{t('common.save')}</Text>
         </GlassPressable>
       </View>
 
@@ -224,8 +225,8 @@ export default function SaveSheet({
             {emojiButton}
             <TextInput
               value={draft.name}
-              onChangeText={(t) => setDraft({ ...draft, name: t })}
-              placeholder="Recipe name"
+              onChangeText={(v) => setDraft({ ...draft, name: v })}
+              placeholder={t('save.name')}
               placeholderTextColor={C.ink50}
               style={styles.nameInput}
               returnKeyType="done"
@@ -240,8 +241,8 @@ export default function SaveSheet({
           <View style={styles.notesBox}>
             <TextInput
               value={draft.note}
-              onChangeText={(t) => setDraft({ ...draft, note: t })}
-              placeholder="Notes — e.g. shake at 10 min, single layer"
+              onChangeText={(v) => setDraft({ ...draft, note: v })}
+              placeholder={t('save.notes_placeholder')}
               placeholderTextColor={C.ink50}
               style={styles.notesInput}
               returnKeyType="done"

@@ -1,11 +1,17 @@
 // Lightweight i18n: i18n-js + expo-localization.
-// EN ships first; drop in locales/de.json (etc.) and register below later.
+// The app follows the phone's language, and falls back to English.
 import { I18n } from 'i18n-js';
 import { getLocales } from 'expo-localization';
 
-const en = require('./locales/en.json');
-
-const i18n = new I18n({ en });
+const i18n = new I18n({
+  en: require('./locales/en.json'),
+  de: require('./locales/de.json'),
+  fr: require('./locales/fr.json'),
+  es: require('./locales/es.json'),
+  it: require('./locales/it.json'),
+  nl: require('./locales/nl.json'),
+  pt: require('./locales/pt.json'),
+});
 i18n.defaultLocale = 'en';
 i18n.enableFallback = true;
 

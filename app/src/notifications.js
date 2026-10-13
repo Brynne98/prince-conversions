@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { t } from './i18n';
 
 // expo-notifications is a native module. It is present in dev / production
 // builds and (for local notifications) in Expo Go, but we still guard the
@@ -35,7 +36,7 @@ async function prepare() {
     // Android binds the sound to the channel, so one channel per chime.
     try {
       await Notifications.setNotificationChannelAsync(DONE_CHANNEL, {
-        name: 'Cook timer done',
+        name: t('timer.channel_done'),
         importance: Notifications.AndroidImportance.MAX,
         sound: 'done.wav',
         vibrationPattern: [0, 250, 250, 250],
@@ -43,7 +44,7 @@ async function prepare() {
         lightColor: '#C2562E',
       });
       await Notifications.setNotificationChannelAsync(HALF_CHANNEL, {
-        name: 'Shake halfway reminder',
+        name: t('timer.half_label'),
         importance: Notifications.AndroidImportance.HIGH,
         sound: 'shake.wav',
         vibrationPattern: [0, 150],
@@ -99,13 +100,13 @@ export async function scheduleTimerNotifications(
   const ids = { done: null, half: null };
   if (!Notifications) return ids;
   await prepare();
-  const label = timer.label || 'Cook timer';
+  const label = timer.label || t('timer.fallback_label');
   if (done) {
     ids.done = await scheduleAt(
       timer.endsAt,
       {
-        title: 'Done!',
-        body: `${label} is ready.`,
+        title: t('timer.done'),
+        body: t('timer.notif_ready', { label }),
         sound: 'done.wav',
         interruptionLevel: 'timeSensitive',
         data: { timerId: timer.id, kind: 'done' },
@@ -117,8 +118,8 @@ export async function scheduleTimerNotifications(
     ids.half = await scheduleAt(
       timer.halfFiredAt,
       {
-        title: 'Shake halfway',
-        body: `Give ${label} a shake.`,
+        title: t('timer.notif_shake_title'),
+        body: t('timer.notif_shake_body', { label }),
         sound: 'shake.wav',
         interruptionLevel: 'timeSensitive',
         data: { timerId: timer.id, kind: 'half' },

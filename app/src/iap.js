@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useMemo } from '
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { capture } from './analytics';
+import { t } from './i18n';
 
 const IS_EXPO_GO = Constants?.executionEnvironment === 'storeClient';
 
@@ -69,13 +70,13 @@ export function IapProvider({ children }) {
   }, [usable]);
 
   const buyPro = async () => {
-    if (!usable) throw new Error('Purchases not configured');
+    if (!usable) throw new Error(t('paywall.not_configured'));
     capture('purchase_started', { product: 'pro' });
 
     try {
       const offerings = await Purchases.getOfferings();
       const pkg = offerings?.current?.availablePackages?.[0];
-      if (!pkg) throw new Error('No products available');
+      if (!pkg) throw new Error(t('paywall.no_products'));
       const { customerInfo } = await Purchases.purchasePackage(pkg);
       const owned = !!customerInfo?.entitlements?.active?.[ENTITLEMENT_ID];
       setIsPro(owned);

@@ -9,6 +9,7 @@ import { Restart } from '../icons';
 import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
 import { formatRemaining } from '../timer';
+import { t } from '../i18n';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -62,10 +63,10 @@ export default function TimerScreen({
   return (
     <Sheet visible={visible} onClose={onClose} handle={false}>
       {M3 ? (
-        <AppBar title="Cook timer" leading="close" onLeading={onClose} />
+        <AppBar title={t('timer.fallback_label')} leading="close" onLeading={onClose} />
       ) : (
         <View style={styles.header}>
-          <Text style={styles.kicker}>COOK TIMER</Text>
+          <Text style={styles.kicker}>{t('timer.fallback_label').toUpperCase()}</Text>
           <CloseButton onPress={onClose} />
         </View>
       )}
@@ -113,8 +114,8 @@ export default function TimerScreen({
           <View style={styles.centerText} pointerEvents="none">
             {completed ? (
               <>
-                <Text style={styles.doneText}>Done!</Text>
-                <Text style={styles.doneSub}>Tap restart or cancel</Text>
+                <Text style={styles.doneText}>{t('timer.done')}</Text>
+                <Text style={styles.doneSub}>{t('timer.done_hint')}</Text>
               </>
             ) : (
               <>
@@ -132,8 +133,8 @@ export default function TimerScreen({
         {!completed && (
           <View style={styles.halfRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.halfLabel}>Shake halfway reminder</Text>
-              <Text style={styles.halfSub}>Chime at the midpoint of this cook</Text>
+              <Text style={styles.halfLabel}>{t('timer.half_label')}</Text>
+              <Text style={styles.halfSub}>{t('timer.half_sub')}</Text>
             </View>
             <Toggle
               value={!!remindHalfway}
@@ -157,7 +158,7 @@ export default function TimerScreen({
               ]}
             >
               <Restart s={18} c={C.onTerracotta} />
-              <Text style={styles.restartText}>Restart</Text>
+              <Text style={styles.restartText}>{t('timer.restart')}</Text>
             </GlassPressable>
           )}
           <GlassPressable
@@ -172,7 +173,7 @@ export default function TimerScreen({
               { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('common.cancel')}</Text>
           </GlassPressable>
         </View>
       </View>

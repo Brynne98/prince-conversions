@@ -28,6 +28,7 @@ import { initAds } from './src/ads';
 import { capture, setAnalyticsEnabled } from './src/analytics';
 import { recordTimerCompletion } from './src/review';
 import { recordCompletionForSoftPaywall } from './src/softPaywall';
+import { t } from './src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 // Expo Go has its own splash screen and only warns when asked to change it.
@@ -90,8 +91,10 @@ function Root({ themeChoice }) {
   const onTimerDoneRef = useRef(() => {});
 
   const cookTimers = useCookTimers({
-    onShake: (t) => showToast(`Shake halfway · ${t.label || 'cooking'}`),
-    onDone: (t) => onTimerDoneRef.current?.(t),
+    onShake: (timer) => showToast(
+      t('timer.toast_shake', { label: timer.label || t('timer.toast_shake_fallback') }),
+    ),
+    onDone: (timer) => onTimerDoneRef.current?.(timer),
   });
 
   softPaywallGate.current = {
@@ -103,15 +106,15 @@ function Root({ themeChoice }) {
     timers: cookTimers.list,
   };
 
-  onTimerDoneRef.current = (t) => {
+  onTimerDoneRef.current = (timer) => {
     capture('timer_completed', {
-      duration_bucket: durationBucket(t.totalSec),
+      duration_bucket: durationBucket(timer.totalSec),
     });
-    showToast(`Done · ${t.label || 'cook timer'}`);
+    showToast(t('timer.toast_done', { label: timer.label || t('timer.fallback_label') }));
 
     const g = softPaywallGate.current;
     const hasRunning = (g.timers || []).some(
-      (x) => x.id !== t.id && !x.completed,
+      (x) => x.id !== timer.id && !x.completed,
     );
     const canShowSoftPaywall = !g.openTimerId && !hasRunning;
 
@@ -141,7 +144,7 @@ function Root({ themeChoice }) {
   }, [activitySig]);
 
   const openTimer = openTimerId
-    ? cookTimers.list.find((t) => t.id === openTimerId)
+    ? cookTimers.list.find((x) => x.id === openTimerId)
     : null;
   useEffect(() => {
     if (openTimerId && !openTimer) setOpenTimerId(null);
@@ -302,7 +305,7 @@ function Root({ themeChoice }) {
         && Math.abs(p.time - ovenValues.time) < 5,
     );
     setDraft({
-      name: guess ? guess.name : '',
+      name: guess ? t(`presets.${guess.id}`) : '',
       emoji: guess ? guess.emoji : '🍟',
       note: '',
     });
@@ -325,10 +328,10 @@ function Root({ themeChoice }) {
     capture('recipe_saved', { saved_recipe_count: items.length + 1 });
     startTimer(
       airValues.time,
-      `${newItem.emoji} ${newItem.name || 'Recipe'}`,
+      `${newItem.emoji} ${newItem.name || t('saved.recipe_fallback')}`,
       'recipe_save',
     );
-    showToast('Saved to recipes');
+    showToast(t('saved.toast_saved'));
   };
   const doDelete = (id) => {
     setItems(items.filter(i => i.id !== id));
@@ -377,7 +380,7 @@ function Root({ themeChoice }) {
           onOpenSettings={() => setShowSettings(true)}
           onSave={openSave}
           onStartTimer={(min) => {
-            startTimer(min, `Air fryer ${airValues.temp}°${unit}`, 'converter');
+            startTimer(min, t('converter.timer_label', { temp: `${airValues.temp}°${unit}` }), 'converter');
           }}
           topInset={topInset}
           bottomInset={timersInset}
@@ -392,9 +395,9 @@ function Root({ themeChoice }) {
           onStart={(item, mode) => {
             const isAir = mode !== 'oven';
             const minutes = isAir ? item.afTime : item.ovenTime;
-            const label = `${item.emoji} ${item.name || 'Recipe'}${isAir ? '' : ' · oven'}`;
+            const label = `${item.emoji} ${item.name || t('saved.recipe_fallback')}${isAir ? '' : ` · ${t('saved.oven_suffix')}`}`;
             startTimer(minutes, label, 'saved_recipe');
-            showToast(`Timer · ${item.name || 'recipe'}`);
+            showToast(t('saved.toast_timer', { name: item.name || t('saved.recipe_fallback') }));
           }}
           unit={unit}
           topInset={topInset}

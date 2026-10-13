@@ -8,7 +8,7 @@ import { FONT, useTheme, useStyles } from '../theme';
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 const SITE_URL = 'https://brynne98.github.io/prince-conversions';
 import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
-import { M3 } from '../glass';
+import { M3, cap } from '../glass';
 import { BannerAd, isAdPrivacyOptionsRequired, showAdPrivacyOptions } from '../ads';
 import { useIap } from '../iap';
 import { capture, isAnalyticsConfigured } from '../analytics';
@@ -42,17 +42,17 @@ export default function SettingsSheet({
   return (
     <Sheet visible={visible} onClose={onClose}>
       {M3 ? (
-        <AppBar title="Settings" leading="back" onLeading={onClose} />
+        <AppBar title={t('settings.title')} leading="back" onLeading={onClose} />
       ) : (
         <View style={styles.header}>
-          <Text style={styles.title}>Settings</Text>
+          <Text style={styles.title}>{t('settings.title')}</Text>
           <CloseButton onPress={onClose} />
         </View>
       )}
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={{ paddingHorizontal: M3 ? 16 : 20 }}>
-          <Row label="Dark mode" subtitle="Warm-charcoal palette">
+          <Row label={t('settings.dark_mode')} subtitle={t('settings.dark_mode_subtitle')}>
             <Toggle
               value={mode === 'dark'}
               onValueChange={(v) => setMode?.(v ? 'dark' : 'light')}
@@ -61,8 +61,8 @@ export default function SettingsSheet({
 
           {isAnalyticsConfigured() && (
             <Row
-              label="Share anonymous analytics"
-              subtitle="Usage events only — never recipe content"
+              label={t('settings.analytics')}
+              subtitle={t('settings.analytics_subtitle')}
             >
               <Toggle
                 value={analyticsEnabled}
@@ -77,7 +77,7 @@ export default function SettingsSheet({
               subtitle={t('settings.pro_active_subtitle')}
             >
               <View style={styles.proPill}>
-                <Text style={styles.proPillText}>{M3 ? 'Active' : t('settings.pro_active_pill')}</Text>
+                <Text style={styles.proPillText}>{cap(t('settings.pro_active_pill'))}</Text>
               </View>
             </Row>
           ) : (
@@ -90,8 +90,8 @@ export default function SettingsSheet({
 
           {adPrivacyOptions && !isPro && (
             <PressableRow
-              label="Ad privacy options"
-              subtitle="Review or change your consent choices"
+              label={t('settings.ad_privacy')}
+              subtitle={t('settings.ad_privacy_subtitle')}
               onPress={() => {
                 capture('ad_privacy_options_opened');
                 showAdPrivacyOptions();
@@ -100,15 +100,15 @@ export default function SettingsSheet({
           )}
 
           <PressableRow
-            label="Privacy policy"
+            label={t('settings.privacy_policy')}
             onPress={() => Linking.openURL(`${SITE_URL}/privacy`)}
           />
           <PressableRow
-            label="Terms of use"
+            label={t('settings.terms')}
             onPress={() => Linking.openURL(`${SITE_URL}/terms`)}
           />
 
-          <Row label="About" detail={`v${APP_VERSION}`} isLast />
+          <Row label={t('settings.about')} detail={`v${APP_VERSION}`} isLast />
         </View>
 
         <View style={{ paddingHorizontal: M3 ? 16 : 20, marginTop: 20 }}>
