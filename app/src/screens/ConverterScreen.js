@@ -251,7 +251,14 @@ export default function ConverterScreen({
               style={({ pressed }) => [styles.actionBtn, styles.actionPrimary, { opacity: pressed ? 0.85 : 1 }]}
             >
               <Play s={14} c={C.terracotta} />
-              <Text style={[styles.actionBtnText, { color: C.terracotta }]}>{t('converter.start_timer')}</Text>
+              <Text
+                style={[styles.actionBtnText, { color: C.terracotta }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
+                {t('converter.start_timer')}
+              </Text>
             </GlassPressable>
             <GlassPressable
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onSave(); }}
@@ -260,7 +267,14 @@ export default function ConverterScreen({
               style={({ pressed }) => [styles.actionBtn, styles.actionSecondary, { opacity: pressed ? 0.7 : 1 }]}
             >
               <Bookmark s={16} c={C.onTerracotta} />
-              <Text style={[styles.actionBtnText, { color: C.onTerracotta }]}>{t('common.save')}</Text>
+              <Text
+                style={[styles.actionBtnText, { color: C.onTerracotta }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
+                {t('common.save')}
+              </Text>
             </GlassPressable>
           </View>
         </LinearGradient>
@@ -425,6 +439,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 8,
+    paddingHorizontal: 12,
   },
   actionPrimary: {
     flex: 2,
@@ -434,7 +449,9 @@ const makeStyles = (C) => StyleSheet.create({
     flex: 1,
     backgroundColor: C.onTerracotta18,
   },
+  // Shrinks a little for a long word, such as the French for Save.
   actionBtnText: {
+    flexShrink: 1,
     fontFamily: FONT.ui,
     fontSize: 15,
     fontWeight: M3 ? '500' : '600',
