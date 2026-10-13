@@ -106,7 +106,7 @@ export const RestorePurchase = ({ s = 22, c }) => {
   );
 };
 
-export const Close =({ s = 22, c }) => {
+export const Close = ({ s = 22, c }) => {
   const { C } = useTheme();
   const stroke = c || C.ink;
   return (
