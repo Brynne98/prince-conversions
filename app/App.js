@@ -16,7 +16,7 @@ import PaywallSheet from './src/screens/PaywallSheet';
 import TimerStack, { stackHeight } from './src/components/TimerBar';
 import TimerScreen from './src/screens/TimerScreen';
 import AnimatedSplash from './src/components/AnimatedSplash';
-import { ThemeProvider, useTheme, useStyles } from './src/theme';
+import { ThemeProvider, useTheme, useStyles, GROW } from './src/theme';
 import { M3 } from './src/glass';
 import { DialogHost } from './src/primitives';
 import { convert, fToC, FOOD_PRESETS } from './src/convert';
@@ -284,8 +284,10 @@ function Root({ themeChoice }) {
     ? { temp: result.temp, time: result.time }
     : { temp: ovenTemp, time: ovenTime };
 
-  const startTimer = (minutes, label, source) => {
+  // Every start says so, wherever it came from.
+  const startTimer = (minutes, label, source, message) => {
     const id = cookTimers.start(minutes, label);
+    showToast(message ?? t('timer.toast_started', { name: label }));
     capture('timer_started', {
       source,
       duration_bucket: durationBucket(Math.round(minutes * 60)),
@@ -330,8 +332,8 @@ function Root({ themeChoice }) {
       airValues.time,
       `${newItem.emoji} ${newItem.name || t('saved.recipe_fallback')}`,
       'recipe_save',
+      t('saved.toast_saved'),
     );
-    showToast(t('saved.toast_saved'));
   };
   const doDelete = (id) => {
     setItems(items.filter(i => i.id !== id));
@@ -396,8 +398,8 @@ function Root({ themeChoice }) {
             const isAir = mode !== 'oven';
             const minutes = isAir ? item.afTime : item.ovenTime;
             const label = `${item.emoji} ${item.name || t('saved.recipe_fallback')}${isAir ? '' : ` · ${t('saved.oven_suffix')}`}`;
-            startTimer(minutes, label, 'saved_recipe');
-            showToast(t('saved.toast_timer', { name: item.name || t('saved.recipe_fallback') }));
+            startTimer(minutes, label, 'saved_recipe',
+              t('timer.toast_started', { name: item.name || t('saved.recipe_fallback') }));
           }}
           unit={unit}
           topInset={topInset}
@@ -477,11 +479,11 @@ function Root({ themeChoice }) {
 
       {/* Short messages sit at the top, clear of the buttons that raise them
           and of the timers at the bottom: between the two top-bar buttons on
-          iOS, under the app bar on Android. */}
+          iOS (both screens keep it empty), under the app bar on Android. */}
       {toast && (
         <View pointerEvents="none" style={[styles.toastWrap, { top: topInset + (M3 ? 68 : 8) }]}>
           <View style={styles.toast}>
-            <Text style={styles.toastText} numberOfLines={2}>{toast}</Text>
+            <Text style={styles.toastText} numberOfLines={2} maxFontSizeMultiplier={GROW.bar}>{toast}</Text>
           </View>
         </View>
       )}

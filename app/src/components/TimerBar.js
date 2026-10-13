@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
-import { FONT, PALETTES, useTheme } from '../theme';
+import { FONT, GROW, PALETTES, useTheme } from '../theme';
 import { Close, Bell, Restart } from '../icons';
 import { formatRemaining } from '../timer';
 import { GLASS, M3, GlassFill, GlassPressable } from '../glass';
@@ -227,12 +227,12 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
           <Ring frac={timer.elapsedFrac} C={C} done={isDone} />
           <View style={styles.left}>
             <View style={styles.kickerRow}>
-              <Text style={[styles.kicker, isDone && { color: C.onTerracotta85 }]} numberOfLines={1}>
+              <Text style={[styles.kicker, isDone && { color: C.onTerracotta85 }]} numberOfLines={1} maxFontSizeMultiplier={GROW.display}>
                 {timer.label || t('timer.fallback_label')}
               </Text>
               {!isDone && timer.remindHalfway && <Bell s={11} c={C.ink50} />}
             </View>
-            <Text style={[styles.time, { color: fg }]} numberOfLines={1}>
+            <Text style={[styles.time, { color: fg }]} numberOfLines={1} maxFontSizeMultiplier={GROW.display}>
               {isDone ? t('timer.done') : formatRemaining(timer.remainingSec)}
             </Text>
           </View>
@@ -242,7 +242,7 @@ function TimerCard({ timer, onPress, onCancel, onRestart }) {
               <Restart s={18} c={fg} />
             </IconButton>
           )}
-          <IconButton onPress={onCancel} label={t('timer.cancel_a11y')} done={isDone}>
+          <IconButton onPress={onCancel} label={t('timer.stop')} done={isDone}>
             <Close s={18} c={fg} />
           </IconButton>
         </View>

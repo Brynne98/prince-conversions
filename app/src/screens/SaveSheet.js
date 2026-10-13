@@ -4,7 +4,7 @@ import {
   StyleSheet, Animated, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, GROW, useTheme, useStyles } from '../theme';
 import { Sheet, AppBar, TextButton, Field } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { formatMinutes } from '../convert';
@@ -194,9 +194,9 @@ export default function SaveSheet({
     <Sheet visible={visible} onClose={onClose}>
       <View style={styles.headerRow}>
         <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
-          <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+          <Text style={styles.cancelText} maxFontSizeMultiplier={GROW.bar}>{t('common.cancel')}</Text>
         </GlassPressable>
-        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar}>
           {t('save.title')}
         </Text>
         <GlassPressable
@@ -207,7 +207,7 @@ export default function SaveSheet({
           tint={valid ? C.terracotta : undefined}
           style={styles.headerBtn}
         >
-          <Text style={[
+          <Text maxFontSizeMultiplier={GROW.bar} style={[
             styles.saveText,
             { color: !valid ? C.ink30 : GLASS ? C.onTerracotta : C.terracotta },
           ]}>{t('common.save')}</Text>

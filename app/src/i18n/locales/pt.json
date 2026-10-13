@@ -45,8 +45,7 @@
     "delete_a11y": "Excluir %{name}",
     "recipe_fallback": "Receita",
     "oven_suffix": "forno",
-    "toast_saved": "Salva nas receitas",
-    "toast_timer": "Timer · %{name}"
+    "toast_saved": "Salva · timer iniciado"
   },
   "save": {
     "title": "Salvar receita",
@@ -113,7 +112,7 @@
   "timer": {
     "done": "Pronto!",
     "done_short": "Pronto",
-    "done_hint": "Reinicie ou cancele",
+    "done_hint": "Reinicie ou pare o timer",
     "ready_at": "Pronto às %{time}",
     "shake_at": "Sacudir às %{time}",
     "fallback_label": "Timer de preparo",
@@ -123,12 +122,13 @@
     "half_sub": "Aviso sonoro na metade do preparo",
     "restart": "Reiniciar",
     "restart_a11y": "Reiniciar timer",
-    "cancel_a11y": "Cancelar timer",
+    "stop": "Parar timer",
     "notif_ready": "%{label} está pronto.",
     "notif_shake_title": "Sacudir na metade",
     "notif_shake_body": "Dê uma sacudida em %{label}.",
     "toast_shake": "Sacudir na metade · %{label}",
     "toast_shake_fallback": "comida",
-    "toast_done": "Pronto · %{label}"
+    "toast_done": "Pronto · %{label}",
+    "toast_started": "Timer · %{name}"
   }
 }

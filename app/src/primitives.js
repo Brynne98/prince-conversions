@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FONT, useTheme, useStyles } from './theme';
+import { FONT, GROW, useTheme, useStyles } from './theme';
 import { GLASS, M3, GlassFill, GlassPressable } from './glass';
 import { Plus, Minus, Close, ArrowBack, Check } from './icons';
 import { t } from './i18n';
@@ -126,7 +126,7 @@ function M3Switch({ value, onChange }) {
 function TimeRich({ minutes, baseStyle, suffixStyle }) {
   if (minutes < 60) {
     return (
-      <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+      <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>
         {minutes}
         <Text style={suffixStyle}> {t('common.min')}</Text>
       </Text>
@@ -135,7 +135,7 @@ function TimeRich({ minutes, baseStyle, suffixStyle }) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return (
-    <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+    <Text style={baseStyle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>
       {h}
       <Text style={suffixStyle}>{t('common.hr')}</Text>
       {m > 0 ? ` ${m}` : ''}
@@ -189,6 +189,9 @@ export function Stepper({ value, onChange, step, min = 0, max = 999, suffix, for
           <Text
             style={[styles.stepperValue, { fontSize: valueSize, lineHeight: valueSize }]}
             numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+            maxFontSizeMultiplier={GROW.display}
           >
             {value}
             {suffix ? (
@@ -512,7 +515,7 @@ function ConnectedGroup({ options, value, onChange, compact = false, tone = 'def
               borderBottomRightRadius: trail,
             }}
           >
-            <Text style={{
+            <Text maxFontSizeMultiplier={GROW.bar} style={{
               fontFamily: FONT.ui,
               fontSize: 14,
               fontWeight: '500',
@@ -579,9 +582,9 @@ function SlidingSegmented({ options, value, onChange, compact = false, tone = 'd
               }
             }}
             onLayout={measure(i)}
-            style={{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1 }}
+            style={{ paddingVertical: padV, paddingHorizontal: padH, zIndex: 1, flexShrink: 1 }}
           >
-            <Text style={{
+            <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar} style={{
               fontFamily: FONT.ui,
               fontSize,
               fontWeight: '600',
@@ -852,6 +855,7 @@ const makeStyles = (C) => ({
     position: 'relative',
     flexDirection: 'row',
     alignSelf: 'center',
+    maxWidth: '100%',
     backgroundColor: C.ink06,
     borderRadius: 999,
     padding: 3,
