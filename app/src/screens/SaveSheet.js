@@ -196,7 +196,9 @@ export default function SaveSheet({
         <GlassPressable onPress={onClose} hitSlop={10} style={styles.headerBtn}>
           <Text style={styles.cancelText}>{t('common.cancel')}</Text>
         </GlassPressable>
-        <Text style={styles.title}>{t('save.title')}</Text>
+        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+          {t('save.title')}
+        </Text>
         <GlassPressable
           onPress={save}
           hitSlop={10}
@@ -262,6 +264,7 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 8,
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
@@ -272,7 +275,11 @@ const makeStyles = (C) => StyleSheet.create({
     ...(GLASS ? { paddingHorizontal: 18, borderRadius: 22 } : null),
   },
   cancelText: { fontFamily: FONT.ui, fontSize: 15, color: C.ink70 },
-  title: { fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.ink },
+  // Shrinks before it touches the buttons: both are wider in French.
+  title: {
+    flexShrink: 1, textAlign: 'center',
+    fontFamily: FONT.ui, fontSize: 16, fontWeight: '600', color: C.ink,
+  },
   saveText: { fontFamily: FONT.ui, fontSize: 15, fontWeight: '600' },
   namePill: {
     backgroundColor: C.paper,
@@ -369,8 +376,10 @@ const makeStyles = (C) => StyleSheet.create({
     letterSpacing: M3 ? 0.4 : 1,
     opacity: 0.7,
   },
+  // Wraps to a second line when the two halves do not fit, as in Italian.
   summaryRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 6,
