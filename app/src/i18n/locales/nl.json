@@ -45,8 +45,7 @@
     "delete_a11y": "Verwijder %{name}",
     "recipe_fallback": "Recept",
     "oven_suffix": "oven",
-    "toast_saved": "Bewaard in recepten",
-    "toast_timer": "Timer · %{name}"
+    "toast_saved": "Bewaard · timer loopt"
   },
   "save": {
     "title": "Bewaar recept",
@@ -113,7 +112,7 @@
   "timer": {
     "done": "Klaar!",
     "done_short": "Klaar",
-    "done_hint": "Herstart of annuleer",
+    "done_hint": "Herstart of stop de timer",
     "ready_at": "Klaar om %{time}",
     "shake_at": "Schudden om %{time}",
     "fallback_label": "Kooktimer",
@@ -123,12 +122,13 @@
     "half_sub": "Geluidje halverwege de bereiding",
     "restart": "Herstart",
     "restart_a11y": "Herstart timer",
-    "cancel_a11y": "Annuleer timer",
+    "stop": "Stop timer",
     "notif_ready": "%{label} is klaar.",
     "notif_shake_title": "Halverwege schudden",
     "notif_shake_body": "Schud %{label} even.",
     "toast_shake": "Halverwege schudden · %{label}",
     "toast_shake_fallback": "eten",
-    "toast_done": "Klaar · %{label}"
+    "toast_done": "Klaar · %{label}",
+    "toast_started": "Timer · %{name}"
   }
 }

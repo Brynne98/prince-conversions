@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, GROW, useTheme, useStyles } from '../theme';
 import { Stepper, Segmented, Card, RoundButton } from '../primitives';
 import { GLASS, M3, cap, GlassPressable } from '../glass';
 import { BannerAd } from '../ads';
@@ -100,7 +100,7 @@ export default function ConverterScreen({
           {M3 ? <MaterialList s={22} /> : <List s={20} />}
         </RoundButton>
         <View style={styles.topTitleWrap}>
-          <Text style={styles.kicker}>{t('converter.kicker').toUpperCase()}</Text>
+          <Text style={styles.kicker} maxFontSizeMultiplier={GROW.bar}>{t('converter.kicker').toUpperCase()}</Text>
         </View>
         <RoundButton onPress={onOpenSettings} size={44} accessibilityLabel={t('settings.title')}>
           {M3 ? <MaterialSettings s={22} /> : <Gear s={19} />}
@@ -130,7 +130,7 @@ export default function ConverterScreen({
               <View style={styles.flameDot}>
                 <Flame s={M3 ? 16 : 14} c={C.terracottaDeep} />
               </View>
-              <Text style={styles.cardLabel}>{sourceLabel}</Text>
+              <Text style={styles.cardLabel} numberOfLines={1} maxFontSizeMultiplier={GROW.bar}>{sourceLabel}</Text>
             </View>
             <Segmented
               compact
@@ -179,7 +179,7 @@ export default function ConverterScreen({
           style={styles.resultCard}
         >
           <View style={styles.resultHeader}>
-            <Text style={styles.resultKicker}>{targetLabel}</Text>
+            <Text style={styles.resultKicker} numberOfLines={1} maxFontSizeMultiplier={GROW.bar}>{targetLabel}</Text>
             <View style={styles.resultHeaderRight}>
               <GlassPressable
                 onPress={share}
@@ -208,11 +208,17 @@ export default function ConverterScreen({
 
           <View style={styles.resultRow}>
             <View style={styles.resultCol}>
-              <Text style={styles.resultBig} numberOfLines={1}>
+              <Text
+                style={styles.resultBig}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.6}
+                maxFontSizeMultiplier={GROW.display}
+              >
                 {result.temp}
                 <Text style={styles.resultBigSuffix}>°{targetUnit}</Text>
               </Text>
-              <Text style={styles.resultLabel}>{cap(t('converter.temperature'))}</Text>
+              <Text style={styles.resultLabel} numberOfLines={1} maxFontSizeMultiplier={GROW.bar}>{cap(t('converter.temperature'))}</Text>
             </View>
             <View style={styles.resultDivider} />
             <View style={styles.resultCol}>
@@ -221,6 +227,7 @@ export default function ConverterScreen({
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.6}
+                maxFontSizeMultiplier={GROW.display}
               >
                 {result.time < 60 ? (
                   <>
@@ -236,7 +243,7 @@ export default function ConverterScreen({
                   </>
                 )}
               </Text>
-              <Text style={styles.resultLabel}>{cap(t('converter.time'))}</Text>
+              <Text style={styles.resultLabel} numberOfLines={1} maxFontSizeMultiplier={GROW.bar}>{cap(t('converter.time'))}</Text>
             </View>
           </View>
 
@@ -256,6 +263,7 @@ export default function ConverterScreen({
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.8}
+                maxFontSizeMultiplier={GROW.bar}
               >
                 {t('converter.start_timer')}
               </Text>
@@ -272,6 +280,7 @@ export default function ConverterScreen({
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.8}
+                maxFontSizeMultiplier={GROW.bar}
               >
                 {t('common.save')}
               </Text>
@@ -312,7 +321,7 @@ const makeStyles = (C) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  cardLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  cardLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
   flameDot: {
     width: M3 ? 28 : 22,
     height: M3 ? 28 : 22,
@@ -327,6 +336,7 @@ const makeStyles = (C) => StyleSheet.create({
     fontWeight: M3 ? '500' : '700',
     color: C.ink70,
     letterSpacing: M3 ? 0.1 : 0.5,
+    flexShrink: 1,
   },
   divider: {
     height: StyleSheet.hairlineWidth,
@@ -390,6 +400,7 @@ const makeStyles = (C) => StyleSheet.create({
     fontWeight: M3 ? '500' : '700',
     color: C.onTerracotta85,
     letterSpacing: M3 ? 0.1 : 1.6,
+    flexShrink: 1,
   },
   resultRow: {
     flexDirection: 'row',

@@ -20,6 +20,8 @@ const LIGHT = {
   sage: '#7A8F6E',
   sageSoft: '#DDE5D4',
   butter: '#E9B85B',
+  // A label that removes something.
+  danger: '#B3261E',
   divider: 'rgba(42,31,24,0.08)',
   cream0: 'rgba(255,247,238,0)',
   onTerracotta: '#FFF7EE',
@@ -52,6 +54,7 @@ const DARK = {
   sage:       '#B0BFA1',          // lighter sage so notes read on paper
   sageSoft:   '#2E382A',
   butter:     '#E9B85B',
+  danger:     '#F2877B',
   divider:    'rgba(242,232,216,0.13)',
   cream0:     'rgba(255,247,238,0)',
   // The terracotta result-card stays terracotta in dark mode, so its
@@ -78,6 +81,11 @@ export const FONT = {
   display: 'Fraunces_500Medium',
   displayBold: 'Fraunces_600SemiBold',
 };
+
+// How far text may grow with the phone's text-size setting
+// (maxFontSizeMultiplier). The big numbers and the one-line bars stop early,
+// so they stay on screen; everything else grows freely and wraps.
+export const GROW = { display: 1.2, bar: 1.3 };
 
 const ThemeContext = createContext({
   mode: 'light',

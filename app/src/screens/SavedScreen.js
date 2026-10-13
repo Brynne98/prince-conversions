@@ -61,7 +61,9 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         <RoundButton onPress={onClose} size={44} accessibilityLabel={t('common.back')}>
           {M3 ? <ArrowBack s={22} /> : <Back s={20} />}
         </RoundButton>
-        <Text style={styles.topTitle}>{t('saved.title')}</Text>
+        {/* iOS keeps this gap free for the short messages; the large title
+            below names the screen. */}
+        {M3 && <Text style={styles.topTitle}>{t('saved.title')}</Text>}
         <View style={{ width: 44 }} />
       </View>
 
@@ -76,7 +78,7 @@ export default function SavedScreen({ items, onClose, onDelete, onStart, unit, t
         </View>
       ) : (
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-          <Text style={styles.bigTitle}>{t('saved.big_title')}</Text>
+          <Text style={styles.bigTitle} accessibilityRole="header">{t('saved.big_title')}</Text>
           <Text style={styles.subtitle}>{count}</Text>
           <View style={styles.toggleRow}>{unitToggle}{modeToggle}</View>
           {searchBar}
@@ -186,7 +188,7 @@ function SavedRow({ item, unit, mode, onDelete, onStart, first, last }) {
         <Text style={styles.rowEmoji}>{item.emoji}</Text>
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={styles.rowName} numberOfLines={1}>{item.name}</Text>
+        <Text style={styles.rowName} numberOfLines={2}>{item.name}</Text>
         <View style={styles.tagRow}>
           <View style={[styles.tag, { backgroundColor: tagBg }]}>
             <Text style={[styles.tagText, { color: tagFg }]}>{summary}</Text>

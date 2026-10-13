@@ -45,8 +45,7 @@
     "delete_a11y": "Elimina %{name}",
     "recipe_fallback": "Ricetta",
     "oven_suffix": "forno",
-    "toast_saved": "Salvata nelle ricette",
-    "toast_timer": "Timer · %{name}"
+    "toast_saved": "Salvata · timer avviato"
   },
   "save": {
     "title": "Salva ricetta",
@@ -113,7 +112,7 @@
   "timer": {
     "done": "Pronto!",
     "done_short": "Pronto",
-    "done_hint": "Riavvia o annulla",
+    "done_hint": "Riavvia o ferma il timer",
     "ready_at": "Pronto alle %{time}",
     "shake_at": "Scuoti alle %{time}",
     "fallback_label": "Timer di cottura",
@@ -123,12 +122,13 @@
     "half_sub": "Suono a metà cottura",
     "restart": "Riavvia",
     "restart_a11y": "Riavvia timer",
-    "cancel_a11y": "Annulla timer",
+    "stop": "Ferma timer",
     "notif_ready": "%{label}: è pronto.",
     "notif_shake_title": "Scuoti a metà cottura",
     "notif_shake_body": "Dai una scossa a %{label}.",
     "toast_shake": "Scuoti a metà cottura · %{label}",
     "toast_shake_fallback": "cottura",
-    "toast_done": "Pronto · %{label}"
+    "toast_done": "Pronto · %{label}",
+    "toast_started": "Timer · %{name}"
   }
 }

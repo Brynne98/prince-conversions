@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
-import { FONT, useTheme, useStyles } from '../theme';
+import { FONT, GROW, useTheme, useStyles } from '../theme';
 import { Restart } from '../icons';
 import { Toggle, Sheet, CloseButton, AppBar } from '../primitives';
 import { GLASS, M3, GlassPressable } from '../glass';
@@ -66,7 +66,7 @@ export default function TimerScreen({
         <AppBar title={t('timer.fallback_label')} leading="close" onLeading={onClose} />
       ) : (
         <View style={styles.header}>
-          <Text style={styles.kicker}>{t('timer.fallback_label').toUpperCase()}</Text>
+          <Text style={styles.kicker} maxFontSizeMultiplier={GROW.bar}>{t('timer.fallback_label').toUpperCase()}</Text>
           <CloseButton onPress={onClose} />
         </View>
       )}
@@ -114,12 +114,18 @@ export default function TimerScreen({
           <View style={styles.centerText} pointerEvents="none">
             {completed ? (
               <>
-                <Text style={styles.doneText}>{t('timer.done')}</Text>
+                <Text style={styles.doneText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={GROW.display}>{t('timer.done')}</Text>
                 <Text style={styles.doneSub}>{t('timer.done_hint')}</Text>
               </>
             ) : (
               <>
-                <Text style={styles.timeText} numberOfLines={1}>
+                <Text
+                  style={styles.timeText}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.6}
+                  maxFontSizeMultiplier={GROW.display}
+                >
                   {formatRemaining(remainingSec)}
                 </Text>
                 {!!label && <Text style={styles.labelText}>{label}</Text>}
@@ -158,7 +164,7 @@ export default function TimerScreen({
               ]}
             >
               <Restart s={18} c={C.onTerracotta} />
-              <Text style={styles.restartText}>{t('timer.restart')}</Text>
+              <Text style={styles.restartText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={GROW.bar}>{t('timer.restart')}</Text>
             </GlassPressable>
           )}
           <GlassPressable
@@ -169,11 +175,21 @@ export default function TimerScreen({
             }}
             style={({ pressed }) => [
               styles.actionBtn,
-              styles.cancelBtn,
+              styles.stopBtn,
               { opacity: pressed ? 0.7 : 1 },
             ]}
           >
-            <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+            {/* Stopping a running timer throws its time away, so it reads as
+                a delete; a finished one has nothing left to lose. */}
+            <Text
+              style={[styles.stopText, !completed && { color: C.danger }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+              maxFontSizeMultiplier={GROW.bar}
+            >
+              {t('timer.stop')}
+            </Text>
           </GlassPressable>
         </View>
       </View>
@@ -279,16 +295,17 @@ const makeStyles = (C) => StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
-  cancelBtn: {
-    backgroundColor: M3 ? C.terracottaSoft : C.ink,
+  // Plain glass on iOS 26; a tonal button on Android; a faint wash on older
+  // iPhones.
+  stopBtn: {
+    backgroundColor: M3 ? C.terracottaSoft : C.ink06,
   },
-  cancelText: {
+  stopText: {
+    flexShrink: 1,
     fontFamily: FONT.ui,
     fontSize: 16,
     fontWeight: M3 ? '500' : '600',
-    // Plain glass on iOS 26, so the label is ink; a tonal button on Android;
-    // a solid ink button on older iPhones.
-    color: M3 ? C.terracottaDeep : GLASS ? C.ink : C.cream,
+    color: M3 ? C.terracottaDeep : C.ink,
     letterSpacing: M3 ? 0 : -0.2,
   },
   restartBtn: {
@@ -300,6 +317,7 @@ const makeStyles = (C) => StyleSheet.create({
     fontWeight: M3 ? '500' : '600',
     color: C.onTerracotta,
     letterSpacing: M3 ? 0 : -0.2,
+    flexShrink: 1,
   },
   doneText: {
     fontFamily: FONT.display,

@@ -46,8 +46,7 @@
     "delete_a11y": "Supprimer %{name}",
     "recipe_fallback": "Recette",
     "oven_suffix": "four",
-    "toast_saved": "Ajoutée aux recettes",
-    "toast_timer": "Minuteur · %{name}"
+    "toast_saved": "Enregistrée · minuteur lancé"
   },
   "save": {
     "title": "Enregistrer la recette",
@@ -114,7 +113,7 @@
   "timer": {
     "done": "C’est prêt !",
     "done_short": "Prêt",
-    "done_hint": "Relancer ou annuler",
+    "done_hint": "Relancer ou arrêter le minuteur",
     "ready_at": "Prêt à %{time}",
     "shake_at": "Secouer à %{time}",
     "fallback_label": "Minuteur de cuisson",
@@ -124,12 +123,13 @@
     "half_sub": "Signal sonore à la moitié de la cuisson",
     "restart": "Relancer",
     "restart_a11y": "Relancer le minuteur",
-    "cancel_a11y": "Annuler le minuteur",
+    "stop": "Arrêter le minuteur",
     "notif_ready": "%{label} : c’est prêt.",
     "notif_shake_title": "Secouer à mi-cuisson",
     "notif_shake_body": "Secouez %{label}.",
     "toast_shake": "Secouer à mi-cuisson · %{label}",
     "toast_shake_fallback": "cuisson",
-    "toast_done": "Prêt · %{label}"
+    "toast_done": "Prêt · %{label}",
+    "toast_started": "Minuteur · %{name}"
   }
 }

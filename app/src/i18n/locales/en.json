@@ -45,8 +45,7 @@
     "delete_a11y": "Delete %{name}",
     "recipe_fallback": "Recipe",
     "oven_suffix": "oven",
-    "toast_saved": "Saved to recipes",
-    "toast_timer": "Timer · %{name}"
+    "toast_saved": "Saved · timer started"
   },
   "save": {
     "title": "Save recipe",
@@ -113,7 +112,7 @@
   "timer": {
     "done": "Done!",
     "done_short": "Done",
-    "done_hint": "Tap restart or cancel",
+    "done_hint": "Tap Restart or Stop timer",
     "ready_at": "Ready at %{time}",
     "shake_at": "Shake at %{time}",
     "fallback_label": "Cook timer",
@@ -123,12 +122,13 @@
     "half_sub": "Chime at the midpoint of this cook",
     "restart": "Restart",
     "restart_a11y": "Restart timer",
-    "cancel_a11y": "Cancel timer",
+    "stop": "Stop timer",
     "notif_ready": "%{label} is ready.",
     "notif_shake_title": "Shake halfway",
     "notif_shake_body": "Give %{label} a shake.",
     "toast_shake": "Shake halfway · %{label}",
     "toast_shake_fallback": "cooking",
-    "toast_done": "Done · %{label}"
+    "toast_done": "Done · %{label}",
+    "toast_started": "Timer · %{name}"
   }
 }

@@ -45,8 +45,7 @@
     "delete_a11y": "%{name} löschen",
     "recipe_fallback": "Rezept",
     "oven_suffix": "Ofen",
-    "toast_saved": "In Rezepten gespeichert",
-    "toast_timer": "Timer · %{name}"
+    "toast_saved": "Gespeichert · Timer läuft"
   },
   "save": {
     "title": "Rezept speichern",
@@ -113,7 +112,7 @@
   "timer": {
     "done": "Fertig!",
     "done_short": "Fertig",
-    "done_hint": "Neu starten oder abbrechen",
+    "done_hint": "Neu starten oder Timer stoppen",
     "ready_at": "Fertig um %{time}",
     "shake_at": "Schütteln um %{time}",
     "fallback_label": "Kochtimer",
@@ -123,12 +122,13 @@
     "half_sub": "Signalton nach der Hälfte der Garzeit",
     "restart": "Neu starten",
     "restart_a11y": "Timer neu starten",
-    "cancel_a11y": "Timer abbrechen",
+    "stop": "Timer stoppen",
     "notif_ready": "%{label} ist fertig.",
     "notif_shake_title": "Zur Halbzeit schütteln",
     "notif_shake_body": "%{label} einmal schütteln.",
     "toast_shake": "Zur Halbzeit schütteln · %{label}",
     "toast_shake_fallback": "Essen",
-    "toast_done": "Fertig · %{label}"
+    "toast_done": "Fertig · %{label}",
+    "toast_started": "Timer · %{name}"
   }
 }

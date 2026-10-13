@@ -45,8 +45,7 @@
     "delete_a11y": "Eliminar %{name}",
     "recipe_fallback": "Receta",
     "oven_suffix": "horno",
-    "toast_saved": "Guardada en recetas",
-    "toast_timer": "Temporizador · %{name}"
+    "toast_saved": "Guardada · temporizador en marcha"
   },
   "save": {
     "title": "Guardar receta",
@@ -113,7 +112,7 @@
   "timer": {
     "done": "¡Listo!",
     "done_short": "Listo",
-    "done_hint": "Reinicia o cancela",
+    "done_hint": "Reinicia o detén el temporizador",
     "ready_at": "Listo a las %{time}",
     "shake_at": "Agitar a las %{time}",
     "fallback_label": "Temporizador de cocina",
@@ -123,12 +122,13 @@
     "half_sub": "Sonido a mitad de la cocción",
     "restart": "Reiniciar",
     "restart_a11y": "Reiniciar temporizador",
-    "cancel_a11y": "Cancelar temporizador",
+    "stop": "Detener temporizador",
     "notif_ready": "%{label}: ¡listo!",
     "notif_shake_title": "Agitar a la mitad",
     "notif_shake_body": "Agita %{label}.",
     "toast_shake": "Agitar a la mitad · %{label}",
     "toast_shake_fallback": "cocción",
-    "toast_done": "Listo · %{label}"
+    "toast_done": "Listo · %{label}",
+    "toast_started": "Temporizador · %{name}"
   }
 }
