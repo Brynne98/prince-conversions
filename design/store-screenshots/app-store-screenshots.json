@@ -4,9 +4,15 @@
   "themeId": "afc",
   "connectedCanvas": false,
   "locales": [
-    "en"
+    "en",
+    "de",
+    "fr",
+    "es",
+    "it",
+    "nl",
+    "pt"
   ],
-  "locale": "en",
+  "locale": "de",
   "device": "iphone",
   "orientation": "portrait",
   "appIcon": "/app-icon.png",
@@ -17,12 +23,24 @@
         "layout": "hero",
         "tone": "cream",
         "label": {
-          "en": "NO MORE GUESSWORK"
+          "en": "NO MORE GUESSWORK",
+          "de": "SCHLUSS MIT RATEN",
+          "fr": "FINI LES APPROXIMATIONS",
+          "es": "SE ACABÓ ADIVINAR",
+          "it": "BASTA INDOVINARE",
+          "nl": "NOOIT MEER GOKKEN",
+          "pt": "CHEGA DE ADIVINHAR"
         },
         "headline": {
-          "en": "Two numbers.\n*One tap.*"
+          "en": "Two numbers.\n*One tap.*",
+          "de": "Zwei Zahlen.\n*Ein Tipp.*",
+          "fr": "Deux chiffres.\n*Un geste.*",
+          "es": "Dos números.\n*Un toque.*",
+          "it": "Due numeri.\n*Un tocco.*",
+          "nl": "Twee getallen.\n*Eén tik.*",
+          "pt": "Dois números.\n*Um toque.*"
         },
-        "screenshot": "/screenshots/apple/iphone/en/convert.png",
+        "screenshot": "/screenshots/apple/iphone/{locale}/convert.png",
         "transforms": {
           "caption": {
             "x": 66,
@@ -43,7 +61,13 @@
           {
             "id": "afc_2",
             "text": {
-              "en": "Oven recipe or air fryer —\nget the answer instantly."
+              "en": "Oven recipe or air fryer —\nget the answer instantly.",
+              "de": "Ofenrezept oder Airfryer –\ndie Antwort kommt sofort.",
+              "fr": "Recette au four ou Airfryer :\nla réponse est immédiate.",
+              "es": "Receta de horno o de freidora:\nla respuesta, al instante.",
+              "it": "Ricetta da forno o da friggitrice:\nla risposta è immediata.",
+              "nl": "Ovenrecept of airfryer:\nmeteen het antwoord.",
+              "pt": "Receita de forno ou de airfryer:\na resposta na hora."
             },
             "transform": {
               "x": 105.60000000000001,
@@ -64,12 +88,24 @@
         "layout": "device-bottom",
         "tone": "terracotta",
         "label": {
-          "en": "OVEN ↔ AIR FRYER"
+          "en": "OVEN ↔ AIR FRYER",
+          "de": "OFEN ↔ AIRFRYER",
+          "fr": "FOUR ↔ AIRFRYER",
+          "es": "HORNO ↔ FREIDORA DE AIRE",
+          "it": "FORNO ↔ FRIGGITRICE AD ARIA",
+          "nl": "OVEN ↔ AIRFRYER",
+          "pt": "FORNO ↔ AIRFRYER"
         },
         "headline": {
-          "en": "Cook it *right,*\nevery time."
+          "en": "Cook it *right,*\nevery time.",
+          "de": "Jedes Mal\n*auf den Punkt.*",
+          "fr": "*Réussi,*\nà chaque fois.",
+          "es": "*En su punto,*\nsiempre.",
+          "it": "*Cotto giusto,*\nogni volta.",
+          "nl": "*Precies goed,*\nelke keer.",
+          "pt": "*No ponto,*\nsempre."
         },
-        "screenshot": "/screenshots/apple/iphone/en/convert-reverse.png",
+        "screenshot": "/screenshots/apple/iphone/{locale}/convert-reverse.png",
         "transforms": {
           "caption": {
             "x": 66,
@@ -90,7 +126,13 @@
           {
             "id": "afc_4",
             "text": {
-              "en": "Accurate temperature & time\nconversions for any recipe."
+              "en": "Accurate temperature & time\nconversions for any recipe.",
+              "de": "Temperatur und Zeit genau\numgerechnet, für jedes Rezept.",
+              "fr": "Température et temps précis,\npour chaque recette.",
+              "es": "Temperatura y tiempo exactos\npara cualquier receta.",
+              "it": "Temperatura e tempo precisi\nper ogni ricetta.",
+              "nl": "Temperatuur en tijd exact\nomgerekend, voor elk recept.",
+              "pt": "Temperatura e tempo exatos\npara qualquer receita."
             },
             "transform": {
               "x": 105.60000000000001,
@@ -111,13 +153,25 @@
         "layout": "two-devices",
         "tone": "terracotta",
         "label": {
-          "en": "YOUR RECIPE BOOK"
+          "en": "YOUR RECIPE BOOK",
+          "de": "DEIN REZEPTBUCH",
+          "fr": "VOTRE CARNET DE RECETTES",
+          "es": "TU RECETARIO",
+          "it": "IL TUO RICETTARIO",
+          "nl": "JOUW RECEPTENBOEK",
+          "pt": "SEU LIVRO DE RECEITAS"
         },
         "headline": {
-          "en": "Save recipes\nwith a *name*\n*and emoji.*"
+          "en": "Save recipes\nwith a *name*\n*and emoji.*",
+          "de": "Rezepte sichern\nmit *Name*\n*und Emoji.*",
+          "fr": "Vos recettes,\navec un *nom*\n*et un emoji.*",
+          "es": "Guarda recetas\ncon *nombre*\n*y emoji.*",
+          "it": "Salva le ricette\ncon *nome*\n*ed emoji.*",
+          "nl": "Jouw recepten\nmet *naam*\n*en emoji.*",
+          "pt": "Salve receitas\ncom *nome*\n*e emoji.*"
         },
-        "screenshot": "/screenshots/apple/iphone/en/saved.png",
-        "screenshotSecondary": "/screenshots/apple/iphone/en/saved-dark.png",
+        "screenshot": "/screenshots/apple/iphone/{locale}/saved.png",
+        "screenshotSecondary": "/screenshots/apple/iphone/{locale}/saved-dark.png",
         "transforms": {
           "caption": {
             "x": 66,
@@ -148,12 +202,24 @@
         "layout": "device-bottom",
         "tone": "cream",
         "label": {
-          "en": "SMART COOK TIMER"
+          "en": "SMART COOK TIMER",
+          "de": "SCHLAUER KOCHTIMER",
+          "fr": "MINUTEUR MALIN",
+          "es": "TEMPORIZADOR LISTO",
+          "it": "TIMER INTELLIGENTE",
+          "nl": "SLIMME KOOKTIMER",
+          "pt": "TIMER INTELIGENTE"
         },
         "headline": {
-          "en": "Set it, *shake it,*\nserve it."
+          "en": "Set it, *shake it,*\nserve it.",
+          "de": "*Schütteln*\nnicht vergessen.",
+          "fr": "Lancez, *secouez,*\nservez.",
+          "es": "Pon, *agita,*\nsirve.",
+          "it": "Avvia, *scuoti,*\nservi.",
+          "nl": "*Schudden*\nniet vergeten.",
+          "pt": "Inicie, *sacuda,*\nsirva."
         },
-        "screenshot": "/screenshots/apple/iphone/en/timer.png",
+        "screenshot": "/screenshots/apple/iphone/{locale}/timer.png",
         "transforms": {
           "caption": {
             "x": 66,
@@ -174,7 +240,13 @@
           {
             "id": "afc_7",
             "text": {
-              "en": "A halfway chime — perfect\nfor flipping, never for burning."
+              "en": "A halfway chime — perfect\nfor flipping, never for burning.",
+              "de": "Ein Signal zur Halbzeit –\nwenden statt anbrennen.",
+              "fr": "Un signal à mi-cuisson :\non retourne, rien ne brûle.",
+              "es": "Un aviso a mitad de cocción:\nda la vuelta y nada se quema.",
+              "it": "Un avviso a metà cottura:\ngiri in tempo, niente si brucia.",
+              "nl": "Een seintje halverwege:\nkeren op tijd, niets brandt aan.",
+              "pt": "Um aviso na metade do tempo:\nvire na hora, nada queima."
             },
             "transform": {
               "x": 105.60000000000001,
@@ -195,10 +267,22 @@
         "layout": "no-device",
         "tone": "dark",
         "label": {
-          "en": "DESIGNED FOR THE KITCHEN"
+          "en": "DESIGNED FOR THE KITCHEN",
+          "de": "FÜR DIE KÜCHE GEMACHT",
+          "fr": "PENSÉE POUR LA CUISINE",
+          "es": "PENSADA PARA LA COCINA",
+          "it": "PENSATA PER LA CUCINA",
+          "nl": "GEMAAKT VOOR DE KEUKEN",
+          "pt": "FEITO PARA A COZINHA"
         },
         "headline": {
-          "en": "Small\ndetails.\n*Big*\n*difference.*"
+          "en": "Small\ndetails.\n*Big*\n*difference.*",
+          "de": "Kleine\nDetails.\n*Großer*\n*Unterschied.*",
+          "fr": "Petits\ndétails.\n*Grande*\n*différence.*",
+          "es": "Pequeños\ndetalles.\n*Gran*\n*diferencia.*",
+          "it": "Piccoli\ndettagli.\n*Grande*\n*differenza.*",
+          "nl": "Kleine\ndetails.\n*Groot*\n*verschil.*",
+          "pt": "Pequenos\ndetalhes.\n*Grande*\n*diferença.*"
         },
         "screenshot": "",
         "transforms": {
@@ -214,7 +298,13 @@
           {
             "id": "afc_9",
             "text": {
-              "en": "°F or °C, your call"
+              "en": "°F or °C, your call",
+              "de": "°C oder °F, du wählst",
+              "fr": "°C ou °F, au choix",
+              "es": "°C o °F, tú eliges",
+              "it": "°C o °F, scegli tu",
+              "nl": "°C of °F, jij kiest",
+              "pt": "°C ou °F, você escolhe"
             },
             "transform": {
               "x": 132,
@@ -231,7 +321,13 @@
           {
             "id": "afc_10",
             "text": {
-              "en": "Toggle units anywhere, instantly."
+              "en": "Toggle units anywhere, instantly.",
+              "de": "Einheit jederzeit umschalten.",
+              "fr": "Changez d’unité à tout moment.",
+              "es": "Cambia de unidad al instante.",
+              "it": "Cambia unità in un attimo.",
+              "nl": "Wissel overal van eenheid.",
+              "pt": "Troque de unidade na hora."
             },
             "transform": {
               "x": 132,
@@ -248,7 +344,13 @@
           {
             "id": "afc_11",
             "text": {
-              "en": "Saved recipes"
+              "en": "Saved recipes",
+              "de": "Gespeicherte Rezepte",
+              "fr": "Recettes enregistrées",
+              "es": "Recetas guardadas",
+              "it": "Ricette salvate",
+              "nl": "Bewaarde recepten",
+              "pt": "Receitas salvas"
             },
             "transform": {
               "x": 132,
@@ -265,7 +367,13 @@
           {
             "id": "afc_12",
             "text": {
-              "en": "One tap to your favorites."
+              "en": "One tap to your favorites.",
+              "de": "Ein Tipp zu deinen Favoriten.",
+              "fr": "Vos favorites en un geste.",
+              "es": "Tus favoritas a un toque.",
+              "it": "Le tue preferite in un tocco.",
+              "nl": "Je favorieten met één tik.",
+              "pt": "Suas favoritas em um toque."
             },
             "transform": {
               "x": 132,
@@ -282,7 +390,13 @@
           {
             "id": "afc_13",
             "text": {
-              "en": "Reverse convert"
+              "en": "Reverse convert",
+              "de": "Auch umgekehrt",
+              "fr": "Conversion inverse",
+              "es": "Conversión inversa",
+              "it": "Conversione inversa",
+              "nl": "Ook andersom",
+              "pt": "Conversão inversa"
             },
             "transform": {
               "x": 132,
@@ -299,7 +413,13 @@
           {
             "id": "afc_14",
             "text": {
-              "en": "Air fryer back to oven, in one tap."
+              "en": "Air fryer back to oven, in one tap.",
+              "de": "Vom Airfryer zurück zum Ofen.",
+              "fr": "De l’Airfryer au four, en un geste.",
+              "es": "De la freidora al horno.",
+              "it": "Dalla friggitrice al forno.",
+              "nl": "Van airfryer terug naar oven.",
+              "pt": "Da airfryer de volta ao forno."
             },
             "transform": {
               "x": 132,
@@ -316,7 +436,13 @@
           {
             "id": "afc_15",
             "text": {
-              "en": "Light & dark"
+              "en": "Light & dark",
+              "de": "Hell & dunkel",
+              "fr": "Clair & sombre",
+              "es": "Claro y oscuro",
+              "it": "Chiaro e scuro",
+              "nl": "Licht & donker",
+              "pt": "Claro e escuro"
             },
             "transform": {
               "x": 132,
@@ -333,7 +459,13 @@
           {
             "id": "afc_16",
             "text": {
-              "en": "Warm charcoal for late nights."
+              "en": "Warm charcoal for late nights.",
+              "de": "Warmes Anthrazit für späte Abende.",
+              "fr": "Un anthracite chaud pour le soir.",
+              "es": "Un gris cálido para la noche.",
+              "it": "Un antracite caldo per la sera.",
+              "nl": "Warm antraciet voor late avonden.",
+              "pt": "Um cinza quente para a noite."
             },
             "transform": {
               "x": 132,
@@ -354,13 +486,25 @@
         "layout": "two-devices",
         "tone": "dark",
         "label": {
-          "en": "LIGHT & DARK"
+          "en": "LIGHT & DARK",
+          "de": "HELL & DUNKEL",
+          "fr": "CLAIR & SOMBRE",
+          "es": "CLARO Y OSCURO",
+          "it": "CHIARO E SCURO",
+          "nl": "LICHT & DONKER",
+          "pt": "CLARO E ESCURO"
         },
         "headline": {
-          "en": "Beautiful in\n*any light.*"
+          "en": "Beautiful in\n*any light.*",
+          "de": "Schön bei\n*jedem Licht.*",
+          "fr": "Belle,\n*jour et nuit.*",
+          "es": "Bonita con\n*cualquier luz.*",
+          "it": "Bella con\n*ogni luce.*",
+          "nl": "Mooi bij\n*elk licht.*",
+          "pt": "Bonito em\n*qualquer luz.*"
         },
-        "screenshot": "/screenshots/apple/iphone/en/convert-dark.png",
-        "screenshotSecondary": "/screenshots/apple/iphone/en/convert.png",
+        "screenshot": "/screenshots/apple/iphone/{locale}/convert-dark.png",
+        "screenshotSecondary": "/screenshots/apple/iphone/{locale}/convert.png",
         "transforms": {
           "caption": {
             "x": 66,
@@ -389,7 +533,13 @@
           {
             "id": "afc_18",
             "text": {
-              "en": "Warm cream or warm charcoal —\npick your mood in Settings."
+              "en": "Warm cream or warm charcoal —\npick your mood in Settings.",
+              "de": "Warmes Creme oder Anthrazit –\nwähle es in den Einstellungen.",
+              "fr": "Crème ou anthracite :\nchoisissez dans les Réglages.",
+              "es": "Crema o gris cálido:\nelige en Ajustes.",
+              "it": "Crema o antracite:\nscegli nelle Impostazioni.",
+              "nl": "Warm crème of warm antraciet:\nkies het in Instellingen.",
+              "pt": "Creme ou cinza quente:\nescolha nos Ajustes."
             },
             "transform": {
               "x": 105.60000000000001,
@@ -412,12 +562,24 @@
         "layout": "hero",
         "tone": "cream",
         "label": {
-          "en": "NO MORE GUESSWORK"
+          "en": "NO MORE GUESSWORK",
+          "de": "SCHLUSS MIT RATEN",
+          "fr": "FINI LES APPROXIMATIONS",
+          "es": "SE ACABÓ ADIVINAR",
+          "it": "BASTA INDOVINARE",
+          "nl": "NOOIT MEER GOKKEN",
+          "pt": "CHEGA DE ADIVINHAR"
         },
         "headline": {
-          "en": "Two numbers.\n*One tap.*"
+          "en": "Two numbers.\n*One tap.*",
+          "de": "Zwei Zahlen.\n*Ein Tipp.*",
+          "fr": "Deux chiffres.\n*Un geste.*",
+          "es": "Dos números.\n*Un toque.*",
+          "it": "Due numeri.\n*Un tocco.*",
+          "nl": "Twee getallen.\n*Eén tik.*",
+          "pt": "Dois números.\n*Um toque.*"
         },
-        "screenshot": "/screenshots/android/phone/en/convert.png",
+        "screenshot": "/screenshots/android/phone/{locale}/convert.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -438,7 +600,13 @@
           {
             "id": "afc_20",
             "text": {
-              "en": "Oven recipe or air fryer —\nget the answer instantly."
+              "en": "Oven recipe or air fryer —\nget the answer instantly.",
+              "de": "Ofenrezept oder Airfryer –\ndie Antwort kommt sofort.",
+              "fr": "Recette au four ou Airfryer :\nla réponse est immédiate.",
+              "es": "Receta de horno o de freidora:\nla respuesta, al instante.",
+              "it": "Ricetta da forno o da friggitrice:\nla risposta è immediata.",
+              "nl": "Ovenrecept of airfryer:\nmeteen het antwoord.",
+              "pt": "Receita de forno ou de airfryer:\na resposta na hora."
             },
             "transform": {
               "x": 86.4,
@@ -459,12 +627,24 @@
         "layout": "device-bottom",
         "tone": "terracotta",
         "label": {
-          "en": "OVEN ↔ AIR FRYER"
+          "en": "OVEN ↔ AIR FRYER",
+          "de": "OFEN ↔ AIRFRYER",
+          "fr": "FOUR ↔ AIRFRYER",
+          "es": "HORNO ↔ FREIDORA DE AIRE",
+          "it": "FORNO ↔ FRIGGITRICE AD ARIA",
+          "nl": "OVEN ↔ AIRFRYER",
+          "pt": "FORNO ↔ AIRFRYER"
         },
         "headline": {
-          "en": "Cook it *right,*\nevery time."
+          "en": "Cook it *right,*\nevery time.",
+          "de": "Jedes Mal\n*auf den Punkt.*",
+          "fr": "*Réussi,*\nà chaque fois.",
+          "es": "*En su punto,*\nsiempre.",
+          "it": "*Cotto giusto,*\nogni volta.",
+          "nl": "*Precies goed,*\nelke keer.",
+          "pt": "*No ponto,*\nsempre."
         },
-        "screenshot": "/screenshots/android/phone/en/convert-reverse.png",
+        "screenshot": "/screenshots/android/phone/{locale}/convert-reverse.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -485,7 +665,13 @@
           {
             "id": "afc_22",
             "text": {
-              "en": "Accurate temperature & time\nconversions for any recipe."
+              "en": "Accurate temperature & time\nconversions for any recipe.",
+              "de": "Temperatur und Zeit genau\numgerechnet, für jedes Rezept.",
+              "fr": "Température et temps précis,\npour chaque recette.",
+              "es": "Temperatura y tiempo exactos\npara cualquier receta.",
+              "it": "Temperatura e tempo precisi\nper ogni ricetta.",
+              "nl": "Temperatuur en tijd exact\nomgerekend, voor elk recept.",
+              "pt": "Temperatura e tempo exatos\npara qualquer receita."
             },
             "transform": {
               "x": 86.4,
@@ -506,13 +692,25 @@
         "layout": "two-devices",
         "tone": "terracotta",
         "label": {
-          "en": "YOUR RECIPE BOOK"
+          "en": "YOUR RECIPE BOOK",
+          "de": "DEIN REZEPTBUCH",
+          "fr": "VOTRE CARNET DE RECETTES",
+          "es": "TU RECETARIO",
+          "it": "IL TUO RICETTARIO",
+          "nl": "JOUW RECEPTENBOEK",
+          "pt": "SEU LIVRO DE RECEITAS"
         },
         "headline": {
-          "en": "Save recipes\nwith a *name*\n*and emoji.*"
+          "en": "Save recipes\nwith a *name*\n*and emoji.*",
+          "de": "Rezepte sichern\nmit *Name*\n*und Emoji.*",
+          "fr": "Vos recettes,\navec un *nom*\n*et un emoji.*",
+          "es": "Guarda recetas\ncon *nombre*\n*y emoji.*",
+          "it": "Salva le ricette\ncon *nome*\n*ed emoji.*",
+          "nl": "Jouw recepten\nmet *naam*\n*en emoji.*",
+          "pt": "Salve receitas\ncom *nome*\n*e emoji.*"
         },
-        "screenshot": "/screenshots/android/phone/en/saved.png",
-        "screenshotSecondary": "/screenshots/android/phone/en/saved-dark.png",
+        "screenshot": "/screenshots/android/phone/{locale}/saved.png",
+        "screenshotSecondary": "/screenshots/android/phone/{locale}/saved-dark.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -543,12 +741,24 @@
         "layout": "device-bottom",
         "tone": "cream",
         "label": {
-          "en": "SMART COOK TIMER"
+          "en": "SMART COOK TIMER",
+          "de": "SCHLAUER KOCHTIMER",
+          "fr": "MINUTEUR MALIN",
+          "es": "TEMPORIZADOR LISTO",
+          "it": "TIMER INTELLIGENTE",
+          "nl": "SLIMME KOOKTIMER",
+          "pt": "TIMER INTELIGENTE"
         },
         "headline": {
-          "en": "Set it, *shake it,*\nserve it."
+          "en": "Set it, *shake it,*\nserve it.",
+          "de": "*Schütteln*\nnicht vergessen.",
+          "fr": "Lancez, *secouez,*\nservez.",
+          "es": "Pon, *agita,*\nsirve.",
+          "it": "Avvia, *scuoti,*\nservi.",
+          "nl": "*Schudden*\nniet vergeten.",
+          "pt": "Inicie, *sacuda,*\nsirva."
         },
-        "screenshot": "/screenshots/android/phone/en/timer.png",
+        "screenshot": "/screenshots/android/phone/{locale}/timer.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -569,7 +779,13 @@
           {
             "id": "afc_25",
             "text": {
-              "en": "A halfway chime — perfect\nfor flipping, never for burning."
+              "en": "A halfway chime — perfect\nfor flipping, never for burning.",
+              "de": "Ein Signal zur Halbzeit –\nwenden statt anbrennen.",
+              "fr": "Un signal à mi-cuisson :\non retourne, rien ne brûle.",
+              "es": "Un aviso a mitad de cocción:\nda la vuelta y nada se quema.",
+              "it": "Un avviso a metà cottura:\ngiri in tempo, niente si brucia.",
+              "nl": "Een seintje halverwege:\nkeren op tijd, niets brandt aan.",
+              "pt": "Um aviso na metade do tempo:\nvire na hora, nada queima."
             },
             "transform": {
               "x": 86.4,
@@ -590,10 +806,22 @@
         "layout": "no-device",
         "tone": "dark",
         "label": {
-          "en": "DESIGNED FOR THE KITCHEN"
+          "en": "DESIGNED FOR THE KITCHEN",
+          "de": "FÜR DIE KÜCHE GEMACHT",
+          "fr": "PENSÉE POUR LA CUISINE",
+          "es": "PENSADA PARA LA COCINA",
+          "it": "PENSATA PER LA CUCINA",
+          "nl": "GEMAAKT VOOR DE KEUKEN",
+          "pt": "FEITO PARA A COZINHA"
         },
         "headline": {
-          "en": "Small\ndetails.\n*Big*\n*difference.*"
+          "en": "Small\ndetails.\n*Big*\n*difference.*",
+          "de": "Kleine\nDetails.\n*Großer*\n*Unterschied.*",
+          "fr": "Petits\ndétails.\n*Grande*\n*différence.*",
+          "es": "Pequeños\ndetalles.\n*Gran*\n*diferencia.*",
+          "it": "Piccoli\ndettagli.\n*Grande*\n*differenza.*",
+          "nl": "Kleine\ndetails.\n*Groot*\n*verschil.*",
+          "pt": "Pequenos\ndetalhes.\n*Grande*\n*diferença.*"
         },
         "screenshot": "",
         "transforms": {
@@ -609,7 +837,13 @@
           {
             "id": "afc_27",
             "text": {
-              "en": "°F or °C, your call"
+              "en": "°F or °C, your call",
+              "de": "°C oder °F, du wählst",
+              "fr": "°C ou °F, au choix",
+              "es": "°C o °F, tú eliges",
+              "it": "°C o °F, scegli tu",
+              "nl": "°C of °F, jij kiest",
+              "pt": "°C ou °F, você escolhe"
             },
             "transform": {
               "x": 108,
@@ -626,7 +860,13 @@
           {
             "id": "afc_28",
             "text": {
-              "en": "Toggle units anywhere, instantly."
+              "en": "Toggle units anywhere, instantly.",
+              "de": "Einheit jederzeit umschalten.",
+              "fr": "Changez d’unité à tout moment.",
+              "es": "Cambia de unidad al instante.",
+              "it": "Cambia unità in un attimo.",
+              "nl": "Wissel overal van eenheid.",
+              "pt": "Troque de unidade na hora."
             },
             "transform": {
               "x": 108,
@@ -643,7 +883,13 @@
           {
             "id": "afc_29",
             "text": {
-              "en": "Saved recipes"
+              "en": "Saved recipes",
+              "de": "Gespeicherte Rezepte",
+              "fr": "Recettes enregistrées",
+              "es": "Recetas guardadas",
+              "it": "Ricette salvate",
+              "nl": "Bewaarde recepten",
+              "pt": "Receitas salvas"
             },
             "transform": {
               "x": 108,
@@ -660,7 +906,13 @@
           {
             "id": "afc_30",
             "text": {
-              "en": "One tap to your favorites."
+              "en": "One tap to your favorites.",
+              "de": "Ein Tipp zu deinen Favoriten.",
+              "fr": "Vos favorites en un geste.",
+              "es": "Tus favoritas a un toque.",
+              "it": "Le tue preferite in un tocco.",
+              "nl": "Je favorieten met één tik.",
+              "pt": "Suas favoritas em um toque."
             },
             "transform": {
               "x": 108,
@@ -677,7 +929,13 @@
           {
             "id": "afc_31",
             "text": {
-              "en": "Reverse convert"
+              "en": "Reverse convert",
+              "de": "Auch umgekehrt",
+              "fr": "Conversion inverse",
+              "es": "Conversión inversa",
+              "it": "Conversione inversa",
+              "nl": "Ook andersom",
+              "pt": "Conversão inversa"
             },
             "transform": {
               "x": 108,
@@ -694,7 +952,13 @@
           {
             "id": "afc_32",
             "text": {
-              "en": "Air fryer back to oven, in one tap."
+              "en": "Air fryer back to oven, in one tap.",
+              "de": "Vom Airfryer zurück zum Ofen.",
+              "fr": "De l’Airfryer au four, en un geste.",
+              "es": "De la freidora al horno.",
+              "it": "Dalla friggitrice al forno.",
+              "nl": "Van airfryer terug naar oven.",
+              "pt": "Da airfryer de volta ao forno."
             },
             "transform": {
               "x": 108,
@@ -711,7 +975,13 @@
           {
             "id": "afc_33",
             "text": {
-              "en": "Light & dark"
+              "en": "Light & dark",
+              "de": "Hell & dunkel",
+              "fr": "Clair & sombre",
+              "es": "Claro y oscuro",
+              "it": "Chiaro e scuro",
+              "nl": "Licht & donker",
+              "pt": "Claro e escuro"
             },
             "transform": {
               "x": 108,
@@ -728,7 +998,13 @@
           {
             "id": "afc_34",
             "text": {
-              "en": "Warm charcoal for late nights."
+              "en": "Warm charcoal for late nights.",
+              "de": "Warmes Anthrazit für späte Abende.",
+              "fr": "Un anthracite chaud pour le soir.",
+              "es": "Un gris cálido para la noche.",
+              "it": "Un antracite caldo per la sera.",
+              "nl": "Warm antraciet voor late avonden.",
+              "pt": "Um cinza quente para a noite."
             },
             "transform": {
               "x": 108,
@@ -749,13 +1025,25 @@
         "layout": "two-devices",
         "tone": "dark",
         "label": {
-          "en": "LIGHT & DARK"
+          "en": "LIGHT & DARK",
+          "de": "HELL & DUNKEL",
+          "fr": "CLAIR & SOMBRE",
+          "es": "CLARO Y OSCURO",
+          "it": "CHIARO E SCURO",
+          "nl": "LICHT & DONKER",
+          "pt": "CLARO E ESCURO"
         },
         "headline": {
-          "en": "Beautiful in\n*any light.*"
+          "en": "Beautiful in\n*any light.*",
+          "de": "Schön bei\n*jedem Licht.*",
+          "fr": "Belle,\n*jour et nuit.*",
+          "es": "Bonita con\n*cualquier luz.*",
+          "it": "Bella con\n*ogni luce.*",
+          "nl": "Mooi bij\n*elk licht.*",
+          "pt": "Bonito em\n*qualquer luz.*"
         },
-        "screenshot": "/screenshots/android/phone/en/convert-dark.png",
-        "screenshotSecondary": "/screenshots/android/phone/en/convert.png",
+        "screenshot": "/screenshots/android/phone/{locale}/convert-dark.png",
+        "screenshotSecondary": "/screenshots/android/phone/{locale}/convert.png",
         "transforms": {
           "caption": {
             "x": 54,
@@ -784,7 +1072,13 @@
           {
             "id": "afc_36",
             "text": {
-              "en": "Warm cream or warm charcoal —\npick your mood in Settings."
+              "en": "Warm cream or warm charcoal —\npick your mood in Settings.",
+              "de": "Warmes Creme oder Anthrazit –\nwähle es in den Einstellungen.",
+              "fr": "Crème ou anthracite :\nchoisissez dans les Réglages.",
+              "es": "Crema o gris cálido:\nelige en Ajustes.",
+              "it": "Crema o antracite:\nscegli nelle Impostazioni.",
+              "nl": "Warm crème of warm antraciet:\nkies het in Instellingen.",
+              "pt": "Creme ou cinza quente:\nescolha nos Ajustes."
             },
             "transform": {
               "x": 86.4,
@@ -892,9 +1186,15 @@
         "tone": "terracotta",
         "label": {},
         "headline": {
-          "en": "Oven recipe in.\n*Air fryer time out.*"
+          "en": "Oven recipe in.\n*Air fryer time out.*",
+          "de": "Ofenrezept rein.\n*Airfryer-Zeit raus.*",
+          "fr": "Recette au four.\n*Temps Airfryer.*",
+          "es": "Receta de horno.\n*Tiempo de freidora.*",
+          "it": "Ricetta da forno.\n*Tempo da friggitrice.*",
+          "nl": "Ovenrecept erin.\n*Airfryertijd eruit.*",
+          "pt": "Receita de forno.\n*Tempo de airfryer.*"
         },
-        "screenshot": "/screenshots/android/phone/en/convert.png"
+        "screenshot": "/screenshots/android/phone/{locale}/convert.png"
       }
     ],
     "apple-header": [
@@ -904,9 +1204,15 @@
         "tone": "terracotta",
         "label": {},
         "headline": {
-          "en": "Oven recipe in.\n*Air fryer time out.*"
+          "en": "Oven recipe in.\n*Air fryer time out.*",
+          "de": "Ofenrezept rein.\n*Airfryer-Zeit raus.*",
+          "fr": "Recette au four.\n*Temps Airfryer.*",
+          "es": "Receta de horno.\n*Tiempo de freidora.*",
+          "it": "Ricetta da forno.\n*Tempo da friggitrice.*",
+          "nl": "Ovenrecept erin.\n*Airfryertijd eruit.*",
+          "pt": "Receita de forno.\n*Tempo de airfryer.*"
         },
-        "screenshot": "/screenshots/apple/iphone/en/convert.png"
+        "screenshot": "/screenshots/apple/iphone/{locale}/convert.png"
       }
     ]
   }
