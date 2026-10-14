@@ -24,7 +24,17 @@
         "releaseNotes": "• Now in German, French, Spanish, Italian, Dutch and Portuguese\n• Small improvements and fixes",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/06-two-devices.png"
+          ]
+        }
       },
       "en-GB": {
         "title": "Oven to Air Fryer Converter",
@@ -47,7 +57,17 @@
         "releaseNotes": "• Now in German, French, Spanish, Italian, Dutch and Portuguese\n• Small improvements and fixes",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/en/06-two-devices.png"
+          ]
+        }
       },
       "de-DE": {
         "title": "Ofen & Airfryer Umrechner",
@@ -70,7 +90,17 @@
         "releaseNotes": "• Die App spricht jetzt Deutsch\n• Kleine Verbesserungen und Fehlerbehebungen",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/de/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/de/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/de/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/de/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/de/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/de/06-two-devices.png"
+          ]
+        }
       },
       "fr-FR": {
         "title": "Convertisseur Four & Airfryer",
@@ -94,7 +124,17 @@
         "releaseNotes": "• L’app est maintenant en français\n• Petites améliorations et corrections",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/fr/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/fr/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/fr/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/fr/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/fr/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/fr/06-two-devices.png"
+          ]
+        }
       },
       "es-ES": {
         "title": "Convertidor Freidora de Aire",
@@ -117,7 +157,17 @@
         "releaseNotes": "• La app ya está en español\n• Pequeñas mejoras y correcciones",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/06-two-devices.png"
+          ]
+        }
       },
       "es-MX": {
         "title": "Convertidor Freidora de Aire",
@@ -140,7 +190,17 @@
         "releaseNotes": "• La app ya está en español\n• Pequeñas mejoras y correcciones",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/es/06-two-devices.png"
+          ]
+        }
       },
       "it": {
         "title": "Convertitore Friggitrice Aria",
@@ -163,7 +223,17 @@
         "releaseNotes": "• L’app ora è in italiano\n• Piccoli miglioramenti e correzioni",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/it/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/it/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/it/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/it/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/it/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/it/06-two-devices.png"
+          ]
+        }
       },
       "nl-NL": {
         "title": "Airfryer Omrekener",
@@ -187,7 +257,17 @@
         "releaseNotes": "• De app is er nu in het Nederlands\n• Kleine verbeteringen en oplossingen",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/nl/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/nl/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/nl/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/nl/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/nl/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/nl/06-two-devices.png"
+          ]
+        }
       },
       "pt-BR": {
         "title": "Conversor Airfryer e Forno",
@@ -211,7 +291,17 @@
         "releaseNotes": "• O app agora está em português\n• Pequenas melhorias e correções",
         "marketingUrl": "https://brynne98.github.io/prince-conversions/",
         "supportUrl": "https://brynne98.github.io/prince-conversions/",
-        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html"
+        "privacyPolicyUrl": "https://brynne98.github.io/prince-conversions/privacy.html",
+        "screenshots": {
+          "APP_IPHONE_67": [
+            "../design/store-screenshots/final/apple/phone-1320x2868/pt/01-hero.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/pt/02-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/pt/03-two-devices.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/pt/04-device-bottom.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/pt/05-no-device.png",
+            "../design/store-screenshots/final/apple/phone-1320x2868/pt/06-two-devices.png"
+          ]
+        }
       }
     }
   }
