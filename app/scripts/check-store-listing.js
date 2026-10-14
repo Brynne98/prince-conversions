@@ -12,6 +12,7 @@ const COPIES = { 'en-GB': 'en-US', 'es-MX': 'es-ES' };
 const APPLE = ['en-US', 'en-GB', 'de-DE', 'fr-FR', 'es-ES', 'es-MX', 'it', 'nl-NL', 'pt-BR'];
 const APPLE_MAX = { title: 30, subtitle: 30, promoText: 170, description: 4000, releaseNotes: 4000 };
 const APPLE_URLS = ['marketingUrl', 'supportUrl', 'privacyPolicyUrl'];
+const SHOTS = '../design/store-screenshots/final/apple/phone-1320x2868/';
 // Google Play folder -> the App Store language its name and description come from.
 const PLAY = { 'en-US': 'en-US', 'de-DE': 'de-DE', 'fr-FR': 'fr-FR', 'es-ES': 'es-ES', 'it-IT': 'it', 'nl-NL': 'nl-NL', 'pt-BR': 'pt-BR' };
 const PLAY_MAX = { title: 30, short_description: 80, full_description: 4000 };
@@ -28,7 +29,14 @@ for (const key of Object.keys(apple)) {
 for (const lang of APPLE) {
   const text = info[lang];
   if (!text) { fail(`apple ${lang}: missing`); continue; }
-  if (text.screenshots) fail(`apple ${lang}: screenshots must not be listed`);
+  // Only the finished iPhone pictures, never what metadata:pull downloads.
+  for (const [type, files] of Object.entries(text.screenshots ?? {})) {
+    if (type !== 'APP_IPHONE_67') fail(`apple ${lang}: screenshots ${type} not expected`);
+    for (const file of files) {
+      if (!file.startsWith(SHOTS)) fail(`apple ${lang}: screenshot ${file} is not under ${SHOTS}`);
+      else if (!fs.existsSync(`${__dirname}/../${file}`)) fail(`apple ${lang}: screenshot ${file} is missing`);
+    }
+  }
   for (const [field, max] of Object.entries(APPLE_MAX)) {
     const value = text[field] ?? '';
     if (!value.trim()) fail(`apple ${lang}: empty ${field}`);

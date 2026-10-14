@@ -33,8 +33,10 @@ Only on Brynne's say-so, every time.
   and Spanish (Mexico), which must repeat the English and Spanish text. It
   replaces the text once typed into App Store Connect by hand. Before a release,
   write the new What's New in every language, then run
-  `npx eas-cli metadata:push` in `app/`. It changes text only: the file lists
-  no screenshots and no review contact (the repo is public). A push never
+  `npx eas-cli metadata:push` in `app/`. It sends the text and the six iPhone
+  pictures per language from `design/store-screenshots/final/apple/`, and
+  replaces the pictures on the store. The file lists no review contact (the
+  repo is public). A push never
   removes a language; that is done by hand in App Store Connect.
   Apple refuses the push while a version waits for review. After editing text
   in App Store Connect by hand, copy it back into the file;
