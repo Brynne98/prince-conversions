@@ -3,9 +3,12 @@ import {
   View, Text, Pressable, ScrollView, StyleSheet, Linking,
 } from 'react-native';
 import Constants from 'expo-constants';
+import * as Updates from 'expo-updates';
 import { FONT, LABEL, useTheme, useStyles } from '../theme';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
+// Short ID of the over-the-air update running, if any.
+const UPDATE_ID = !Updates.isEmbeddedLaunch && Updates.updateId ? Updates.updateId.slice(0, 8) : null;
 const SITE_URL = 'https://brynne98.github.io/prince-conversions';
 import { Toggle, Sheet, SheetHeader, AppBar } from '../primitives';
 import { Chevron } from '../icons';
@@ -109,7 +112,7 @@ export default function SettingsSheet({
             onPress={() => Linking.openURL(`${SITE_URL}/terms`)}
           />
 
-          <Row label={t('settings.about')} detail={`v${APP_VERSION}`} isLast />
+          <Row label={t('settings.about')} detail={UPDATE_ID ? `v${APP_VERSION} · ${UPDATE_ID}` : `v${APP_VERSION}`} isLast />
         </View>
 
         <View style={{ paddingHorizontal: M3 ? 16 : 20, marginTop: 20 }}>
