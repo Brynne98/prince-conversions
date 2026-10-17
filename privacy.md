@@ -4,7 +4,7 @@ title: Privacy Policy — Air Fryer Converter
 
 # Privacy Policy
 
-_Last updated: 12 October 2026_
+_Last updated: 17 October 2026_
 
 This privacy policy applies to the **Air Fryer Converter** app (the
 "App") on both iOS and Android. It is published on the Apple App Store
@@ -30,11 +30,16 @@ analytics preference locally on your device using the operating system's
 standard storage. Recipe names, notes, temperatures, and other recipe
 content are not included in product analytics.
 
+Cooking timer alerts are scheduled by your phone's own notification
+system. They are made and shown on the device, and nothing about them
+is sent to us or to any third party. You can turn them off in your
+phone's notification settings.
+
 ## Data collected by third-party services
 
 The App uses third-party services for anonymous product analytics,
-advertising, and processing the optional in-app purchase that removes
-ads.
+advertising, processing the optional in-app purchase that removes ads,
+and delivering app updates.
 
 ### PostHog (product analytics)
 
@@ -100,6 +105,17 @@ information you typed into the App.
 RevenueCat's full privacy policy:
 https://www.revenuecat.com/privacy
 
+### Expo (app updates)
+
+When the App starts, it asks Expo's update service whether a newer
+version of the App's code is available, and downloads it if so. To
+answer, Expo receives your IP address, your device platform and OS
+version, and the App's version and update ID. Expo does not receive
+your recipes, settings or any information you typed into the App.
+
+Expo's privacy policy:
+https://expo.dev/privacy
+
 ### Apple and Google payments
 
 When you make an in-app purchase, Apple (on iOS) or Google Play (on
@@ -121,19 +137,21 @@ Where the law asks for a legal reason, these are ours:
   features are used. You can switch it off in Settings.
 - **The Remove Ads purchase** — to carry out the purchase you asked for
   and to restore it later.
+- **App updates** — our legitimate interest in keeping the App working
+  and fixing faults quickly.
 
 ## How long data is kept
 
 We do not keep our own copy of any of this data. Data on your device
 stays there until you delete it or remove the App. Data held by PostHog,
-Google and RevenueCat is kept only for as long as each service needs it
+Google, RevenueCat and Expo is kept only for as long as each service needs it
 for the purposes above, under that service's own retention rules, which
 are described in the policies linked above.
 
 ## Where data is processed
 
-PostHog stores analytics on servers in the European Union. Google and
-RevenueCat may process data in the United States and other countries.
+PostHog stores analytics on servers in the European Union. Google,
+RevenueCat and Expo may process data in the United States and other countries.
 Where data leaves the European Economic Area, the United Kingdom or
 South Africa, those services rely on the safeguards described in their
 own policies, such as standard contractual clauses.
@@ -179,13 +197,15 @@ You have the right to:
   Because product analytics is not linked to your name or email address,
   we may not be able to identify a particular anonymous installation
   from your contact details alone.
-- Opt out of personalized advertising at any time, via the tracking
-  setting in iOS or the advertising ID setting in Android.
+- Opt out of personalized advertising at any time, via **Ad privacy
+  options** in the App's Settings (shown where it applies), the tracking
+  setting in iOS, or the advertising ID setting in Android.
 - Ask what data is held about you, ask for it to be corrected, and
   object to or withdraw consent for any of the uses above.
 - Complain to the data protection authority where you live, for example
   your national authority in the EU, the Information Commissioner's
-  Office in the UK, or the Information Regulator in South Africa.
+  Office in the UK, the National Data Protection Authority (ANPD) in
+  Brazil, or the Information Regulator in South Africa.
 
 ## Changes to this policy
 
