@@ -4,6 +4,8 @@
     "slug": "prince-conversions",
     "scheme": "princeconversions",
     "version": "1.5.0",
+    "runtimeVersion": { "policy": "appVersion" },
+    "updates": { "url": "https://u.expo.dev/ad23e342-6da3-4d83-b69e-5d1ca2af6400" },
     "orientation": "portrait",
     "platforms": ["ios", "android"],
     "icon": "./assets/icon.png",
