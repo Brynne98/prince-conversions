@@ -37,14 +37,16 @@ reached a safe internal temperature. Timers and reminders are a
 convenience; do not leave cooking appliances unattended because of
 them. Always follow the instructions that came with your appliance.
 
-## Ads and the Remove Ads purchase
+## Ads and the Pro purchase
 
-The App is free and shows ads. Where it is offered, a one-time purchase
-removes ads and unlocks the features listed on the Pro screen. Payment
+The App is free and shows ads. Where it is offered, **Air Fryer Pro**
+is a one-time purchase that removes ads. The converter and timers stay
+free with or without it. Payment
 is handled by Apple or Google through your store account, and their
 terms apply to the purchase. Refunds are handled by the store you bought
 from, under its refund policy. You can restore a purchase on the same
-store account at any time from the App's Settings.
+store account at any time with **Restore purchases** on the Pro
+screen (Settings → Get Pro).
 
 If you live in the EU, the UK or another country that gives a right to
 cancel online purchases, the purchase unlocks Pro straight away. By
