@@ -4,7 +4,7 @@ title: Terms of Use — Air Fryer Converter
 
 # Terms of Use
 
-_Last updated: 12 October 2026_
+_Last updated: 17 October 2026_
 
 These terms apply to the **Air Fryer Converter** app (the "App"),
 published on the Apple App Store and on Google Play as "Oven to Air
@@ -20,6 +20,9 @@ reverse engineer it, except where the law says you may.
 On iOS, Apple's Licensed Application End User License Agreement also
 applies:
 https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+On Android, the Google Play Terms of Service also apply:
+https://play.google.com/about/play-terms/
 
 ## Cooking times are estimates
 
@@ -42,6 +45,12 @@ is handled by Apple or Google through your store account, and their
 terms apply to the purchase. Refunds are handled by the store you bought
 from, under its refund policy. You can restore a purchase on the same
 store account at any time from the App's Settings.
+
+If you live in the EU, the UK or another country that gives a right to
+cancel online purchases, the purchase unlocks Pro straight away. By
+buying, you ask for it to start at once and accept that the right to
+cancel ends when Pro is unlocked. This does not affect the store's own
+refund policy, or your rights if the purchase does not work.
 
 ## Privacy
 
