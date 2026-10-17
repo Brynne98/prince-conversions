@@ -51,6 +51,11 @@ events to PostHog's EU-hosted service. These events include:
 - Counts such as the number of saved recipes or active timers.
 - Coarse timer-duration ranges rather than exact cooking values.
 - Ad impressions and revenue, paywall views, and purchase outcomes.
+- Device model, operating system, language and screen size, which
+  PostHog's SDK adds to each event.
+
+PostHog also receives your IP address with each request, as any web
+service does. Looking up your location from it is turned off.
 
 PostHog assigns a random identifier to an installation so that we can
 measure return usage. We do not send your name, email address, recipe
@@ -80,15 +85,18 @@ The App displays banner ads via Google AdMob. AdMob may collect:
 
 If you decline tracking on iOS, delete your advertising ID on Android,
 or decline personalized ads in the consent message shown where the law
-requires one, AdMob will continue to serve **non-personalized** ads,
-which use only contextual signals and do not link to your identity.
+requires one, AdMob shows **non-personalized** ads, chosen from things
+like the screen they appear on and your approximate location. If you
+decline all choices in that consent message, the App may show no ads
+at all.
 
 Google's full privacy policy:
 https://policies.google.com/privacy
 
 ### RevenueCat (in-app purchase processing)
 
-Where the in-app purchase is offered, tapping **Remove Ads** uses
+Where the in-app purchase is offered, buying **Air Fryer Pro** (the
+one-time purchase that removes ads, from **Get Pro** in Settings) uses
 RevenueCat to validate the purchase receipt with Apple's or Google's
 servers and to remember your purchase across reinstalls. RevenueCat may
 collect:
@@ -97,6 +105,9 @@ collect:
   SDK on first launch.
 - **Purchase history** for the App (which products you've bought,
   when, and the price).
+- **The store receipt** for the purchase, which it checks with Apple
+  or Google.
+- **Your IP address**, which it receives with each request.
 - **Device platform and OS version** for analytics.
 
 RevenueCat does not receive your name, email address, or any
@@ -129,13 +140,16 @@ https://policies.google.com/privacy
 
 Where the law asks for a legal reason, these are ours:
 
-- **Personalized ads** — your consent, given in the consent message or
-  the tracking prompt. You can withdraw it at any time.
+- **Personalized ads** — where the law requires consent (such as in the
+  EEA, the UK and Switzerland, and on iOS everywhere), your consent,
+  given in the consent message or the tracking prompt. You can withdraw
+  it at any time. Elsewhere, our legitimate interest in funding a free
+  App; you can opt out at any time as described below.
 - **Non-personalized ads and ad measurement** — our legitimate interest
   in funding a free App.
 - **Product analytics** — our legitimate interest in understanding which
   features are used. You can switch it off in Settings.
-- **The Remove Ads purchase** — to carry out the purchase you asked for
+- **The Pro purchase** — to carry out the purchase you asked for
   and to restore it later.
 - **App updates** — our legitimate interest in keeping the App working
   and fixing faults quickly.
@@ -177,7 +191,7 @@ reset or delete it at any time in Android **Settings → Privacy → Ads**
 (the exact path varies by device).
 
 On either platform, declining does not disable any feature of the App;
-it only switches AdMob from personalized to non-personalized ads.
+it only stops AdMob from personalizing the ads you see.
 
 ## Children
 
